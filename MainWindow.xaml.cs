@@ -1,7 +1,9 @@
 ﻿using Npgsql;
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 
@@ -13,6 +15,24 @@ namespace StoryTracker
         private Story? _selectedStory;  // Use nullable type to handle the case when no story is selected
         private DispatcherTimer _autoSaveTimer; // Timer for auto-saving
         private List<Story> _allStories = new List<Story>(); // Store all stories to allow filtering
+
+        public static readonly DependencyProperty AppFontSizeProperty =
+        DependencyProperty.Register(nameof(AppFontSize), typeof(double), typeof(MainWindow), new PropertyMetadata(14.0));
+
+        public double AppFontSize
+        {
+            get { return (double)GetValue(AppFontSizeProperty); }
+            set { SetValue(AppFontSizeProperty, value); }
+        }
+
+        public static readonly DependencyProperty AppFontFamilyProperty =
+            DependencyProperty.Register(nameof(AppFontFamily), typeof(FontFamily), typeof(MainWindow), new PropertyMetadata(new FontFamily("Segoe UI")));
+
+        public FontFamily AppFontFamily
+        {
+            get { return (FontFamily)GetValue(AppFontFamilyProperty); }
+            set { SetValue(AppFontFamilyProperty, value); }
+        }
 
         public MainWindow(string connectionString)
         {
@@ -137,7 +157,7 @@ namespace StoryTracker
                 return;
             }
 
-            if (MessageBox.Show("Are you sure you want to permanently delete this story?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"Are you sure you want to permanently delete '{_selectedStory.Title}'?", "Confirm Delete", MessageBoxButton.YesNo) == MessageBoxResult.Yes)           
             {
                 try
                 {
@@ -171,7 +191,7 @@ namespace StoryTracker
                 Title = TitleTextBox.Text,
                 StoryType = StoryTypeTextBox.Text,
                 Genre = GenreTextBox.Text,
-                Status = StoryStatusTextBox.Text, // <-- UPDATED NAME
+                Status = StoryStatusTextBox.Text,
                 StoryText = StoryTextBox.Text,
                 WordCount = StoryTextBox.Text.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length
             };
@@ -183,23 +203,29 @@ namespace StoryTracker
                 string sql;
                 if (storyToSave.Id == 0) // New story
                 {
-                    // Add LastUpdated to the INSERT statement
                     sql = "INSERT INTO Stories (Title, StoryType, Genre, Status, WordCount, StoryText, LastUpdated) VALUES (@title, @storyType, @genre, @status, @wordCount, @storyText, @lastUpdated)";
                 }
                 else // Existing story
                 {
-                    // Add LastUpdated to the UPDATE statement
                     sql = "UPDATE Stories SET Title = @title, StoryType = @storyType, Genre = @genre, Status = @status, WordCount = @wordCount, StoryText = @storyText, LastUpdated = @lastUpdated WHERE StoryID = @id";
                 }
 
                 using var command = new NpgsqlCommand(sql, connection);
-                // ... (all the other parameters stay the same) ...
+
+                // Add all the parameters for the story's data
+                command.Parameters.AddWithValue("title", storyToSave.Title);
+                command.Parameters.AddWithValue("storyType", storyToSave.StoryType);
+                command.Parameters.AddWithValue("genre", storyToSave.Genre);
                 command.Parameters.AddWithValue("status", storyToSave.Status);
                 command.Parameters.AddWithValue("wordCount", storyToSave.WordCount);
                 command.Parameters.AddWithValue("storyText", storyToSave.StoryText);
 
-                // Add this new parameter for the current time
-                command.Parameters.AddWithValue("lastUpdated", DateTime.UtcNow);
+                // This is the corrected block for the timestamp parameter
+                var lastUpdatedParam = command.CreateParameter();
+                lastUpdatedParam.ParameterName = "lastUpdated";
+                lastUpdatedParam.Value = DateTime.UtcNow;
+                lastUpdatedParam.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.TimestampTz;
+                command.Parameters.Add(lastUpdatedParam);
 
                 if (storyToSave.Id != 0)
                 {
@@ -294,6 +320,90 @@ namespace StoryTracker
         {
             // If the user clicks out and the box is empty, restore the placeholder
             SetPlaceholderText();
+        }
+
+        // This method handles the Exit menu item click event
+        private void ExitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
+        }
+
+        // This method handles the theme change menu item click event
+        private void ThemeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            if (menuItem == null || menuItem.Header == null) return;
+
+            string header = menuItem.Header.ToString().Replace("_", "");
+            string themeName;
+
+            // Special check for the original two themes
+            if (header == "Light Theme" || header == "Dark Theme")
+            {
+                themeName = header.Replace(" ", "") + ".xaml";
+            }
+            else
+            {
+                // Logic for all other themes
+                themeName = header.Replace("/", "").Replace(" ", "") + "Theme.xaml";
+            }
+
+            try
+            {
+                Application.Current.Resources.MergedDictionaries.Clear();
+                Application.Current.Resources.MergedDictionaries.Add(
+                    new ResourceDictionary { Source = new Uri($"Themes/{themeName}", UriKind.Relative) });
+
+                // This line needs to be inside the try block
+                File.WriteAllText("theme.settings", themeName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Could not load theme: {themeName}\n{ex.Message}");
+            }
+        }
+
+        // This method handles the About menu item click event
+        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var aboutWindow = new AboutWindow();
+            aboutWindow.ShowDialog();
+        }
+
+        // This method handles the Font Size and Font Family menu item clicks
+        private void FontSizeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && double.TryParse(menuItem.Header.ToString(), out double newSize))
+            {
+                // Set the global font size property
+                AppFontSize = newSize;
+            }
+        }
+
+        private void FontFamilyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem)
+            {
+                // Set the global font family property
+                AppFontFamily = new FontFamily(menuItem.Header.ToString());
+            }
+        }
+
+        // This method handles the font size and family changes in the editor
+        private void EditorFontSizeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem && double.TryParse(menuItem.Header.ToString(), out double newSize))
+            {
+                StoryTextBox.FontSize = newSize;
+            }
+        }
+
+        private void EditorFontFamilyMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuItem menuItem)
+            {
+                StoryTextBox.FontFamily = new System.Windows.Media.FontFamily(menuItem.Header.ToString());
+            }
         }
     }
 }

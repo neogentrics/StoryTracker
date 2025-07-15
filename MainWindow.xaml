@@ -4,14 +4,60 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StoryTracker"
-        mc:Ignorable="d"
-        Background="#FF2D2D30" Foreground="White"
+        mc:Ignorable="d"        
+        Background="{DynamicResource BackgroundColor}" Foreground="{DynamicResource ForegroundColor}"
+        FontSize="{Binding AppFontSize, RelativeSource={RelativeSource Self}}"
+        FontFamily="{Binding AppFontFamily, RelativeSource={RelativeSource Self}}"
         Title="Story Tracker" Height="650" Width="1000">
     
 
     <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Exit" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Settings">
+                <MenuItem Header="_Themes">
+                    <MenuItem Header="_Light Theme" Click="ThemeMenuItem_Click"/>
+                    <MenuItem Header="_Dark Theme" Click="ThemeMenuItem_Click"/>
+                    <Separator/>
+                    <MenuItem Header="_High Contrast" Click="ThemeMenuItem_Click"/>
+                    <MenuItem Header="_Blue/Orange" Click="ThemeMenuItem_Click"/>
+                    <Separator/>
+                    <MenuItem Header="_Sepia" Click="ThemeMenuItem_Click"/>
+                    <MenuItem Header="_Plum" Click="ThemeMenuItem_Click"/>
+                    <MenuItem Header="_Evergreen" Click="ThemeMenuItem_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Font">
+                    <MenuItem Header="Font Size">
+                        <MenuItem Header="12" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="14" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="16" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="18" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="22" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="28" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="36" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="48" Click="FontSizeMenuItem_Click"/>
+                        <MenuItem Header="72" Click="FontSizeMenuItem_Click"/>
+                    </MenuItem>
+                    <MenuItem Header="Font Family">
+                        <MenuItem Header="Segoe UI" Click="FontFamilyMenuItem_Click"/>
+                        <MenuItem Header="Arial" Click="FontFamilyMenuItem_Click"/>
+                        <MenuItem Header="Times New Roman" Click="FontFamilyMenuItem_Click"/>
+                        <MenuItem Header="Courier New" Click="FontFamilyMenuItem_Click"/>
+                        <MenuItem Header="Georgia" Click="FontFamilyMenuItem_Click"/>
+                        <MenuItem Header="Century Gothic" Click="FontFamilyMenuItem_Click"/>
+                    </MenuItem>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" Click="AboutMenuItem_Click"/>
+            </MenuItem>
+        </Menu>
 
-        <StatusBar DockPanel.Dock="Bottom">
+        <StatusBar DockPanel.Dock="Bottom" 
+           Background="{DynamicResource BackgroundColor}" 
+           Foreground="{DynamicResource ForegroundColor}">
             <StatusBarItem>
                 <TextBlock Name="AppStatusTextBlock" Text="Ready"/>
             </StatusBarItem>
@@ -74,6 +120,35 @@
                     <TextBlock Name="WordCountTextBlock" Text="--"/>
 
                     <TextBlock Text="Story Text:" FontWeight="Bold" Margin="0,10,0,0"/>
+                    <Menu Margin="0,0,0,5">
+                        <MenuItem Header="_Editor Font Size">
+                            <MenuItem Header="8" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="9" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="10" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="11" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="12" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="14" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="16" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="18" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="20" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="24" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="28" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="36" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="48" Click="EditorFontSizeMenuItem_Click"/>
+                            <MenuItem Header="72" Click="EditorFontSizeMenuItem_Click"/>
+                        </MenuItem>
+                        <MenuItem Header="_Editor Font Family">
+                            <MenuItem Header="Arial" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Calibri" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Cambria" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Century Gothic" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Courier New" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Georgia" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Segoe UI" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Times New Roman" Click="EditorFontFamilyMenuItem_Click"/>
+                            <MenuItem Header="Verdana" Click="EditorFontFamilyMenuItem_Click"/>
+                        </MenuItem>
+                    </Menu>
                     <TextBox Name="StoryTextBox" Height="300" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
 
                     <Button Name="SaveButton" Content="Save Changes" Margin="0,10,0,0" Click="SaveButton_Click"/>

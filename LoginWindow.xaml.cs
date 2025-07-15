@@ -24,24 +24,43 @@ namespace StoryTracker
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            // ... (The 'if (SaveCheckBox.IsChecked == true)' block stays the same) ...
+            // If the "Save" checkbox is checked, save the connection details.
+            if (SaveCheckBox.IsChecked == true)
+            {
+                var connInfo = new ConnectionInfo
+                {
+                    Name = $"{UserTextBox.Text}@{HostTextBox.Text}",
+                    Host = HostTextBox.Text,
+                    Database = DatabaseTextBox.Text,
+                    User = UserTextBox.Text
+                };
+                _connections.RemoveAll(c => c.Name == connInfo.Name);
+                _connections.Add(connInfo);
+                SaveConnections();
+                LoadConnections(); // Refresh the list
+                SavedConnectionsComboBox.SelectedItem = connInfo;
+            }
 
+            // Build the connection string from the text fields.
             var connectionString = $"Host={HostTextBox.Text};Database={DatabaseTextBox.Text};Username={UserTextBox.Text};Password={PasswordBox.Password}";
 
-            LoginStatusTextBlock.Text = "Attempting to connect..."; // <-- ADD THIS
+            LoginStatusTextBlock.Text = "Attempting to connect...";
 
             try
             {
+                // Attempt to connect to the database.
                 using var connection = new NpgsqlConnection(connectionString);
                 connection.Open();
 
+                // If successful, open the main window and close this one.
                 var mainWindow = new MainWindow(connectionString);
                 mainWindow.Show();
                 this.Close();
             }
             catch (Exception ex)
             {
-                LoginStatusTextBlock.Text = "Connection failed."; // <-- ADD THIS
+                // If it fails, update the status and show an error message.
+                LoginStatusTextBlock.Text = "Connection failed.";
                 MessageBox.Show($"Failed to connect: {ex.Message}", "Connection Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }

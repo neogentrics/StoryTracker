@@ -1,13 +1,15 @@
 ﻿<Window x:Class="StoryTracker.LoginWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Background="#FF2D2D30" Foreground="White"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"   
+        Background="{DynamicResource BackgroundColor}" Foreground="{DynamicResource ForegroundColor}"
         Title="Database Connection" Height="400" Width="400"
         WindowStartupLocation="CenterScreen">
 
     <DockPanel Margin="15">
 
-        <StatusBar DockPanel.Dock="Bottom" Background="#FF2D2D30">
+        <StatusBar DockPanel.Dock="Bottom" 
+           Background="{DynamicResource BackgroundColor}" 
+           Foreground="{DynamicResource ForegroundColor}">
             <StatusBarItem>
                 <TextBlock Name="LoginStatusTextBlock" Text="Ready"/>
             </StatusBarItem>
