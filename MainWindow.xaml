@@ -25,6 +25,14 @@
             </Grid.ColumnDefinitions>
 
             <DockPanel Grid.Column="0" Margin="5">
+
+                <TextBox Name="SearchTextBox" 
+                         DockPanel.Dock="Top" 
+                         Margin="0,0,0,5"
+                         TextChanged="SearchTextBox_TextChanged"
+                         GotFocus="SearchTextBox_GotFocus"
+                         LostFocus="SearchTextBox_LostFocus"/>
+
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Name="AddButton" Margin="5" Padding="5" Click="AddButton_Click">
                         <StackPanel Orientation="Horizontal">
@@ -39,9 +47,11 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
+                
                 <ListBox Name="StoryListBox"
                          SelectionChanged="StoryListBox_SelectionChanged"
                          DisplayMemberPath="Title"/>
+                
             </DockPanel>
 
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightGray"/>
