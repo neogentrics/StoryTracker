@@ -5,9 +5,29 @@
              StartupUri="LoginWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+
+            <Style TargetType="MenuItem">
+                <Style.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.ControlDarkBrushKey}" Color="Transparent"/>
+                </Style.Resources>
+
+                <Setter Property="Background" Value="{DynamicResource BackgroundColor}"/>
+                <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="BorderBrush" Value="{DynamicResource BackgroundColor}"/>
+
+                <Style.Triggers>
+                    <Trigger Property="IsHighlighted" Value="True">
+                        <Setter Property="Background" Value="{DynamicResource BorderColor}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource BackgroundColor}"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Themes/DarkTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

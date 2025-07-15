@@ -8,11 +8,11 @@
         Background="{DynamicResource BackgroundColor}" Foreground="{DynamicResource ForegroundColor}"
         FontSize="{Binding AppFontSize, RelativeSource={RelativeSource Self}}"
         FontFamily="{Binding AppFontFamily, RelativeSource={RelativeSource Self}}"
-        Title="Story Tracker" Height="650" Width="1000">
+        Title="Story Tracker" Height="900" Width="1500">
     
 
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
+        <Menu DockPanel.Dock="Top" HorizontalAlignment="Left">
             <MenuItem Header="_File">
                 <MenuItem Header="_Exit" Click="ExitMenuItem_Click"/>
             </MenuItem>
@@ -65,7 +65,7 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300" MinWidth="150"/>
+                <ColumnDefinition Width="400" MinWidth="150"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
@@ -120,7 +120,10 @@
                     <TextBlock Name="WordCountTextBlock" Text="--"/>
 
                     <TextBlock Text="Story Text:" FontWeight="Bold" Margin="0,10,0,0"/>
-                    <Menu Margin="0,0,0,5">
+                    <Menu Margin="0,10,0,15"
+                              HorizontalAlignment="Left"
+                              Background="{DynamicResource ButtonBackgroundColor}"
+                              Foreground="{DynamicResource ForegroundColor}">
                         <MenuItem Header="_Editor Font Size">
                             <MenuItem Header="8" Click="EditorFontSizeMenuItem_Click"/>
                             <MenuItem Header="9" Click="EditorFontSizeMenuItem_Click"/>
@@ -147,6 +150,13 @@
                             <MenuItem Header="Segoe UI" Click="EditorFontFamilyMenuItem_Click"/>
                             <MenuItem Header="Times New Roman" Click="EditorFontFamilyMenuItem_Click"/>
                             <MenuItem Header="Verdana" Click="EditorFontFamilyMenuItem_Click"/>
+                        </MenuItem>
+                        <MenuItem Header="_Text Color">
+                            <MenuItem Header="Black" Tag="Black" Foreground="Black" Click="EditorTextColorMenuItem_Click"/>
+                            <MenuItem Header="White" Tag="White" Foreground="White" Click="EditorTextColorMenuItem_Click"/>
+                            <MenuItem Header="Red" Tag="Red" Foreground="Red" Click="EditorTextColorMenuItem_Click"/>
+                            <MenuItem Header="Blue" Tag="Blue" Foreground="Blue" Click="EditorTextColorMenuItem_Click"/>
+                            <MenuItem Header="Green" Tag="Green" Foreground="Green" Click="EditorTextColorMenuItem_Click"/>
                         </MenuItem>
                     </Menu>
                     <TextBox Name="StoryTextBox" Height="300" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
