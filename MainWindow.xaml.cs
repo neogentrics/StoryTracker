@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 
@@ -6,17 +7,19 @@ namespace StoryTracker
 {
     public partial class MainWindow : Window
     {
-        private readonly string _connectionString = "Host=104.181.3.1;Username=fighttoby;Password=Mudpuppy@2025!;Database=recontowersdb";
-        private Story? _selectedStory; // To keep track of the currently selected story
+        private readonly string _connectionString;
+        private Story? _selectedStory;
 
-        public MainWindow()
+        public MainWindow(string connectionString)
         {
             InitializeComponent();
+            _connectionString = connectionString;
             LoadStories();
         }
 
         private void LoadStories()
         {
+            // ... (This method is correct and needs no changes)
             var stories = new List<Story>();
             try
             {
@@ -41,7 +44,7 @@ namespace StoryTracker
                 ClearForm();
                 return;
             }
-            _selectedStory = new Story { Id = selected.Id }; // Store the selected ID
+            _selectedStory = new Story { Id = selected.Id };
 
             try
             {
@@ -56,9 +59,11 @@ namespace StoryTracker
                     TitleTextBox.Text = reader.GetString(0);
                     StoryTypeTextBox.Text = reader.IsDBNull(1) ? "" : reader.GetString(1);
                     GenreTextBox.Text = reader.IsDBNull(2) ? "" : reader.GetString(2);
-                    StatusTextBox.Text = reader.IsDBNull(3) ? "" : reader.GetString(3);
+                    StoryStatusTextBox.Text = reader.IsDBNull(3) ? "" : reader.GetString(3); // <-- UPDATED NAME
                     WordCountTextBlock.Text = reader.GetInt32(4).ToString();
                     StoryTextBox.Text = reader.IsDBNull(5) ? "" : reader.GetString(5);
+
+                    AppStatusTextBlock.Text = $"Selected '{TitleTextBox.Text}'."; // <-- ADDED
                 }
             }
             catch (NpgsqlException ex) { MessageBox.Show($"Database error: {ex.Message}"); }
@@ -68,6 +73,7 @@ namespace StoryTracker
         {
             ClearForm();
             TitleTextBox.Focus();
+            AppStatusTextBlock.Text = "Ready to create a new story."; // <-- ADDED
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
@@ -89,8 +95,9 @@ namespace StoryTracker
                     command.Parameters.AddWithValue("id", _selectedStory.Id);
                     command.ExecuteNonQuery();
 
-                    LoadStories(); // Refresh the list
+                    LoadStories();
                     ClearForm();
+                    AppStatusTextBlock.Text = "Story successfully deleted."; // <-- ADDED
                 }
                 catch (NpgsqlException ex) { MessageBox.Show($"Database error: {ex.Message}"); }
             }
@@ -106,11 +113,11 @@ namespace StoryTracker
 
             var storyToSave = new Story
             {
-                Id = _selectedStory?.Id ?? 0, // Use existing ID or 0 for new story
+                Id = _selectedStory?.Id ?? 0,
                 Title = TitleTextBox.Text,
                 StoryType = StoryTypeTextBox.Text,
                 Genre = GenreTextBox.Text,
-                Status = StatusTextBox.Text,
+                Status = StoryStatusTextBox.Text, // <-- UPDATED NAME
                 StoryText = StoryTextBox.Text,
                 WordCount = StoryTextBox.Text.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length
             };
@@ -120,11 +127,11 @@ namespace StoryTracker
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
                 string sql;
-                if (storyToSave.Id == 0) // This is a new story
+                if (storyToSave.Id == 0)
                 {
                     sql = "INSERT INTO Stories (Title, StoryType, Genre, Status, WordCount, StoryText) VALUES (@title, @storyType, @genre, @status, @wordCount, @storyText)";
                 }
-                else // This is an existing story
+                else
                 {
                     sql = "UPDATE Stories SET Title = @title, StoryType = @storyType, Genre = @genre, Status = @status, WordCount = @wordCount, StoryText = @storyText WHERE StoryID = @id";
                 }
@@ -142,8 +149,9 @@ namespace StoryTracker
                 }
 
                 command.ExecuteNonQuery();
+                AppStatusTextBlock.Text = $"Story '{storyToSave.Title}' saved successfully."; // <-- ADDED
+                LoadStories();
                 MessageBox.Show("Saved successfully!");
-                LoadStories(); // Refresh list to show changes
             }
             catch (NpgsqlException ex) { MessageBox.Show($"Database error: {ex.Message}"); }
         }
@@ -155,9 +163,10 @@ namespace StoryTracker
             TitleTextBox.Text = "";
             StoryTypeTextBox.Text = "";
             GenreTextBox.Text = "";
-            StatusTextBox.Text = "";
+            StoryStatusTextBox.Text = ""; // <-- UPDATED NAME
             WordCountTextBlock.Text = "--";
             StoryTextBox.Text = "";
+            AppStatusTextBlock.Text = "Ready."; // <-- ADDED
         }
     }
 }

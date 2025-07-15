@@ -5,48 +5,70 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StoryTracker"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250" MinWidth="150"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        Background="#FF2D2D30" Foreground="White"
+        Title="Story Tracker" Height="650" Width="1000">
+    
 
-        <DockPanel Grid.Column="0" Margin="5">
-            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
-                <Button Name="AddButton" Content="Add New" Margin="5" Click="AddButton_Click"/>
-                <Button Name="DeleteButton" Content="Delete Selected" Margin="5" Click="DeleteButton_Click"/>
-            </StackPanel>
-            <ListBox Name="StoryListBox"
-                 SelectionChanged="StoryListBox_SelectionChanged"
-                 DisplayMemberPath="Title"/>
-        </DockPanel>
+    <DockPanel>
 
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightGray"/>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Name="AppStatusTextBlock" Text="Ready"/>
+            </StatusBarItem>
+        </StatusBar>
 
-        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="10">
-                <TextBlock Text="Title:" FontWeight="Bold"/>
-                <TextBox Name="TitleTextBox"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" MinWidth="150"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-                <TextBlock Text="Story Type:" FontWeight="Bold" Margin="0,10,0,0"/>
-                <TextBox Name="StoryTypeTextBox"/>
+            <DockPanel Grid.Column="0" Margin="5">
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Name="AddButton" Margin="5" Padding="5" Click="AddButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE710;" VerticalAlignment="Center"/>
+                            <TextBlock Text="Add New" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="DeleteButton" Margin="5" Padding="5" Click="DeleteButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE74D;" VerticalAlignment="Center"/>
+                            <TextBlock Text="Delete" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <ListBox Name="StoryListBox"
+                         SelectionChanged="StoryListBox_SelectionChanged"
+                         DisplayMemberPath="Title"/>
+            </DockPanel>
 
-                <TextBlock Text="Genre:" FontWeight="Bold" Margin="0,10,0,0"/>
-                <TextBox Name="GenreTextBox"/>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightGray"/>
 
-                <TextBlock Text="Status:" FontWeight="Bold" Margin="0,10,0,0"/>
-                <TextBox Name="StatusTextBox"/>
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Title:" FontWeight="Bold"/>
+                    <TextBox Name="TitleTextBox"/>
 
-                <TextBlock Text="Word Count:" FontWeight="Bold" Margin="0,10,0,0"/>
-                <TextBlock Name="WordCountTextBlock" Text="--"/>
+                    <TextBlock Text="Story Type:" FontWeight="Bold" Margin="0,10,0,0"/>
+                    <TextBox Name="StoryTypeTextBox"/>
 
-                <TextBlock Text="Story Text:" FontWeight="Bold" Margin="0,10,0,0"/>
-                <TextBox Name="StoryTextBox" Height="300" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+                    <TextBlock Text="Genre:" FontWeight="Bold" Margin="0,10,0,0"/>
+                    <TextBox Name="GenreTextBox"/>
 
-                <Button Name="SaveButton" Content="Save Changes" Margin="0,10,0,0" Click="SaveButton_Click"/>
-            </StackPanel>
-        </ScrollViewer>
-    </Grid>
+                    <TextBlock Text="Status:" FontWeight="Bold" Margin="0,10,0,0"/>
+                    <TextBox Name="StoryStatusTextBox"/>
+
+                    <TextBlock Text="Word Count:" FontWeight="Bold" Margin="0,10,0,0"/>
+                    <TextBlock Name="WordCountTextBlock" Text="--"/>
+
+                    <TextBlock Text="Story Text:" FontWeight="Bold" Margin="0,10,0,0"/>
+                    <TextBox Name="StoryTextBox" Height="300" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+
+                    <Button Name="SaveButton" Content="Save Changes" Margin="0,10,0,0" Click="SaveButton_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
 </Window>
