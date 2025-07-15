@@ -8,9 +8,45 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="250" MinWidth="150"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <ListBox Grid.Column="0" Name="StoryListBox" Margin="5"/>
+
+        <DockPanel Grid.Column="0" Margin="5">
+            <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Name="AddButton" Content="Add New" Margin="5" Click="AddButton_Click"/>
+                <Button Name="DeleteButton" Content="Delete Selected" Margin="5" Click="DeleteButton_Click"/>
+            </StackPanel>
+            <ListBox Name="StoryListBox"
+                 SelectionChanged="StoryListBox_SelectionChanged"
+                 DisplayMemberPath="Title"/>
+        </DockPanel>
+
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightGray"/>
+
+        <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10">
+                <TextBlock Text="Title:" FontWeight="Bold"/>
+                <TextBox Name="TitleTextBox"/>
+
+                <TextBlock Text="Story Type:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Name="StoryTypeTextBox"/>
+
+                <TextBlock Text="Genre:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Name="GenreTextBox"/>
+
+                <TextBlock Text="Status:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Name="StatusTextBox"/>
+
+                <TextBlock Text="Word Count:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBlock Name="WordCountTextBlock" Text="--"/>
+
+                <TextBlock Text="Story Text:" FontWeight="Bold" Margin="0,10,0,0"/>
+                <TextBox Name="StoryTextBox" Height="300" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
+
+                <Button Name="SaveButton" Content="Save Changes" Margin="0,10,0,0" Click="SaveButton_Click"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>
