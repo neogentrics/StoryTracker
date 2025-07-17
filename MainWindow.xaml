@@ -65,105 +65,179 @@
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400" MinWidth="150"/>
+                <!-- Column 0 for the stories list -->
+                <ColumnDefinition Width="220" MinWidth="150"/>
                 <ColumnDefinition Width="Auto"/>
+                <!-- Column 1 for the chapters list -->
+                <ColumnDefinition Width="220" MinWidth="150"/>
+                <ColumnDefinition Width="Auto"/>
+                <!-- Column 2 for the details and editor -->
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
+            <!-- ===================================== -->
+            <!--           COLUMN 0: STORIES           -->
+            <!-- ===================================== -->
             <DockPanel Grid.Column="0" Margin="5">
-
                 <TextBox Name="SearchTextBox" 
-                         DockPanel.Dock="Top" 
-                         Margin="0,0,0,5"
-                         TextChanged="SearchTextBox_TextChanged"
-                         GotFocus="SearchTextBox_GotFocus"
-                         LostFocus="SearchTextBox_LostFocus"/>
-
+                 DockPanel.Dock="Top" 
+                 Margin="0,0,0,5"
+                 TextChanged="SearchTextBox_TextChanged"
+                 GotFocus="SearchTextBox_GotFocus"
+                 LostFocus="SearchTextBox_LostFocus"/>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Name="AddButton" Margin="5" Padding="5" Click="AddButton_Click">
+                    <Button Name="AddStoryButton" Margin="5" Padding="5" Click="AddStoryButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE710;" VerticalAlignment="Center"/>
-                            <TextBlock Text="Add New" Margin="5,0,0,0"/>
+                            <TextBlock Text="Add Story" Margin="5,0,0,0"/>
                         </StackPanel>
                     </Button>
-                    <Button Name="DeleteButton" Margin="5" Padding="5" Click="DeleteButton_Click">
+                    <Button Name="DeleteStoryButton" Margin="5" Padding="5" Click="DeleteStoryButton_Click">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE74D;" VerticalAlignment="Center"/>
                             <TextBlock Text="Delete" Margin="5,0,0,0"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                
                 <ListBox Name="StoryListBox"
-                         SelectionChanged="StoryListBox_SelectionChanged"
-                         DisplayMemberPath="Title"/>
-                
+                 SelectionChanged="StoryListBox_SelectionChanged"
+                 DisplayMemberPath="Title"/>
             </DockPanel>
 
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="LightGray"/>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderColor}"/>
 
-            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
-                <StackPanel Margin="10">
-                    <TextBlock Text="Title:" FontWeight="Bold"/>
-                    <TextBox Name="TitleTextBox"/>
-
-                    <TextBlock Text="Story Type:" FontWeight="Bold" Margin="0,10,0,0"/>
-                    <TextBox Name="StoryTypeTextBox"/>
-
-                    <TextBlock Text="Genre:" FontWeight="Bold" Margin="0,10,0,0"/>
-                    <TextBox Name="GenreTextBox"/>
-
-                    <TextBlock Text="Status:" FontWeight="Bold" Margin="0,10,0,0"/>
-                    <TextBox Name="StoryStatusTextBox"/>
-
-                    <TextBlock Text="Word Count:" FontWeight="Bold" Margin="0,10,0,0"/>
-                    <TextBlock Name="WordCountTextBlock" Text="--"/>
-
-                    <TextBlock Text="Story Text:" FontWeight="Bold" Margin="0,10,0,0"/>
-                    <Menu Margin="0,10,0,15"
-                              HorizontalAlignment="Left"
-                              Background="{DynamicResource ButtonBackgroundColor}"
-                              Foreground="{DynamicResource ForegroundColor}">
-                        <MenuItem Header="_Editor Font Size">
-                            <MenuItem Header="8" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="9" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="10" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="11" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="12" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="14" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="16" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="18" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="20" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="24" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="28" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="36" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="48" Click="EditorFontSizeMenuItem_Click"/>
-                            <MenuItem Header="72" Click="EditorFontSizeMenuItem_Click"/>
-                        </MenuItem>
-                        <MenuItem Header="_Editor Font Family">
-                            <MenuItem Header="Arial" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Calibri" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Cambria" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Century Gothic" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Courier New" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Georgia" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Segoe UI" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Times New Roman" Click="EditorFontFamilyMenuItem_Click"/>
-                            <MenuItem Header="Verdana" Click="EditorFontFamilyMenuItem_Click"/>
-                        </MenuItem>
-                        <MenuItem Header="_Text Color">
-                            <MenuItem Header="Black" Tag="Black" Foreground="Black" Click="EditorTextColorMenuItem_Click"/>
-                            <MenuItem Header="White" Tag="White" Foreground="White" Click="EditorTextColorMenuItem_Click"/>
-                            <MenuItem Header="Red" Tag="Red" Foreground="Red" Click="EditorTextColorMenuItem_Click"/>
-                            <MenuItem Header="Blue" Tag="Blue" Foreground="Blue" Click="EditorTextColorMenuItem_Click"/>
-                            <MenuItem Header="Green" Tag="Green" Foreground="Green" Click="EditorTextColorMenuItem_Click"/>
-                        </MenuItem>
-                    </Menu>
-                    <TextBox Name="StoryTextBox" Height="300" AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
-
-                    <Button Name="SaveButton" Content="Save Changes" Margin="0,10,0,0" Click="SaveButton_Click"/>
+            <!-- ===================================== -->
+            <!--          COLUMN 1: CHAPTERS           -->
+            <!-- ===================================== -->
+            <DockPanel Grid.Column="2" Margin="5">
+                <TextBlock DockPanel.Dock="Top" Text="Chapters" FontWeight="Bold" Margin="5,0"/>
+                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Name="AddChapterButton" Margin="5" Padding="5" Click="AddChapterButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE710;" VerticalAlignment="Center"/>
+                            <TextBlock Text="Add Chapter" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Name="DeleteChapterButton" Margin="5" Padding="5" Click="DeleteChapterButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE74D;" VerticalAlignment="Center"/>
+                            <TextBlock Text="Delete" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
-            </ScrollViewer>
+                <ListBox Name="ChapterListBox" 
+                 SelectionChanged="ChapterListBox_SelectionChanged"
+                 DisplayMemberPath="Title"/>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderColor}"/>
+
+            <!-- ===================================== -->
+            <!--      COLUMN 2: DETAILS & EDITOR       -->
+            <!-- ===================================== -->
+            <Grid Grid.Column="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <!-- Row for Story Properties -->
+                    <RowDefinition Height="*"/>
+                    <!-- Row for Chapter Editor -->
+                </Grid.RowDefinitions>
+
+                <!-- Story Properties GroupBox -->
+                <GroupBox Grid.Row="0" Header="Story Properties" Margin="5" Padding="5">
+                    <StackPanel>
+                        <TextBlock Text="Title:" FontWeight="Bold"/>
+                        <TextBox Name="StoryTitleTextBox"/>
+                        <TextBlock Text="Story Type:" FontWeight="Bold" Margin="0,5,0,0"/>
+                        <TextBox Name="StoryTypeTextBox"/>
+                        <TextBlock Text="Genre:" FontWeight="Bold" Margin="0,5,0,0"/>
+                        <TextBox Name="GenreTextBox"/>
+                        <TextBlock Text="Status:" FontWeight="Bold" Margin="0,5,0,0"/>
+                        <TextBox Name="StoryStatusTextBox"/>
+                        <Button Name="SaveStoryDetailsButton" Content="Save Story Details" Margin="0,10,0,0" Click="SaveStoryDetailsButton_Click"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Chapter Editor GroupBox -->
+                <GroupBox Grid.Row="1" Header="Chapter Editor" Margin="5" Padding="5">
+                    <DockPanel>
+                        <Button Name="SaveChapterButton" DockPanel.Dock="Bottom" Content="Save Chapter" Margin="0,5,0,0" Padding="5" Click="SaveChapterButton_Click"/>
+
+                        <StackPanel DockPanel.Dock="Top">
+
+                            <TextBlock Text="Chapter Title:" FontWeight="Bold"/>
+                            <TextBox Name="ChapterTitleTextBox" Margin="0,5,0,5"/>
+
+                            <ToolBarTray>
+                                <ToolBar>
+                                    <Button Command="EditingCommands.ToggleBold" ToolTip="Bold (Ctrl+B)">
+                                        <TextBlock FontWeight="Bold" FontSize="14">B</TextBlock>
+                                    </Button>
+                                    <Button Command="EditingCommands.ToggleItalic" ToolTip="Italic (Ctrl+I)">
+                                        <TextBlock FontStyle="Italic" FontSize="14">I</TextBlock>
+                                    </Button>
+                                    <Button Command="EditingCommands.ToggleUnderline" ToolTip="Underline (Ctrl+U)">
+                                        <TextBlock TextDecorations="Underline" FontSize="14">U</TextBlock>
+                                    </Button>
+                                    <Separator/>
+
+                                    <ComboBox Name="FontFamilyComboBox" Width="120" ToolTip="Font Family" SelectionChanged="FontFamilyComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="Arial"/>
+                                        <ComboBoxItem Content="Calibri"/>
+                                        <ComboBoxItem Content="Cambria"/>
+                                        <ComboBoxItem Content="Century Gothic"/>
+                                        <ComboBoxItem Content="Courier New"/>
+                                        <ComboBoxItem Content="Georgia"/>
+                                        <ComboBoxItem Content="Segoe UI"/>
+                                        <ComboBoxItem Content="Times New Roman"/>
+                                        <ComboBoxItem Content="Verdana"/>
+                                    </ComboBox>
+
+                                    <ComboBox Name="FontSizeComboBox" Width="50" ToolTip="Font Size" IsEditable="True" TextBoxBase.TextChanged="FontSizeComboBox_TextChanged">
+                                        <ComboBoxItem Content="8"/>
+                                        <ComboBoxItem Content="9"/>
+                                        <ComboBoxItem Content="10"/>
+                                        <ComboBoxItem Content="11"/>
+                                        <ComboBoxItem Content="12"/>
+                                        <ComboBoxItem Content="14"/>
+                                        <ComboBoxItem Content="16"/>
+                                        <ComboBoxItem Content="18"/>
+                                        <ComboBoxItem Content="20"/>
+                                        <ComboBoxItem Content="24"/>
+                                        <ComboBoxItem Content="36"/>
+                                        <ComboBoxItem Content="48"/>
+                                        <ComboBoxItem Content="72"/>
+                                    </ComboBox>
+                                    <Separator/>
+
+                                    <!-- This ComboBox will be our color picker -->
+                                    <ComboBox Name="TextColorComboBox" Width="40" ToolTip="Text Color" SelectionChanged="TextColorComboBox_SelectionChanged" SelectedValuePath="Name">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                
+                                                <!-- This template displays a colored rectangle for each item -->
+                                                <Rectangle Fill="{Binding Name}" Width="20" Height="20" Margin="2"/>
+                                            </DataTemplate>
+                                            
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </ToolBar>
+                            </ToolBarTray>
+                        </StackPanel>
+
+                        <Grid DockPanel.Dock="Bottom" Margin="0,5,0,0">
+                            <TextBlock Name="LiveCharCountTextBlock" Text="Characters: 0" HorizontalAlignment="Left"/>
+                            <TextBlock Name="LiveWordCountTextBlock" Text="Word Count: 0" HorizontalAlignment="Right"/>
+                        </Grid>
+
+                        <RichTextBox Name="StoryRichTextBox" 
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto" 
+                     TextChanged="StoryRichTextBox_TextChanged"
+                     BorderThickness="1"/>
+                    </DockPanel>
+                </GroupBox>
+            </Grid>
         </Grid>
     </DockPanel>
 </Window>

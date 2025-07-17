@@ -14,6 +14,7 @@ namespace StoryTracker
             _connectionString = connectionString;
         }
 
+        // --- STORY METHODS ---
         public List<Story> LoadStoryTitles()
         {
             var stories = new List<Story>();
@@ -29,11 +30,7 @@ namespace StoryTracker
                     stories.Add(new Story { Id = reader.GetInt32(0), Title = reader.GetString(1) });
                 }
             }
-            catch (Exception ex)
-            {
-                LogError(ex);
-                throw new Exception("Could not load stories from the database. See log.txt for details.");
-            }
+            catch (Exception ex) { LogError(ex); throw new Exception("Could not load stories. See log.txt."); }
             return stories;
         }
 
@@ -44,7 +41,7 @@ namespace StoryTracker
             {
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
-                var sql = "SELECT Title, StoryType, Genre, Status, WordCount, StoryText FROM Stories WHERE StoryID = @id";
+                var sql = "SELECT Title, StoryType, Genre, Status FROM Stories WHERE StoryID = @id";
                 using var command = new NpgsqlCommand(sql, connection);
                 command.Parameters.AddWithValue("id", storyId);
                 using var reader = command.ExecuteReader();
@@ -55,77 +52,111 @@ namespace StoryTracker
                     story.StoryType = reader.IsDBNull(1) ? "" : reader.GetString(1);
                     story.Genre = reader.IsDBNull(2) ? "" : reader.GetString(2);
                     story.Status = reader.IsDBNull(3) ? "" : reader.GetString(3);
-                    story.WordCount = reader.GetInt32(4);
-                    story.StoryText = reader.IsDBNull(5) ? "" : reader.GetString(5);
                 }
             }
-            catch (Exception ex)
-            {
-                LogError(ex);
-                throw new Exception($"Could not load details for story ID {storyId}. See log.txt for details.");
-            }
+            catch (Exception ex) { LogError(ex); throw new Exception($"Could not load details for story ID {storyId}. See log.txt."); }
             return story;
         }
 
-        public void SaveStory(Story storyToSave)
+        public void SaveStoryDetails(Story storyToSave)
         {
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
-                string sql;
-                if (storyToSave.Id == 0) // New story
-                {
-                    sql = "INSERT INTO Stories (Title, StoryType, Genre, Status, WordCount, StoryText, LastUpdated) VALUES (@title, @storyType, @genre, @status, @wordCount, @storyText, @lastUpdated)";
-                }
-                else // Existing story
-                {
-                    sql = "UPDATE Stories SET Title = @title, StoryType = @storyType, Genre = @genre, Status = @status, WordCount = @wordCount, StoryText = @storyText, LastUpdated = @lastUpdated WHERE StoryID = @id";
-                }
-
+                var sql = "UPDATE Stories SET Title = @title, StoryType = @storyType, Genre = @genre, Status = @status, LastUpdated = @lastUpdated WHERE StoryID = @id";
                 using var command = new NpgsqlCommand(sql, connection);
                 command.Parameters.AddWithValue("title", storyToSave.Title);
                 command.Parameters.AddWithValue("storyType", storyToSave.StoryType);
                 command.Parameters.AddWithValue("genre", storyToSave.Genre);
                 command.Parameters.AddWithValue("status", storyToSave.Status);
-                command.Parameters.AddWithValue("wordCount", storyToSave.WordCount);
-                command.Parameters.AddWithValue("storyText", storyToSave.StoryText);
-
-                var lastUpdatedParam = command.CreateParameter();
-                lastUpdatedParam.ParameterName = "lastUpdated";
-                lastUpdatedParam.Value = DateTime.UtcNow;
-                lastUpdatedParam.NpgsqlDbType = NpgsqlTypes.NpgsqlDbType.TimestampTz;
-                command.Parameters.Add(lastUpdatedParam);
-
-                if (storyToSave.Id != 0)
-                {
-                    command.Parameters.AddWithValue("id", storyToSave.Id);
-                }
+                command.Parameters.AddWithValue("lastUpdated", DateTime.UtcNow);
+                command.Parameters.AddWithValue("id", storyToSave.Id);
                 command.ExecuteNonQuery();
             }
-            catch (Exception ex)
-            {
-                LogError(ex);
-                throw new Exception("Could not save the story. See log.txt for details.");
-            }
+            catch (Exception ex) { LogError(ex); throw new Exception("Could not save story details. See log.txt."); }
         }
 
-        public void DeleteStory(int storyId)
+        // --- CHAPTER METHODS ---
+        public List<Chapter> GetChaptersForStory(int storyId)
+        {
+            var chapters = new List<Chapter>();
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+                var sql = "SELECT ChapterID, ChapterNumber, ChapterTitle FROM Chapters WHERE StoryID = @storyId ORDER BY ChapterNumber";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("storyId", storyId);
+                using var reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    chapters.Add(new Chapter { Id = reader.GetInt32(0), StoryId = storyId, ChapterNumber = reader.GetInt32(1), Title = reader.GetString(2) });
+                }
+            }
+            catch (Exception ex) { LogError(ex); throw new Exception($"Could not load chapters for story ID {storyId}. See log.txt."); }
+            return chapters;
+        }
+
+        public string GetChapterText(int chapterId)
         {
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
-                var sql = "DELETE FROM Stories WHERE StoryID = @id";
+                var sql = "SELECT ChapterText FROM Chapters WHERE ChapterID = @chapterId";
                 using var command = new NpgsqlCommand(sql, connection);
-                command.Parameters.AddWithValue("id", storyId);
+                command.Parameters.AddWithValue("chapterId", chapterId);
+                var result = command.ExecuteScalar();
+                return result is DBNull ? "" : (string)result;
+            }
+            catch (Exception ex) { LogError(ex); throw new Exception($"Could not load text for chapter ID {chapterId}. See log.txt."); }
+        }
+
+        public void SaveChapter(Chapter chapterToSave)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+                var sql = "UPDATE Chapters SET ChapterTitle = @title, ChapterText = @text WHERE ChapterID = @id";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("title", chapterToSave.Title);
+                command.Parameters.AddWithValue("text", chapterToSave.Text);
+                command.Parameters.AddWithValue("id", chapterToSave.Id);
                 command.ExecuteNonQuery();
             }
-            catch (Exception ex)
+            catch (Exception ex) { LogError(ex); throw new Exception("Could not save the chapter. See log.txt."); }
+        }
+
+        public void CreateChapter(int storyId, int chapterNumber, string title)
+        {
+            try
             {
-                LogError(ex);
-                throw new Exception($"Could not delete story ID {storyId}. See log.txt for details.");
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+                var sql = "INSERT INTO Chapters (StoryID, ChapterNumber, ChapterTitle, ChapterText) VALUES (@storyId, @chapterNumber, @title, '')";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("storyId", storyId);
+                command.Parameters.AddWithValue("chapterNumber", chapterNumber);
+                command.Parameters.AddWithValue("title", title);
+                command.ExecuteNonQuery();
             }
+            catch (Exception ex) { LogError(ex); throw new Exception("Could not create new chapter. See log.txt."); }
+        }
+
+        public void DeleteChapter(int chapterId)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+                var sql = "DELETE FROM Chapters WHERE ChapterID = @id";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("id", chapterId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex) { LogError(ex); throw new Exception($"Could not delete chapter ID {chapterId}. See log.txt."); }
         }
 
         private void LogError(Exception ex)
