@@ -80,3 +80,86 @@ This is a landmark release for the **Story Tracker**, representing a complete ar
   * The `DatabaseService` has been completely rewritten to support the new story/chapter data model.
   * The C\# code-behind for the `MainWindow` has been refactored to handle the new three-column UI and the `RichTextBox` control.
 
+
+***
+
+## **Story Tracker: Official Development Roadmap**
+
+This document outlines the planned features and architectural changes for future versions of the Story Tracker application.
+
+### **v2.1: The "Export & Polish" Release** 🖋️
+
+This version focuses on getting your work out of the application and adding essential editor functionality.
+
+* **Enable Built-in Spell Check:** Activate the native spell checker within the rich text editor.
+* **Export Chapter to File:** Implement the "File > Export Chapter As..." functionality.
+    * **Initial formats:** Plain Text (`.txt`) and Rich Text Format (`.rtf`).
+* **Improved Dialogs:** Make confirmation messages more informative (e.g., including the story or chapter title).
+* **Add "Select All" to Menu:** Include a "Select All" option under an "Edit" menu for discoverability.
+
+---
+
+### **v2.2: The "Advanced Export & Import" Release** ↔️
+
+This version will add more complex file interactions and make the editor more powerful.
+
+* **Full Story Export:** Add the ability to export an entire story (all chapters combined) into a single document.
+* **Advanced Export Formats:**
+    * Microsoft Word (`.docx`).
+    * HTML (`.html`).
+    * PDF (`.pdf`).
+* **Import from Files:** Create a system to import existing `.txt` or `.rtf` files as new chapters.
+* **Print Functionality:** Add a "File > Print" option to print the content of the current chapter.
+
+---
+
+### **v3.0: The "Professional Authoring" Release** 📖
+
+This is a major architectural update focused on book formatting and professional output.
+
+* **Full Page Layout System:**
+    * Implement a "Page Setup" dialog.
+    * Support for standard book sizes (6x9, 8x11, etc.).
+    * Customizable margins.
+* **Headers, Footers, & Page Numbers:** Add the ability to define and edit headers and footers, with automatic page numbering.
+* **Table of Contents Generation:** Create a feature to automatically generate a table of contents based on chapter titles.
+* **Image Support:**
+    * Allow users to insert images into the rich text editor.
+    * Update the database to store and retrieve these images.
+    * Ensure images are included in all export formats.
+* **Advanced Formatting:**
+    * Support for creating and styling tables.
+    * Add "WordArt" or other decorative text features.
+    * Implement "Clear Formatting" button.
+
+---
+
+### **v4.0: The "Collaboration & Accessibility" Release** 👥
+
+This version focuses on making the app work for multiple users and in different environments.
+
+* **Offline Mode:**
+    * Implement a local database (like SQLite) for offline work.
+    * Create a robust synchronization system to push local changes to the main server database when a connection is available.
+* **User Account System:**
+    * Implement a user login system for the main database.
+    * Ensure users can only see and edit their own stories.
+* **Dynamic Theming & Fonts:**
+    * Allow users to create and import their own theme files.
+    * Allow users to add and use their own font files.
+* **UI Customization:** Add a "Preferences" window where users can customize the editor toolbar.
+
+---
+
+### **v5.0: The "AI & Publishing" Release** 🤖
+
+This is a forward-looking release focused on advanced assistance and direct publishing.
+
+* **AI Integration:**
+    * Create a system for users to input their API keys for services like Gemini.
+    * Implement features for summarization, grammar checks, and idea generation.
+* **Advanced Publishing Formats:**
+    * Add support for exporting to publishing-specific formats like **ePub** (for Kindle, etc.).
+* **Scriptwriting Mode:** Implement a special mode with formatting tools for writing plays or screenplays.
+
+***
