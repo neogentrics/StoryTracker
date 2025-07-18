@@ -4,6 +4,14 @@
     <SolidColorBrush x:Key="ForegroundColor" Color="#FFFFE5F7"/>
     <SolidColorBrush x:Key="ButtonBackgroundColor" Color="#FF7D2B52"/>
     <SolidColorBrush x:Key="BorderColor" Color="#FFDDA0DD"/>
+    <SolidColorBrush x:Key="ToolBarButtonAreaBackgroundColor" Color="#FF672345"/>
+
+    <BitmapImage x:Key="StandardButtonBackgroundImage" UriSource="/Images/plum_button.png" />
+
+    <LinearGradientBrush x:Key="ToolBarBackgroundColor" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#AAF0F5FB" Offset="0"/>
+        <GradientStop Color="#AAB2C4D5" Offset="1"/>
+    </LinearGradientBrush>
 
     <Style TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundColor}"/>

@@ -27,6 +27,8 @@
                     <MenuItem Header="_Sepia" Click="ThemeMenuItem_Click"/>
                     <MenuItem Header="_Plum" Click="ThemeMenuItem_Click"/>
                     <MenuItem Header="_Evergreen" Click="ThemeMenuItem_Click"/>
+                    <Separator/>
+                    <MenuItem Header="_Aero" Click="ThemeMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Font">
                     <MenuItem Header="Font Size">
@@ -66,7 +68,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <!-- Column 0 for the stories list -->
-                <ColumnDefinition Width="220" MinWidth="150"/>
+                <ColumnDefinition Width="220" MinWidth="350"/>
                 <ColumnDefinition Width="Auto"/>
                 <!-- Column 1 for the chapters list -->
                 <ColumnDefinition Width="220" MinWidth="150"/>
@@ -86,13 +88,13 @@
                  GotFocus="SearchTextBox_GotFocus"
                  LostFocus="SearchTextBox_LostFocus"/>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Name="AddStoryButton" Margin="5" Padding="5" Click="AddStoryButton_Click">
+                    <Button Name="AddStoryButton" Margin="5" Padding="5" Click="AddStoryButton_Click" Width="109" Height="30">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE710;" VerticalAlignment="Center"/>
                             <TextBlock Text="Add Story" Margin="5,0,0,0"/>
                         </StackPanel>
                     </Button>
-                    <Button Name="DeleteStoryButton" Margin="5" Padding="5" Click="DeleteStoryButton_Click">
+                    <Button x:Name="DeleteStoryButton" Padding="5" Click="DeleteStoryButton_Click" Width="75" Height="30">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE74D;" VerticalAlignment="Center"/>
                             <TextBlock Text="Delete" Margin="5,0,0,0"/>
@@ -109,16 +111,16 @@
             <!-- ===================================== -->
             <!--          COLUMN 1: CHAPTERS           -->
             <!-- ===================================== -->
-            <DockPanel Grid.Column="2" Margin="5">
+            <DockPanel Grid.Column="2" Margin="5" >
                 <TextBlock DockPanel.Dock="Top" Text="Chapters" FontWeight="Bold" Margin="5,0"/>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Name="AddChapterButton" Margin="5" Padding="5" Click="AddChapterButton_Click">
-                        <StackPanel Orientation="Horizontal">
+                    <Button Name="AddChapterButton" Margin="5" Padding="5" Click="AddChapterButton_Click" Width="109">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE710;" VerticalAlignment="Center"/>
                             <TextBlock Text="Add Chapter" Margin="5,0,0,0"/>
                         </StackPanel>
                     </Button>
-                    <Button Name="DeleteChapterButton" Margin="5" Padding="5" Click="DeleteChapterButton_Click">
+                    <Button Name="DeleteChapterButton" Margin="5" Padding="5" Click="DeleteChapterButton_Click" Width="75" Height="30">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock FontFamily="Segoe Fluent Icons" Text="&#xE74D;" VerticalAlignment="Center"/>
                             <TextBlock Text="Delete" Margin="5,0,0,0"/>
@@ -126,8 +128,8 @@
                     </Button>
                 </StackPanel>
                 <ListBox Name="ChapterListBox" 
-                 SelectionChanged="ChapterListBox_SelectionChanged"
-                 DisplayMemberPath="Title"/>
+             SelectionChanged="ChapterListBox_SelectionChanged"
+             DisplayMemberPath="Title"/>
             </DockPanel>
 
             <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderColor}"/>
@@ -144,41 +146,48 @@
                 </Grid.RowDefinitions>
 
                 <!-- Story Properties GroupBox -->
-                <GroupBox Grid.Row="0" Header="Story Properties" Margin="5" Padding="5">
+                <GroupBox Grid.Row="0" Header="Story Properties" Margin="50,15,50,15" Padding="15">
                     <StackPanel>
                         <TextBlock Text="Title:" FontWeight="Bold"/>
-                        <TextBox Name="StoryTitleTextBox"/>
-                        <TextBlock Text="Story Type:" FontWeight="Bold" Margin="0,5,0,0"/>
-                        <TextBox Name="StoryTypeTextBox"/>
-                        <TextBlock Text="Genre:" FontWeight="Bold" Margin="0,5,0,0"/>
-                        <TextBox Name="GenreTextBox"/>
+                        <TextBox Name="StoryTitleTextBox" Tag="Enter story title..." GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
+                        <TextBlock Text="Story Type:" FontWeight="Bold" Margin="0,10,0,0"/>
+                        <TextBox Name="StoryTypeTextBox" Tag="e.g., Fiction, Non-Fiction" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
+                        <TextBlock Text="Genre:" FontWeight="Bold" Margin="0,10,0,0"/>
+                        <TextBox Name="GenreTextBox" Tag="e.g., Fantasy, Sci-Fi" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
                         <TextBlock Text="Status:" FontWeight="Bold" Margin="0,5,0,0"/>
-                        <TextBox Name="StoryStatusTextBox"/>
+                        <TextBox Name="StoryStatusTextBox" Tag="e.g., Drafting, Complete" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
                         <Button Name="SaveStoryDetailsButton" Content="Save Story Details" Margin="0,10,0,0" Click="SaveStoryDetailsButton_Click"/>
                     </StackPanel>
                 </GroupBox>
+                <Separator/>
 
                 <!-- Chapter Editor GroupBox -->
-                <GroupBox Grid.Row="1" Header="Chapter Editor" Margin="5" Padding="5">
+                <GroupBox Grid.Row="1" Header="Chapter Editor" Margin="15" Padding="5">
                     <DockPanel>
                         <Button Name="SaveChapterButton" DockPanel.Dock="Bottom" Content="Save Chapter" Margin="0,5,0,0" Padding="5" Click="SaveChapterButton_Click"/>
 
                         <StackPanel DockPanel.Dock="Top">
 
                             <TextBlock Text="Chapter Title:" FontWeight="Bold"/>
-                            <TextBox Name="ChapterTitleTextBox" Margin="0,5,0,5"/>
+                            <TextBox Name="ChapterTitleTextBox" Tag="Enter chapter title..." GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus" Margin="0,5,0,10"/>
 
-                            <ToolBarTray>
-                                <ToolBar>
-                                    <Button Command="EditingCommands.ToggleBold" ToolTip="Bold (Ctrl+B)">
-                                        <TextBlock FontWeight="Bold" FontSize="14">B</TextBlock>
-                                    </Button>
-                                    <Button Command="EditingCommands.ToggleItalic" ToolTip="Italic (Ctrl+I)">
-                                        <TextBlock FontStyle="Italic" FontSize="14">I</TextBlock>
-                                    </Button>
-                                    <Button Command="EditingCommands.ToggleUnderline" ToolTip="Underline (Ctrl+U)">
-                                        <TextBlock TextDecorations="Underline" FontSize="14">U</TextBlock>
-                                    </Button>
+                            <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolBarBackgroundColor}" Margin="0,10,0,10">
+                                <ToolBar Background="{DynamicResource ToolBarButtonAreaBackgroundColor}" Margin="0,2,0,2">
+                                    <Button Command="ApplicationCommands.Cut" ToolTip="Cut (Ctrl+X)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/cut.png"/>
+                                    <Button Command="ApplicationCommands.Copy" ToolTip="Copy (Ctrl+C)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/copy.png"/>
+                                    <Button Command="ApplicationCommands.Paste" ToolTip="Paste (Ctrl+V)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/paste.png"/>
+                                    <Button Command="ApplicationCommands.SelectAll" ToolTip="Select All (Ctrl+A)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/select-all.png"/>
+                                    <Separator/>
+                                    <Button Command="ApplicationCommands.Undo" ToolTip="Undo (Ctrl+Z)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/undo.png"/>
+                                    <Button Command="ApplicationCommands.Redo" ToolTip="Redo (Ctrl+Y)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/redo.png"/>
+                                    <Separator/>
+
+                                    <Button Command="EditingCommands.ToggleBold" ToolTip="Bold (Ctrl+B)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/bold.png"/>
+                                    <Button Command="EditingCommands.ToggleItalic" ToolTip="Italic (Ctrl+I)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/italic.png"/>
+                                    <Button Command="EditingCommands.ToggleUnderline" ToolTip="Underline (Ctrl+U)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/underline.png"/>
+                                    <Button Click="StrikethroughButton_Click" ToolTip="Strikethrough" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/strikethrough.png"/>
+                                    <Button Command="EditingCommands.ToggleSubscript" ToolTip="Subscript" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/subscript.png"/>
+                                    <Button Command="EditingCommands.ToggleSuperscript" ToolTip="Superscript" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/superscript.png"/>
                                     <Separator/>
 
                                     <ComboBox Name="FontFamilyComboBox" Width="120" ToolTip="Font Family" SelectionChanged="FontFamilyComboBox_SelectionChanged">
@@ -192,7 +201,6 @@
                                         <ComboBoxItem Content="Times New Roman"/>
                                         <ComboBoxItem Content="Verdana"/>
                                     </ComboBox>
-
                                     <ComboBox Name="FontSizeComboBox" Width="50" ToolTip="Font Size" IsEditable="True" TextBoxBase.TextChanged="FontSizeComboBox_TextChanged">
                                         <ComboBoxItem Content="8"/>
                                         <ComboBoxItem Content="9"/>
@@ -208,19 +216,25 @@
                                         <ComboBoxItem Content="48"/>
                                         <ComboBoxItem Content="72"/>
                                     </ComboBox>
-                                    <Separator/>
-
-                                    <!-- This ComboBox will be our color picker -->
                                     <ComboBox Name="TextColorComboBox" Width="40" ToolTip="Text Color" SelectionChanged="TextColorComboBox_SelectionChanged" SelectedValuePath="Name">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
-                                                
-                                                <!-- This template displays a colored rectangle for each item -->
                                                 <Rectangle Fill="{Binding Name}" Width="20" Height="20" Margin="2"/>
                                             </DataTemplate>
-                                            
                                         </ComboBox.ItemTemplate>
                                     </ComboBox>
+                                    <Separator/>
+
+                                    <Button Command="EditingCommands.AlignLeft" ToolTip="Align Left" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/align-left.png"/>
+                                    <Button Command="EditingCommands.AlignCenter" ToolTip="Align Center" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/align-center.png"/>
+                                    <Button Command="EditingCommands.AlignRight" ToolTip="Align Right" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/align-right.png"/>
+                                    <Button Command="EditingCommands.AlignJustify" ToolTip="Align Justify" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/align-justify.png"/>
+                                    <Separator/>
+                                    <Button Command="EditingCommands.ToggleBullets" ToolTip="Bulleted List" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/list-bullets.png"/>
+                                    <Button Command="EditingCommands.ToggleNumbering" ToolTip="Numbered List" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/list-numbers.png"/>
+                                    <Separator/>
+                                    <Button Command="EditingCommands.IncreaseIndentation" ToolTip="Increase Indent" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/indent-increase.png"/>
+                                    <Button Command="EditingCommands.DecreaseIndentation" ToolTip="Decrease Indent" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/indent-decrease.png"/>
                                 </ToolBar>
                             </ToolBarTray>
                         </StackPanel>

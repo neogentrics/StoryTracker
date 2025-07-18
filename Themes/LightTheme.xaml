@@ -5,6 +5,16 @@
     <SolidColorBrush x:Key="ForegroundColor" Color="Black"/>
     <SolidColorBrush x:Key="ButtonBackgroundColor" Color="#FFDDDDDD"/>
     <SolidColorBrush x:Key="BorderColor" Color="LightGray"/>
+    <SolidColorBrush x:Key="ToolBarButtonAreaBackgroundColor" Color="#FFE6E6E6"/>
+
+    <BitmapImage x:Key="StandardButtonBackgroundImage" UriSource="/Images/light_button.png" />
+
+
+
+    <LinearGradientBrush x:Key="ToolBarBackgroundColor" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#AAF0F5FB" Offset="0"/>
+        <GradientStop Color="#AAB2C4D5" Offset="1"/>
+    </LinearGradientBrush>
 
     <Style TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource ButtonBackgroundColor}"/>

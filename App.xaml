@@ -10,18 +10,95 @@
                 <Style.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.ControlDarkBrushKey}" Color="Transparent"/>
                 </Style.Resources>
-
                 <Setter Property="Background" Value="{DynamicResource BackgroundColor}"/>
                 <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BackgroundColor}"/>
-
                 <Style.Triggers>
                     <Trigger Property="IsHighlighted" Value="True">
                         <Setter Property="Background" Value="{DynamicResource BorderColor}"/>
                         <Setter Property="Foreground" Value="{DynamicResource BackgroundColor}"/>
                     </Trigger>
                 </Style.Triggers>
+            </Style>
+
+            <Style x:Key="SquareIconButtonStyle" TargetType="Button">
+                <Setter Property="Width" Value="100"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="MainBorder" CornerRadius="4">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{DynamicResource StandardButtonBackgroundImage}" Stretch="Fill"/>
+                                </Border.Background>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="9,5"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="MainBorder" Property="Opacity" Value="0.9"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="MainBorder" Property="Opacity" Value="0.7"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ActionButtonStyle" TargetType="Button">
+                <Setter Property="MinWidth" Value="150"/>
+                <Setter Property="Height" Value="30"/>
+                <Setter Property="Foreground" Value="{DynamicResource ForegroundColor}"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="MainBorder" CornerRadius="4">
+                                <Border.Background>
+                                    <ImageBrush ImageSource="{DynamicResource StandardButtonBackgroundImage}"  Stretch="Fill"/>
+                                </Border.Background>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,5"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="MainBorder" Property="Opacity" Value="0.9"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="MainBorder" Property="Opacity" Value="0.7"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ToolBarImageButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Width" Value="24"/>
+                <Setter Property="Height" Value="24"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Border x:Name="Backing" Background="#22FFFFFF" CornerRadius="3" Opacity="0"/>
+                                <Image Source="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}" Stretch="Uniform"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Backing" Property="Opacity" Value="1"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Backing" Property="Background" Value="#44FFFFFF"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Style>
 
             <ResourceDictionary.MergedDictionaries>

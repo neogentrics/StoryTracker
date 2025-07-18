@@ -33,7 +33,12 @@ namespace StoryTracker
             LoadStories();
             SetPlaceholderText();
             TextColorComboBox.ItemsSource = typeof(Brushes).GetProperties().Select(p => new { Name = p.Name });
+            this.Loaded += MainWindow_Loaded;
         }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            WindowAccentHelper.EnableAcrylicBlur(this); // <-- ADD THIS
         }
 
         #region Story Methods
@@ -320,5 +325,69 @@ namespace StoryTracker
             }
         }
         #endregion
+
+        // --- GENERIC PLACEHOLDER TEXT METHODS ---
+
+        private void SetInitialPlaceholders()
+        {
+            // Call LostFocus once on each TextBox to set its initial placeholder
+            TextBox_LostFocus(StoryTitleTextBox, null);
+            TextBox_LostFocus(StoryTypeTextBox, null);
+            TextBox_LostFocus(GenreTextBox, null);
+            TextBox_LostFocus(StoryStatusTextBox, null);
+            TextBox_LostFocus(ChapterTitleTextBox, null);
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                // If the text is the placeholder (stored in the Tag), clear it
+                if (textBox.Text == textBox.Tag.ToString())
+                {
+                    textBox.Text = "";
+                    textBox.SetResourceReference(ForegroundProperty, "ForegroundColor");
+                    textBox.FontStyle = FontStyles.Normal;
+                }
+            }
+        }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                // If the box is empty, restore the placeholder text from the Tag
+                if (string.IsNullOrWhiteSpace(textBox.Text))
+                {
+                    textBox.Text = textBox.Tag.ToString();
+                    textBox.Foreground = Brushes.Gray;
+                    textBox.FontStyle = FontStyles.Italic;
+                }
+            }
+        }
+
+        private void StrikethroughButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Get the current decorations on the selected text
+            var currentDecorations = StoryRichTextBox.Selection.GetPropertyValue(Inline.TextDecorationsProperty) as TextDecorationCollection;
+
+            // Check if strikethrough is already applied
+            if (currentDecorations != null && currentDecorations.Count > 0 && currentDecorations.Equals(TextDecorations.Strikethrough))
+            {
+                // If it is, remove the decoration
+                StoryRichTextBox.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, null);
+            }
+            else
+            {
+                // If it's not, apply the strikethrough decoration
+                StoryRichTextBox.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, TextDecorations.Strikethrough);
+            }
+        }
+
+        private void SelectAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            StoryRichTextBox.SelectAll();
+        }
+
     }
 }

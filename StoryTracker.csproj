@@ -9,8 +9,70 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Images\aero_button.png" />
+    <None Remove="Images\align-center.png" />
+    <None Remove="Images\align-justify.png" />
+    <None Remove="Images\align-left.png" />
+    <None Remove="Images\align-right.png" />
+    <None Remove="Images\bold.png" />
+    <None Remove="Images\copy.png" />
+    <None Remove="Images\cut.png" />
+    <None Remove="Images\dark_button.png" />
+    <None Remove="Images\evergreen_button.png" />
+    <None Remove="Images\highcontrast_button.png" />
+    <None Remove="Images\indent-decrease.png" />
+    <None Remove="Images\indent-increase.png" />
+    <None Remove="Images\italic.png" />
+    <None Remove="Images\light_button.png" />
+    <None Remove="Images\list-bullets.png" />
+    <None Remove="Images\list-numbers.png" />
+    <None Remove="Images\orange_button.png" />
+    <None Remove="Images\paste.png" />
+    <None Remove="Images\plum_button.png" />
+    <None Remove="Images\redo.png" />
+    <None Remove="Images\select-all.png" />
+    <None Remove="Images\sepia_button.png" />
+    <None Remove="Images\strikethrough.png" />
+    <None Remove="Images\subscript.png" />
+    <None Remove="Images\superscript.png" />
+    <None Remove="Images\underline.png" />
+    <None Remove="Images\undo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\aero_button.png" />
+    <Resource Include="Images\align-center.png" />
+    <Resource Include="Images\align-justify.png" />
+    <Resource Include="Images\align-left.png" />
+    <Resource Include="Images\align-right.png" />
+    <Resource Include="Images\bold.png" />
+    <Resource Include="Images\copy.png" />
+    <Resource Include="Images\cut.png" />
+    <Resource Include="Images\dark_button.png" />
+    <Resource Include="Images\evergreen_button.png" />
+    <Resource Include="Images\highcontrast_button.png" />
+    <Resource Include="Images\indent-decrease.png" />
+    <Resource Include="Images\indent-increase.png" />
+    <Resource Include="Images\italic.png" />
+    <Resource Include="Images\light_button.png" />
+    <Resource Include="Images\list-bullets.png" />
+    <Resource Include="Images\list-numbers.png" />
+    <Resource Include="Images\orange_button.png" />
+    <Resource Include="Images\paste.png" />
+    <Resource Include="Images\plum_button.png" />
+    <Resource Include="Images\redo.png" />
+    <Resource Include="Images\select-all.png" />
+    <Resource Include="Images\sepia_button.png" />
+    <Resource Include="Images\strikethrough.png" />
+    <Resource Include="Images\subscript.png" />
+    <Resource Include="Images\superscript.png" />
+    <Resource Include="Images\underline.png" />
+    <Resource Include="Images\undo.png" />
   </ItemGroup>
 
 </Project>
