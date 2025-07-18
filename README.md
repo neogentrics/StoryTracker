@@ -162,4 +162,25 @@ This is a forward-looking release focused on advanced assistance and direct publ
     * Add support for exporting to publishing-specific formats like **ePub** (for Kindle, etc.).
 * **Scriptwriting Mode:** Implement a special mode with formatting tools for writing plays or screenplays.
 
+---
+
 ***
+
+
+## **v6.0 and Beyond: The "Cloud & Collaboration" Releases** ☁️
+
+This phase focuses on transforming Story Tracker from a personal authoring tool into a collaborative, cloud-based platform.
+
+* **Real-Time Collaboration:** Go beyond simple file sharing and implement a Google Docs-style system where multiple users can edit the same chapter simultaneously, seeing each other's cursors and changes in real-time.
+
+* **Commenting & Track Changes:** Add the ability for collaborators and editors to leave comments in the margins and to make edits that can be accepted or rejected by the story's owner.
+
+* **Cloud Sync & Web Version:** Transition from a self-hosted database to a cloud-based backend. This would be the foundation for a full web-based version of Story Tracker, allowing users to access and edit their work from any device with a web browser.
+
+* **Version History & Snapshots:** Implement a system that automatically saves "snapshots" of each chapter, allowing writers to view and restore previous versions of their work at any time.
+
+* **Mobile Companion App:** Create a simple, lightweight mobile app (for iOS/Android) that allows writers to review their work, jot down notes, and make quick edits on the go.
+
+* **Advanced Analytics:** Provide a "dashboard" for writers that offers insights into their work, such as writing pace (words per day), most frequently used words, readability scores, and character dialogue analysis.
+
+* **Plugin & Add-on Support:** Create a plugin architecture that would allow other developers to build and share their own add-ons, such as new export formats, custom themes, or integrations with other writing services.
