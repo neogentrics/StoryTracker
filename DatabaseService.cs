@@ -77,6 +77,37 @@ namespace StoryTracker
             catch (Exception ex) { LogError(ex); throw new Exception("Could not save story details. See log.txt."); }
         }
 
+        public int CreateStory(string title)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+                // The "RETURNING StoryID" part gives us back the ID of the new story
+                var sql = "INSERT INTO Stories (Title, LastUpdated) VALUES (@title, @lastUpdated) RETURNING StoryID";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("title", title);
+                command.Parameters.AddWithValue("lastUpdated", DateTime.UtcNow);
+                // Use ExecuteScalar to get the returned ID
+                return (int)command.ExecuteScalar();
+            }
+            catch (Exception ex) { LogError(ex); throw new Exception("Could not create new story. See log.txt."); }
+        }
+
+        public void DeleteStory(int storyId)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+                var sql = "DELETE FROM Stories WHERE StoryID = @id";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("id", storyId);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex) { LogError(ex); throw new Exception($"Could not delete story ID {storyId}. See log.txt."); }
+        }
+
         // --- CHAPTER METHODS ---
         public List<Chapter> GetChaptersForStory(int storyId)
         {

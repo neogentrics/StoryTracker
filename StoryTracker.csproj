@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="custom.lex" />
     <None Remove="Images\aero_button.png" />
     <None Remove="Images\align-center.png" />
     <None Remove="Images\align-justify.png" />
@@ -45,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="custom.lex" />
     <Resource Include="Images\aero_button.png" />
     <Resource Include="Images\align-center.png" />
     <Resource Include="Images\align-justify.png" />

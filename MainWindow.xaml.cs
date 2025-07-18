@@ -16,6 +16,9 @@ namespace StoryTracker
         private Story? _selectedStory;
         private Chapter? _selectedChapter;
         private List<Story> _allStories = new List<Story>();
+        private string? _misspelledWord;
+        private readonly ExportService _exportService = new ExportService();
+        private readonly EditorService _editorService = new EditorService();
 
         #region Dependency Properties for Global Font
         public static readonly DependencyProperty AppFontSizeProperty =
@@ -34,6 +37,25 @@ namespace StoryTracker
             SetPlaceholderText();
             TextColorComboBox.ItemsSource = typeof(Brushes).GetProperties().Select(p => new { Name = p.Name });
             this.Loaded += MainWindow_Loaded;
+
+            // --- Corrected Dictionary Loading ---
+            Uri dictionaryUri = new Uri("pack://application:,,,/custom.lex");
+            if (SpellCheck.GetCustomDictionaries(StoryRichTextBox).Count == 0)
+            {
+                SpellCheck.GetCustomDictionaries(StoryRichTextBox).Add(dictionaryUri);
+            }
+            // ---------------------------------
+
+            // Call the new helper method and pass it all the textboxes
+            UIHelper.SetInitialPlaceholders(
+                SearchTextBox,
+                StoryTitleTextBox,
+                StoryTypeTextBox,
+                GenreTextBox,
+                StoryStatusTextBox,
+                ChapterTitleTextBox
+                );
+
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -74,8 +96,42 @@ namespace StoryTracker
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
 
-        private void AddStoryButton_Click(object sender, RoutedEventArgs e) { MessageBox.Show("Adding a new story is not yet implemented in v2.0."); }
-        private void DeleteStoryButton_Click(object sender, RoutedEventArgs e) { MessageBox.Show("Deleting a story is not yet implemented in v2.0."); }
+        private void AddStoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new InputDialog("Enter a title for the new story:");
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    _dbService.CreateStory(dialog.Answer);
+                    LoadStories(); // Refresh the list
+                    AppStatusTextBlock.Text = "New story created.";
+                }
+                catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); }
+            }
+        }
+
+        private void DeleteStoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null || _selectedStory.Id == 0)
+            {
+                MessageBox.Show("Please select a story to delete.");
+                return;
+            }
+
+            if (MessageBox.Show($"Are you sure you want to permanently delete '{_selectedStory.Title}' and all its chapters?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    _dbService.DeleteStory(_selectedStory.Id);
+                    LoadStories();
+                    ClearStoryForm();
+                    ChapterListBox.ItemsSource = null;
+                    AppStatusTextBlock.Text = "Story deleted.";
+                }
+                catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); }
+            }
+        }
 
         private void SaveStoryDetailsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -91,7 +147,7 @@ namespace StoryTracker
                 _selectedStory.Genre = GenreTextBox.Text;
                 _selectedStory.Status = StoryStatusTextBox.Text;
                 _dbService.SaveStoryDetails(_selectedStory);
-                MessageBox.Show("Story details saved!");
+                MessageBox.Show($"Details for '{_selectedStory.Title}' saved successfully!", "Save Successful");
                 AppStatusTextBlock.Text = "Story details saved.";
                 LoadStories(); // Refresh list in case title changed
             }
@@ -198,39 +254,75 @@ namespace StoryTracker
         #region Editor and Toolbar Methods
         private void StoryRichTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // --- Get the plain text for word/character counts ---
             string richText = new TextRange(StoryRichTextBox.Document.ContentStart, StoryRichTextBox.Document.ContentEnd).Text;
             int charCount = richText.Length - 2;
             int wordCount = richText.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+
             LiveCharCountTextBlock.Text = $"Characters: {Math.Max(0, charCount)}";
             LiveWordCountTextBlock.Text = $"Word Count: {wordCount}";
+
+            // --- Universal Spelling Error Count Logic ---
+            int errorCount = 0;
+            // We'll iterate through the plain text and check each word
+            var words = richText.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+            // This is a simplified check and may not be perfectly performant,
+            // but it avoids the version-specific API issues.
+            // A full implementation would be much more complex.
+
+            // For now, let's disable the live error count to prevent further issues,
+            // as a reliable, cross-version implementation is very complex.
+            SpellingErrorsTextBlock.Text = "Spelling Errors: N/A";
         }
+        private void StrikethroughButton_Click(object sender, RoutedEventArgs e)
+        {
+            _editorService.ToggleStrikethrough(StoryRichTextBox);
+        }
+
         private void FontFamilyComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (FontFamilyComboBox.SelectedItem is ComboBoxItem selectedItem && selectedItem.Content is string fontFamily)
             {
-                StoryRichTextBox.Selection.ApplyPropertyValue(TextElement.FontFamilyProperty, new FontFamily(fontFamily));
+                _editorService.ChangeFontFamily(StoryRichTextBox, fontFamily);
             }
         }
+
         private void FontSizeComboBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (double.TryParse(FontSizeComboBox.Text, out double newSize))
-            {
-                StoryRichTextBox.Selection.ApplyPropertyValue(TextElement.FontSizeProperty, newSize);
-            }
+            _editorService.ChangeFontSize(StoryRichTextBox, FontSizeComboBox.Text);
         }
+
         private void TextColorComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Make sure an item is actually selected
-            if (TextColorComboBox.SelectedItem == null) return;
-
-            // Get the name of the selected color
-            string colorName = (string)TextColorComboBox.SelectedValue;
-
-            // Convert the color name into a Brush and apply it to the selected text
-            var converter = new BrushConverter();
-            if (converter.ConvertFromString(colorName) is Brush newBrush)
+            if (TextColorComboBox.SelectedItem != null)
             {
-                StoryRichTextBox.Selection.ApplyPropertyValue(TextElement.ForegroundProperty, newBrush);
+                string colorName = (string)TextColorComboBox.SelectedValue;
+                _editorService.ChangeTextColor(StoryRichTextBox, colorName);
+            }
+        }
+
+        private void StoryRichTextBox_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var spellingError = StoryRichTextBox.GetSpellingError(StoryRichTextBox.CaretPosition);
+            if (spellingError != null)
+            {
+                _misspelledWord = spellingError.Suggestions.FirstOrDefault();
+                AddToDictionaryMenuItem.IsEnabled = true;
+            }
+            else
+            {
+                _misspelledWord = null;
+                AddToDictionaryMenuItem.IsEnabled = false;
+            }
+        }
+
+        private void AddToDictionaryMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(_misspelledWord))
+            {
+                File.AppendAllText("custom.lex", _misspelledWord + Environment.NewLine);
+                // No direct "IgnoreAll" in this context, adding to dictionary is the action
             }
         }
         #endregion
@@ -256,16 +348,15 @@ namespace StoryTracker
                 SearchTextBox.FontStyle = FontStyles.Italic;
             }
         }
-        private void SearchTextBox_GotFocus(object sender, RoutedEventArgs e)
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (SearchTextBox.Text == "Search by Title...")
-            {
-                SearchTextBox.Text = "";
-                SearchTextBox.SetResourceReference(ForegroundProperty, "ForegroundColor");
-                SearchTextBox.FontStyle = FontStyles.Normal;
-            }
+            UIHelper.TextBox_GotFocus(sender, e);
         }
-        private void SearchTextBox_LostFocus(object sender, RoutedEventArgs e) { SetPlaceholderText(); }
+
+        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            UIHelper.TextBox_LostFocus(sender, e);
+        }
         #endregion
 
         #region Form Clearing and Other Helpers
@@ -306,7 +397,6 @@ namespace StoryTracker
             }
             catch (Exception ex) { MessageBox.Show($"Could not load theme: {themeName}\n{ex.Message}"); }
         }
-
         private void FontSizeMenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem && double.TryParse(menuItem.Header.ToString(), out double newSize))
@@ -315,7 +405,10 @@ namespace StoryTracker
                 AppFontSize = newSize;
             }
         }
-
+        private void SelectAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            StoryRichTextBox.SelectAll();
+        }
         private void FontFamilyMenuItem_Click(object sender, RoutedEventArgs e)
         {
             if (sender is MenuItem menuItem)
@@ -324,70 +417,53 @@ namespace StoryTracker
                 AppFontFamily = new FontFamily(menuItem.Header.ToString());
             }
         }
+        private void ExportTxtMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedChapter == null)
+            {
+                MessageBox.Show("Please select a chapter to export.");
+                return;
+            }
+            try
+            {
+                _exportService.ExportToTxt(StoryRichTextBox, _selectedChapter.Title);
+                AppStatusTextBlock.Text = "Chapter exported successfully.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export file: {ex.Message}");
+            }
+        }
+        private void ExportRtfMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedChapter == null)
+            {
+                MessageBox.Show("Please select a chapter to export.");
+                return;
+            }
+            try
+            {
+                _exportService.ExportToRtf(StoryRichTextBox, _selectedChapter.Title);
+                AppStatusTextBlock.Text = "Chapter exported successfully.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export file: {ex.Message}");
+            }
+        }
+        private void PrintPreviewMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedChapter == null)
+            {
+                MessageBox.Show("Please select a chapter to preview.");
+                return;
+            }
+
+            // Pass the current RichTextBox document to the new PreviewWindow
+            var preview = new PreviewWindow(StoryRichTextBox.Document, _selectedChapter.Title);
+            preview.Show();
+        }
         #endregion
-
-        // --- GENERIC PLACEHOLDER TEXT METHODS ---
-
-        private void SetInitialPlaceholders()
-        {
-            // Call LostFocus once on each TextBox to set its initial placeholder
-            TextBox_LostFocus(StoryTitleTextBox, null);
-            TextBox_LostFocus(StoryTypeTextBox, null);
-            TextBox_LostFocus(GenreTextBox, null);
-            TextBox_LostFocus(StoryStatusTextBox, null);
-            TextBox_LostFocus(ChapterTitleTextBox, null);
-        }
-
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox textBox)
-            {
-                // If the text is the placeholder (stored in the Tag), clear it
-                if (textBox.Text == textBox.Tag.ToString())
-                {
-                    textBox.Text = "";
-                    textBox.SetResourceReference(ForegroundProperty, "ForegroundColor");
-                    textBox.FontStyle = FontStyles.Normal;
-                }
-            }
-        }
-
-        private void TextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (sender is TextBox textBox)
-            {
-                // If the box is empty, restore the placeholder text from the Tag
-                if (string.IsNullOrWhiteSpace(textBox.Text))
-                {
-                    textBox.Text = textBox.Tag.ToString();
-                    textBox.Foreground = Brushes.Gray;
-                    textBox.FontStyle = FontStyles.Italic;
-                }
-            }
-        }
-
-        private void StrikethroughButton_Click(object sender, RoutedEventArgs e)
-        {
-            // Get the current decorations on the selected text
-            var currentDecorations = StoryRichTextBox.Selection.GetPropertyValue(Inline.TextDecorationsProperty) as TextDecorationCollection;
-
-            // Check if strikethrough is already applied
-            if (currentDecorations != null && currentDecorations.Count > 0 && currentDecorations.Equals(TextDecorations.Strikethrough))
-            {
-                // If it is, remove the decoration
-                StoryRichTextBox.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, null);
-            }
-            else
-            {
-                // If it's not, apply the strikethrough decoration
-                StoryRichTextBox.Selection.ApplyPropertyValue(Inline.TextDecorationsProperty, TextDecorations.Strikethrough);
-            }
-        }
-
-        private void SelectAllButton_Click(object sender, RoutedEventArgs e)
-        {
-            StoryRichTextBox.SelectAll();
-        }
 
     }
 }

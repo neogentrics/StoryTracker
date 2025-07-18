@@ -14,7 +14,18 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" HorizontalAlignment="Left">
             <MenuItem Header="_File">
+                <MenuItem Header="Export Chapter As">
+                    <MenuItem Header="Plain Text (.txt)..." Click="ExportTxtMenuItem_Click"/>
+                    <MenuItem Header="Rich Text Format (.rtf)..." Click="ExportRtfMenuItem_Click"/>
+                </MenuItem>
+                <MenuItem Header="Print Preview..." Click="PrintPreviewMenuItem_Click"/>
+                <Separator/>
                 <MenuItem Header="_Exit" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Spell Check"
+                  IsCheckable="True"
+                  IsChecked="{Binding ElementName=StoryRichTextBox, Path=(SpellCheck.IsEnabled)}"/>
             </MenuItem>
             <MenuItem Header="_Settings">
                 <MenuItem Header="_Themes">
@@ -81,12 +92,7 @@
             <!--           COLUMN 0: STORIES           -->
             <!-- ===================================== -->
             <DockPanel Grid.Column="0" Margin="5">
-                <TextBox Name="SearchTextBox" 
-                 DockPanel.Dock="Top" 
-                 Margin="0,0,0,5"
-                 TextChanged="SearchTextBox_TextChanged"
-                 GotFocus="SearchTextBox_GotFocus"
-                 LostFocus="SearchTextBox_LostFocus"/>
+                <TextBox Name="SearchTextBox" DockPanel.Dock="Top" Margin="0,0,0,5" TextChanged="SearchTextBox_TextChanged" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Name="AddStoryButton" Margin="5" Padding="5" Click="AddStoryButton_Click" Width="109" Height="30">
                         <StackPanel Orientation="Horizontal">
@@ -173,6 +179,7 @@
 
                             <ToolBarTray DockPanel.Dock="Top" Background="{DynamicResource ToolBarBackgroundColor}" Margin="0,10,0,10">
                                 <ToolBar Background="{DynamicResource ToolBarButtonAreaBackgroundColor}" Margin="0,2,0,2">
+
                                     <Button Command="ApplicationCommands.Cut" ToolTip="Cut (Ctrl+X)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/cut.png"/>
                                     <Button Command="ApplicationCommands.Copy" ToolTip="Copy (Ctrl+C)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/copy.png"/>
                                     <Button Command="ApplicationCommands.Paste" ToolTip="Paste (Ctrl+V)" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/paste.png"/>
@@ -235,20 +242,37 @@
                                     <Separator/>
                                     <Button Command="EditingCommands.IncreaseIndentation" ToolTip="Increase Indent" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/indent-increase.png"/>
                                     <Button Command="EditingCommands.DecreaseIndentation" ToolTip="Decrease Indent" Style="{DynamicResource ToolBarImageButtonStyle}" Tag="/Images/indent-decrease.png"/>
+                                    
+                                    <Separator/>
+                                    
                                 </ToolBar>
                             </ToolBarTray>
                         </StackPanel>
 
                         <Grid DockPanel.Dock="Bottom" Margin="0,5,0,0">
-                            <TextBlock Name="LiveCharCountTextBlock" Text="Characters: 0" HorizontalAlignment="Left"/>
-                            <TextBlock Name="LiveWordCountTextBlock" Text="Word Count: 0" HorizontalAlignment="Right"/>
+                            <TextBlock Name="SpellingErrorsTextBlock" Text="Spelling Errors: 0" Grid.Column="0" HorizontalAlignment="Left"/>
+
+                            <TextBlock Name="LiveCharCountTextBlock" Text="Characters: 0" Grid.Column="1" HorizontalAlignment="Center" Margin="0,0,0,0"/>
+                            <TextBlock Name="LiveWordCountTextBlock" Text="Word Count: 0" Grid.Column="2" HorizontalAlignment="Right"/>
                         </Grid>
 
                         <RichTextBox Name="StoryRichTextBox" 
-                     AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Auto" 
-                     TextChanged="StoryRichTextBox_TextChanged"
-                     BorderThickness="1"/>
+                         AcceptsReturn="True"
+                         VerticalScrollBarVisibility="Auto" 
+                         TextChanged="StoryRichTextBox_TextChanged"
+                         BorderThickness="1"
+                         SpellCheck.IsEnabled="True"
+                         ContextMenuOpening="StoryRichTextBox_ContextMenuOpening">
+                            <RichTextBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Command="ApplicationCommands.Cut"/>
+                                    <MenuItem Command="ApplicationCommands.Copy"/>
+                                    <MenuItem Command="ApplicationCommands.Paste"/>
+                                    <Separator/>
+                                    <MenuItem Name="AddToDictionaryMenuItem" Header="Add to Dictionary" Click="AddToDictionaryMenuItem_Click"/>
+                                </ContextMenu>
+                            </RichTextBox.ContextMenu>
+                        </RichTextBox>
                     </DockPanel>
                 </GroupBox>
             </Grid>
