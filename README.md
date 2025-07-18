@@ -1,42 +1,3 @@
-## Release Notes for v2.0.0
-
-# Story Tracker v2.0.0
-
-This is a landmark release for the **Story Tracker**, representing a complete architectural overhaul to transform the application from a simple document editor into a powerful, multi-chapter authoring tool. Version 2.0 introduces a chapter-based data model, a full rich text editor, and a redesigned user interface to support a more professional writing workflow.
-
------
-
-## ✨ Major New Features & Architectural Changes
-
-  * **Chapter-Based System:**
-
-      * The database schema has been redesigned to support a one-to-many relationship between stories and chapters.
-      * The main UI now features a three-column layout to navigate stories, the chapters within them, and the chapter text itself.
-      * Users can now **add** and **delete** individual chapters within a story.
-
-  * **Rich Text Editor:**
-
-      * The simple text box has been replaced with a powerful **Rich Text Editor**.
-      * A full formatting toolbar has been implemented, including:
-          * Standard clipboard actions (Cut, Copy, Paste, Undo, Redo).
-          * Text styling (**Bold**, *Italic*, Underline, Strikethrough, Subscript, Superscript).
-          * Paragraph formatting (Left, Center, Right, and Justify alignment).
-          * List creation (Bulleted and Numbered lists).
-          * Indentation controls.
-      * **Live word and character counts** now provide real-time feedback as you type.
-
-  * **Advanced UI & Theming:**
-
-      * **Custom Button Styles:** Standard application buttons now use theme-aware, image-based backgrounds for a unique, polished look.
-      * **Custom Toolbar:** The rich text editor toolbar features custom image-based icons for all functions.
-      * **Frosted Glass Effect (Aero Theme):** A semi-transparent, acrylic blur effect has been added to the main window for a modern "frosted glass" look, which is most prominent with the Aero theme.
-
-## 💻 Technical Improvements
-
-  * The `DatabaseService` has been completely rewritten to support the new story/chapter data model.
-  * The C\# code-behind for the `MainWindow` has been refactored to handle the new three-column UI and the `RichTextBox` control.
-
------
 
 ## Updated `README.md` for v2.0.0
 
@@ -79,3 +40,43 @@ A professional, chapter-based authoring tool for writers, built with C\# and WPF
   * **PostgreSQL** for the database backend
   * **Newtonsoft.Json** for data serialization
   * **Npgsql** as the .NET data provider for PostgreSQL
+
+    
+----------------------------------------------------------------------------------------------
+
+# Release Notes for v2.0.0
+
+This is a landmark release for the **Story Tracker**, representing a complete architectural overhaul to transform the application from a simple document editor into a powerful, multi-chapter authoring tool. Version 2.0 introduces a chapter-based data model, a full rich text editor, and a redesigned user interface to support a more professional writing workflow.
+
+-----
+
+## ✨ Major New Features & Architectural Changes
+
+  * **Chapter-Based System:**
+
+      * The database schema has been redesigned to support a one-to-many relationship between stories and chapters.
+      * The main UI now features a three-column layout to navigate stories, the chapters within them, and the chapter text itself.
+      * Users can now **add** and **delete** individual chapters within a story.
+
+  * **Rich Text Editor:**
+
+      * The simple text box has been replaced with a powerful **Rich Text Editor**.
+      * A full formatting toolbar has been implemented, including:
+          * Standard clipboard actions (Cut, Copy, Paste, Undo, Redo).
+          * Text styling (**Bold**, *Italic*, Underline, Strikethrough, Subscript, Superscript).
+          * Paragraph formatting (Left, Center, Right, and Justify alignment).
+          * List creation (Bulleted and Numbered lists).
+          * Indentation controls.
+      * **Live word and character counts** now provide real-time feedback as you type.
+
+  * **Advanced UI & Theming:**
+
+      * **Custom Button Styles:** Standard application buttons now use theme-aware, image-based backgrounds for a unique, polished look.
+      * **Custom Toolbar:** The rich text editor toolbar features custom image-based icons for all functions.
+      * **Frosted Glass Effect (Aero Theme):** A semi-transparent, acrylic blur effect has been added to the main window for a modern "frosted glass" look, which is most prominent with the Aero theme.
+
+## 💻 Technical Improvements
+
+  * The `DatabaseService` has been completely rewritten to support the new story/chapter data model.
+  * The C\# code-behind for the `MainWindow` has been refactored to handle the new three-column UI and the `RichTextBox` control.
+
