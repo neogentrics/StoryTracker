@@ -51,106 +51,90 @@ A professional, chapter-based authoring tool for writers, built with C# and WPF.
 * **PostgreSQL** for the database backend
 * **Newtonsoft.Json** for data serialization
 * **Npgsql** as the .NET data provider for PostgreSQL
-*----------------------------------------------------------
+
+* ----------------------------------------------------------
 
 ***
 
+Here is the complete project roadmap.
+
+***
 ## **Story Tracker: Official Development Roadmap**
 
-This document outlines the planned features and architectural changes for future versions of the Story Tracker application.
-
-### **v2.1: The "Export & Polish" Release** 🖋️
-
-This version focuses on getting your work out of the application and adding essential editor functionality.
-
-* **Enable Built-in Spell Check:** Activate the native spell checker within the rich text editor.
-* **Export Chapter to File:** Implement the "File > Export Chapter As..." functionality.
-    * **Initial formats:** Plain Text (`.txt`) and Rich Text Format (`.rtf`).
-* **Improved Dialogs:** Make confirmation messages more informative (e.g., including the story or chapter title).
-* **Add "Select All" to Menu:** Include a "Select All" option under an "Edit" menu for discoverability.
+This document outlines the history, current status, and planned features for future versions of the Story Tracker application.
 
 ---
+### **v1.x: Foundation & Polish**
 
-### **v2.2: The "Advanced Export & Import" Release** ↔️
+* **v1.0.0** - ✅ **Released**
+    * Initial release.
+    * Core functionality for storing stories as single documents.
+    * Basic data structures and database connection.
 
-This version will add more complex file interactions and make the editor more powerful.
+* **v1.1.0** - ✅ **Released**
+    * Implemented a secure, configurable login window.
+    * Added the ability to save/delete encrypted connection profiles.
+    * Introduced the first UI polish, including a dark theme and status bar.
 
-* **Full Story Export:** Add the ability to export an entire story (all chapters combined) into a single document.
-* **Advanced Export Formats:**
-    * Microsoft Word (`.docx`).
-    * HTML (`.html`).
-    * PDF (`.pdf`).
-* **Import from Files:** Create a system to import existing `.txt` or `.rtf` files as new chapters.
-* **Print Functionality:** Add a "File > Print" option to print the content of the current chapter.
-
----
-
-### **v3.0: The "Professional Authoring" Release** 📖
-
-This is a major architectural update focused on book formatting and professional output.
-
-* **Full Page Layout System:**
-    * Implement a "Page Setup" dialog.
-    * Support for standard book sizes (6x9, 8x11, etc.).
-    * Customizable margins.
-* **Headers, Footers, & Page Numbers:** Add the ability to define and edit headers and footers, with automatic page numbering.
-* **Table of Contents Generation:** Create a feature to automatically generate a table of contents based on chapter titles.
-* **Image Support:**
-    * Allow users to insert images into the rich text editor.
-    * Update the database to store and retrieve these images.
-    * Ensure images are included in all export formats.
-* **Advanced Formatting:**
-    * Support for creating and styling tables.
-    * Add "WordArt" or other decorative text features.
-    * Implement "Clear Formatting" button.
+* **v1.2.0** - ✅ **Released**
+    * Implemented a full, multi-theme engine with accessibility options.
+    * Added global and editor-specific font customization.
+    * Introduced auto-save, "Last Updated" timestamps, and a live search filter.
+    * Refactored database logic into a `DatabaseService` with error logging.
 
 ---
+### **v2.x: The Chapter & Editor Overhaul**
 
-### **v4.0: The "Collaboration & Accessibility" Release** 👥
+* **v2.0.0** - ✅ **Released**
+    * Major architectural redesign to a chapter-based system.
+    * Database refactored with `Stories` and `Chapters` tables.
+    * UI redesigned into a three-column layout.
+    * Replaced `TextBox` with a powerful `RichTextBox`.
+    * Implemented a full formatting toolbar with image-based icons.
 
-This version focuses on making the app work for multiple users and in different environments.
+* **v2.1.1** - ✅ **Released**
+    * Implemented "Add Story" and "Delete Story" functionality.
+    * Added chapter export to Plain Text (`.txt`) and Rich Text Format (`.rtf`).
+    * Integrated a full-featured spell checker with a custom dictionary.
+    * Added a Print Preview window with a "Print" button.
 
-* **Offline Mode:**
-    * Implement a local database (like SQLite) for offline work.
-    * Create a robust synchronization system to push local changes to the main server database when a connection is available.
-* **User Account System:**
-    * Implement a user login system for the main database.
-    * Ensure users can only see and edit their own stories.
-* **Dynamic Theming & Fonts:**
-    * Allow users to create and import their own theme files.
-    * Allow users to add and use their own font files.
-* **UI Customization:** Add a "Preferences" window where users can customize the editor toolbar.
+* **v2.2.0** - 🚧 **Current Version**
+    * Implement full-story export (all chapters combined) into a single document.
+    * Add support for exporting to Microsoft Word (`.docx`).
+    * Add support for exporting to PDF (`.pdf`).
+    * Create a system to import existing `.txt` or `.rtf` files as new chapters.
 
 ---
+### **v3.x: Professional Authoring & Layout**
 
-### **v5.0: The "AI & Publishing" Release** 🤖
+* **v3.0** - 📅 **Planned**
+    * **Page Layout System:** Implement a "Page Setup" dialog with support for standard book sizes (e.g., 6x9, 8.5x11) and customizable margins.
 
-This is a forward-looking release focused on advanced assistance and direct publishing.
+* **v3.1** - 📅 **Planned**
+    * **Page Elements:** Add the ability to define and edit headers, footers, and automatic page numbers for exports.
 
-* **AI Integration:**
-    * Create a system for users to input their API keys for services like Gemini.
-    * Implement features for summarization, grammar checks, and idea generation.
-* **Advanced Publishing Formats:**
-    * Add support for exporting to publishing-specific formats like **ePub** (for Kindle, etc.).
-* **Scriptwriting Mode:** Implement a special mode with formatting tools for writing plays or screenplays.
+* **v3.2** - 📅 **Planned**
+    * **Advanced Content:** Implement support for inserting images and creating tables within the rich text editor.
 
----------------------------------------------------------------------------------------------------------------
+* **v3.3** - 📅 **Planned**
+    * **Final Formatting Tools:** Add a "Clear Formatting" button and a feature to automatically generate a Table of Contents.
+
+---
+### **v4.0 and Beyond: The Cloud & Collaboration Era**
+
+* **v4.0: Collaboration & Accessibility** - 📅 **Planned**
+    * Implement an offline mode with local storage and database synchronization.
+    * Create a full user account system.
+    * Allow users to create and import their own theme and font files.
+
+* **v5.0: AI & Publishing** - 📅 **Planned**
+    * Integrate with AI services (like Gemini) for grammar checks, summaries, and idea generation.
+    * Add support for exporting to publishing-specific formats like **ePub**.
+    * Implement a dedicated scriptwriting mode.
+
+* **v6.0: Real-Time & Cloud** - 📅 **Planned**
+    * Implement real-time, Google Docs-style collaboration.
+    * Add commenting and "track changes" features.
+    * Develop a cloud-synced web version of the application.
 
 ***
-## **v6.0 and Beyond: The "Cloud & Collaboration" Releases** ☁️
-
-This phase focuses on transforming Story Tracker from a personal authoring tool into a collaborative, cloud-based platform.
-
-* **Real-Time Collaboration:** Go beyond simple file sharing and implement a Google Docs-style system where multiple users can edit the same chapter simultaneously, seeing each other's cursors and changes in real-time.
-
-* **Commenting & Track Changes:** Add the ability for collaborators and editors to leave comments in the margins and to make edits that can be accepted or rejected by the story's owner.
-
-* **Cloud Sync & Web Version:** Transition from a self-hosted database to a cloud-based backend. This would be the foundation for a full web-based version of Story Tracker, allowing users to access and edit their work from any device with a web browser.
-
-* **Version History & Snapshots:** Implement a system that automatically saves "snapshots" of each chapter, allowing writers to view and restore previous versions of their work at any time.
-
-* **Mobile Companion App:** Create a simple, lightweight mobile app (for iOS/Android) that allows writers to review their work, jot down notes, and make quick edits on the go.
-
-* **Advanced Analytics:** Provide a "dashboard" for writers that offers insights into their work, such as writing pace (words per day), most frequently used words, readability scores, and character dialogue analysis.
-
-* **Plugin & Add-on Support:** Create a plugin architecture that would allow other developers to build and share their own add-ons, such as new export formats, custom themes, or integrations with other writing services.
