@@ -98,11 +98,23 @@ This document outlines the history, current status, and planned features for fut
     * Integrated a full-featured spell checker with a custom dictionary.
     * Added a Print Preview window with a "Print" button.
 
-* **v2.2.0** - 🚧 **Current Version**
-    * Implement full-story export (all chapters combined) into a single document.
-    * Add support for exporting to Microsoft Word (`.docx`).
-    * Add support for exporting to PDF (`.pdf`).
-    * Create a system to import existing `.txt` or `.rtf` files as new chapters.
+### **Updated Roadmap: The v2.2.x "Import/Export & Polish" Series**
+
+  * **v2.2.0 (Bug Fix & Polish Release)** - 🚧 **Current Version**
+
+      * Fix bug where story-level total word count is not displayed.
+      * Fix bug where button text disappears in the Aero theme.
+      * Add a live-updating total word count for the selected story.
+
+  * **v2.2.1 (Import Release)** - 📅 **Planned**
+
+      * Create a system to import existing `.txt` or `.rtf` files as new chapters.
+      * Implement the "Import Story Outline" feature from a CSV or text file.
+
+  * **v2.2.2 (Advanced Import/Export Release)** - 📅 **Planned**
+
+      * Add support for importing/exporting to Microsoft Word (`.docx`) and PDF (`.pdf`).
+      * Add support for importing/exporting to HTML and XML.
 
 ---
 ### **v3.x: Professional Authoring & Layout**

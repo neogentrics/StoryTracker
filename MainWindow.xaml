@@ -14,11 +14,23 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top" HorizontalAlignment="Left">
             <MenuItem Header="_File">
+                <MenuItem Header="Import Chapter from File...">
+                    <MenuItem Header="Plain Text (.txt)..." Click="ImportTxtMenuItem_Click"/>
+                    <MenuItem Header="Rich Text Format (.rtf)..." Click="ImportRtfMenuItem_Click"/>
+                </MenuItem>
                 <MenuItem Header="Export Chapter As">
                     <MenuItem Header="Plain Text (.txt)..." Click="ExportTxtMenuItem_Click"/>
                     <MenuItem Header="Rich Text Format (.rtf)..." Click="ExportRtfMenuItem_Click"/>
+                    <MenuItem Header="Microsoft Word (.docx)..." Click="ExportStoryDocxMenuItem_Click"/>
+                    <MenuItem Header="PDF Document (.pdf)..." Click="ExportStoryPdfMenuItem_Click"/>
+                </MenuItem>
+                <MenuItem Header="Export Story As">
+                    <MenuItem Header="Rich Text Format (.rtf)..." Click="ExportStoryRtfMenuItem_Click"/>
+                    <MenuItem Header="Microsoft Word (.docx)..." Click="ExportStoryDocxMenuItem_Click"/>
+                    <MenuItem Header="PDF Document (.pdf)..." Click="ExportStoryPdfMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="Print Preview..." Click="PrintPreviewMenuItem_Click"/>
+                <MenuItem Header="Print Story..." Click="PrintStoryMenuItem_Click"/>
                 <Separator/>
                 <MenuItem Header="_Exit" Click="ExitMenuItem_Click"/>
             </MenuItem>
@@ -162,6 +174,8 @@
                         <TextBox Name="GenreTextBox" Tag="e.g., Fantasy, Sci-Fi" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
                         <TextBlock Text="Status:" FontWeight="Bold" Margin="0,5,0,0"/>
                         <TextBox Name="StoryStatusTextBox" Tag="e.g., Drafting, Complete" GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"/>
+                        <TextBlock Text="Total Word Count:" FontWeight="Bold" Margin="0,5,0,0"/>
+                        <TextBlock Name="TotalWordCountTextBlock" Text="0"/>
                         <Button Name="SaveStoryDetailsButton" Content="Save Story Details" Margin="0,10,0,0" Click="SaveStoryDetailsButton_Click"/>
                     </StackPanel>
                 </GroupBox>

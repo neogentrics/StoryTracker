@@ -85,13 +85,14 @@ namespace StoryTracker
             try
             {
                 // Now we fetch the full story details to populate the properties box
-                _selectedStory = _dbService.GetStoryDetails(selectedStory.Id);
-                StoryTitleTextBox.Text = _selectedStory.Title;
-                StoryTypeTextBox.Text = _selectedStory.StoryType;
-                GenreTextBox.Text = _selectedStory.Genre;
-                StoryStatusTextBox.Text = _selectedStory.Status;
-                AppStatusTextBlock.Text = $"Selected '{_selectedStory.Title}'.";
-                LoadChaptersForStory(_selectedStory.Id);
+                _selectedStory = _dbService.GetStoryDetails(selectedStory.Id); 
+                StoryTitleTextBox.Text = _selectedStory.Title; 
+                StoryTypeTextBox.Text = _selectedStory.StoryType; 
+                GenreTextBox.Text = _selectedStory.Genre; 
+                StoryStatusTextBox.Text = _selectedStory.Status; 
+                AppStatusTextBlock.Text = $"Selected '{_selectedStory.Title}'."; 
+                LoadChaptersForStory(_selectedStory.Id); 
+                UpdateTotalWordCount(); // Update the total word count for the selected story
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
@@ -153,6 +154,18 @@ namespace StoryTracker
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
+        private void UpdateTotalWordCount()
+        {
+            if (_selectedStory != null)
+            {
+                try
+                {
+                    int totalCount = _dbService.GetTotalWordCountForStory(_selectedStory.Id);
+                    TotalWordCountTextBlock.Text = totalCount.ToString("N0"); // Format with commas
+                }
+                catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); }
+            }
+        }
         #endregion
 
         #region Chapter Methods
@@ -211,7 +224,9 @@ namespace StoryTracker
                 _dbService.SaveChapter(_selectedChapter);
                 MessageBox.Show("Chapter saved successfully!");
                 AppStatusTextBlock.Text = "Chapter saved.";
-                if (_selectedStory != null) LoadChaptersForStory(_selectedStory.Id);
+                if (_selectedStory != null) 
+                    LoadChaptersForStory(_selectedStory.Id);
+                UpdateTotalWordCount();
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
         }
@@ -226,7 +241,8 @@ namespace StoryTracker
             int nextChapterNumber = (ChapterListBox.Items.Count > 0) ? ChapterListBox.Items.Count + 1 : 1;
             try
             {
-                _dbService.CreateChapter(_selectedStory.Id, nextChapterNumber, $"New Chapter {nextChapterNumber}");
+                // Call the new method, passing an empty string for the content
+                _dbService.CreateChapter(_selectedStory.Id, nextChapterNumber, $"New Chapter {nextChapterNumber}", "");
                 LoadChaptersForStory(_selectedStory.Id);
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error); }
@@ -462,6 +478,350 @@ namespace StoryTracker
             // Pass the current RichTextBox document to the new PreviewWindow
             var preview = new PreviewWindow(StoryRichTextBox.Document, _selectedChapter.Title);
             preview.Show();
+        }
+        private void ExportStoryRtfMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Make sure a story is selected
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to export.");
+                return;
+            }
+
+            // 2. Set up the Save File Dialog
+            var saveFileDialog = new Microsoft.Win32.SaveFileDialog
+            {
+                FileName = $"{_selectedStory.Title}.rtf",
+                Filter = "Rich Text Format (*.rtf)|*.rtf"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // 3. Create a new, empty document to hold everything
+                    var finalDocument = new FlowDocument();
+
+                    // 4. Get the list of all chapters for the story
+                    var chapters = _dbService.GetChaptersForStory(_selectedStory.Id);
+
+                    foreach (var chapter in chapters)
+                    {
+                        var titleParagraph = new Paragraph(new Run($"Chapter {chapter.ChapterNumber}: {chapter.Title}"))
+                        {
+                            FontSize = 18,
+                            FontWeight = FontWeights.Bold,
+                            TextAlignment = TextAlignment.Center,
+                            Margin = new Thickness(0, 0, 0, 20)
+                        };
+                        finalDocument.Blocks.Add(titleParagraph);
+
+                        string chapterRtf = _dbService.GetChapterText(chapter.Id);
+                        if (!string.IsNullOrEmpty(chapterRtf))
+                        {
+                            var tempDoc = new FlowDocument();
+                            var textRange = new TextRange(tempDoc.ContentStart, tempDoc.ContentEnd);
+                            using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(chapterRtf)))
+                            {
+                                textRange.Load(memoryStream, DataFormats.Rtf);
+                            }
+
+                            var blocks = new List<Block>(tempDoc.Blocks);
+                            foreach (var block in blocks)
+                            {
+                                tempDoc.Blocks.Remove(block);
+                                finalDocument.Blocks.Add(block);
+                            }
+                        }
+
+                        // 8. Save the final, combined document to a file
+                        var finalRange = new TextRange(finalDocument.ContentStart, finalDocument.ContentEnd);
+                        using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                        {
+                            finalRange.Save(fileStream, DataFormats.Rtf);
+                        }
+
+                        // Call the new service method with the combined document
+                        _exportService.ExportToDocx(finalDocument, _selectedStory.Title);
+                        AppStatusTextBlock.Text = "Story exported to .docx successfully.";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to export file: {ex.Message}");
+                }
+            }
+        }
+        private void ExportChapterDocxMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedChapter == null)
+            {
+                MessageBox.Show("Please select a chapter to export.");
+                return;
+            }
+
+            try
+            {
+                // Pass the RichTextBox document and chapter title to the service
+                _exportService.ExportToDocx(StoryRichTextBox.Document, _selectedChapter.Title);
+                AppStatusTextBlock.Text = "Chapter exported to .docx successfully.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export file: {ex.Message}");
+            }
+        }
+        private void ExportStoryPdfMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to export.");
+                return;
+            }
+
+            try
+            {
+                // This logic is identical to the other full-story exports
+                var finalDocument = new FlowDocument();
+                var chapters = _dbService.GetChaptersForStory(_selectedStory.Id);
+                foreach (var chapter in chapters)
+                {
+                    var titleParagraph = new Paragraph(new Run($"Chapter {chapter.ChapterNumber}: {chapter.Title}"))
+                    {
+                        FontSize = 18,
+                        FontWeight = FontWeights.Bold,
+                        TextAlignment = TextAlignment.Center,
+                        Margin = new Thickness(0, 0, 0, 20)
+                    };
+                    finalDocument.Blocks.Add(titleParagraph);
+
+                    string chapterRtf = _dbService.GetChapterText(chapter.Id);
+                    if (!string.IsNullOrEmpty(chapterRtf))
+                    {
+                        var tempDoc = new FlowDocument();
+                        var textRange = new TextRange(tempDoc.ContentStart, tempDoc.ContentEnd);
+                        using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(chapterRtf)))
+                        {
+                            textRange.Load(memoryStream, DataFormats.Rtf);
+                        }
+                        var blocks = new List<Block>(tempDoc.Blocks.ToList());
+                        foreach (var block in blocks)
+                        {
+                            tempDoc.Blocks.Remove(block);
+                            finalDocument.Blocks.Add(block);
+                        }
+                    }
+                }
+
+                // Call the new service method with the combined document
+                _exportService.ExportToPdf(finalDocument, _selectedStory.Title);
+                AppStatusTextBlock.Text = "Story exported to .pdf successfully.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export file: {ex.Message}");
+            }
+        }
+        private void ExportChapterPdfMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedChapter == null)
+            {
+                MessageBox.Show("Please select a chapter to export.");
+                return;
+            }
+
+            try
+            {
+                // Pass the RichTextBox document and chapter title to the service
+                _exportService.ExportToPdf(StoryRichTextBox.Document, _selectedChapter.Title);
+                AppStatusTextBlock.Text = "Chapter exported to .pdf successfully.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export file: {ex.Message}");
+            }
+        }
+        private void PrintStoryMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Make sure a story is selected
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to print.");
+                return;
+            }
+
+            try
+            {
+                // 2. Build the full story document in memory (same logic as export)
+                var finalDocument = new FlowDocument();
+                var chapters = _dbService.GetChaptersForStory(_selectedStory.Id);
+                foreach (var chapter in chapters)
+                {
+                    var titleParagraph = new Paragraph(new Run($"Chapter {chapter.ChapterNumber}: {chapter.Title}"))
+                    {
+                        FontSize = 18,
+                        FontWeight = FontWeights.Bold,
+                        TextAlignment = TextAlignment.Center,
+                        Margin = new Thickness(0, 0, 0, 20)
+                    };
+                    finalDocument.Blocks.Add(titleParagraph);
+
+                    string chapterRtf = _dbService.GetChapterText(chapter.Id);
+                    if (!string.IsNullOrEmpty(chapterRtf))
+                    {
+                        var tempDoc = new FlowDocument();
+                        var textRange = new TextRange(tempDoc.ContentStart, tempDoc.ContentEnd);
+                        using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(chapterRtf)))
+                        {
+                            textRange.Load(memoryStream, DataFormats.Rtf);
+                        }
+                        var blocks = new List<Block>(tempDoc.Blocks.ToList());
+                        foreach (var block in blocks)
+                        {
+                            tempDoc.Blocks.Remove(block);
+                            finalDocument.Blocks.Add(block);
+                        }
+                    }
+                }
+
+                // 3. Send the combined document to the print dialog
+                var printDialog = new PrintDialog();
+                if (printDialog.ShowDialog() == true)
+                {
+                    printDialog.PrintDocument(((IDocumentPaginatorSource)finalDocument).DocumentPaginator, $"Printing Story: {_selectedStory.Title}");
+                    AppStatusTextBlock.Text = "Story sent to printer.";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to print story: {ex.Message}");
+            }
+        }
+        private void ExportStoryDocxMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to export.");
+                return;
+            }
+
+            try
+            {
+                // This logic builds the full story document from all its chapters
+                var finalDocument = new FlowDocument();
+                var chapters = _dbService.GetChaptersForStory(_selectedStory.Id);
+
+                foreach (var chapter in chapters)
+                {
+                    var titleParagraph = new Paragraph(new Run($"Chapter {chapter.ChapterNumber}: {chapter.Title}"))
+                    {
+                        FontSize = 18,
+                        FontWeight = FontWeights.Bold,
+                        TextAlignment = TextAlignment.Center,
+                        Margin = new Thickness(0, 0, 0, 20)
+                    };
+                    finalDocument.Blocks.Add(titleParagraph);
+
+                    string chapterRtf = _dbService.GetChapterText(chapter.Id);
+                    if (!string.IsNullOrEmpty(chapterRtf))
+                    {
+                        var tempDoc = new FlowDocument();
+                        var textRange = new TextRange(tempDoc.ContentStart, tempDoc.ContentEnd);
+                        using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(chapterRtf)))
+                        {
+                            textRange.Load(memoryStream, DataFormats.Rtf);
+                        }
+
+                        var blocks = new List<Block>(tempDoc.Blocks.ToList());
+                        foreach (var block in blocks)
+                        {
+                            tempDoc.Blocks.Remove(block);
+                            finalDocument.Blocks.Add(block);
+                        }
+                    }
+                }
+
+                // Call the service method with the combined document
+                _exportService.ExportToDocx(finalDocument, _selectedStory.Title);
+                AppStatusTextBlock.Text = "Story exported to .docx successfully.";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to export file: {ex.Message}");
+            }
+        }
+        private void ImportTxtMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to import the chapter into.");
+                return;
+            }
+
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog { Filter = "Text Documents (*.txt)|*.txt" };
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    string fileContent = File.ReadAllText(openFileDialog.FileName);
+                    string chapterTitle = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
+                    int nextChapterNumber = (ChapterListBox.Items.Count > 0) ? ChapterListBox.Items.Count + 1 : 1;
+
+                    // Convert the plain text to a simple RTF document
+                    var doc = new FlowDocument(new Paragraph(new Run(fileContent)));
+                    var range = new TextRange(doc.ContentStart, doc.ContentEnd);
+                    string rtfContent;
+                    using (var ms = new MemoryStream())
+                    {
+                        range.Save(ms, DataFormats.Rtf);
+                        rtfContent = Encoding.ASCII.GetString(ms.ToArray());
+                    }
+
+                    // Call the new service method that accepts content
+                    _dbService.CreateChapter(_selectedStory.Id, nextChapterNumber, chapterTitle, rtfContent);
+
+                    LoadChaptersForStory(_selectedStory.Id);
+                    AppStatusTextBlock.Text = "Chapter imported successfully.";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to import file: {ex.Message}");
+                }
+            }
+        }
+        private void ImportRtfMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to import the chapter into.");
+                return;
+            }
+
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Rich Text Format (*.rtf)|*.rtf"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Read the raw RTF file content as a string
+                    string rtfContent = File.ReadAllText(openFileDialog.FileName);
+                    string chapterTitle = Path.GetFileNameWithoutExtension(openFileDialog.FileName);
+                    int nextChapterNumber = (ChapterListBox.Items.Count > 0) ? ChapterListBox.Items.Count + 1 : 1;
+
+                    // Call the service method that accepts RTF content
+                    _dbService.CreateChapter(_selectedStory.Id, nextChapterNumber, chapterTitle, rtfContent);
+
+                    LoadChaptersForStory(_selectedStory.Id);
+                    AppStatusTextBlock.Text = "RTF chapter imported successfully.";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to import file: {ex.Message}");
+                }
+            }
         }
         #endregion
 

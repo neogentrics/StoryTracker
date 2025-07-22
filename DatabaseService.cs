@@ -2,6 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Windows;
+using System.Windows.Documents;
 
 namespace StoryTracker
 {
@@ -146,34 +149,63 @@ namespace StoryTracker
 
         public void SaveChapter(Chapter chapterToSave)
         {
+            // This logic correctly gets the plain text from the RTF for word counting.
+            string plainText;
+            var doc = new FlowDocument();
+            var range = new TextRange(doc.ContentStart, doc.ContentEnd);
+            using (var ms = new MemoryStream(Encoding.ASCII.GetBytes(chapterToSave.Text)))
+            {
+                range.Load(ms, DataFormats.Rtf);
+                plainText = range.Text;
+            }
+            int wordCount = plainText.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
+
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
-                var sql = "UPDATE Chapters SET ChapterTitle = @title, ChapterText = @text WHERE ChapterID = @id";
+                var sql = "UPDATE Chapters SET ChapterTitle = @title, ChapterText = @text, WordCount = @wordCount WHERE ChapterID = @id";
                 using var command = new NpgsqlCommand(sql, connection);
                 command.Parameters.AddWithValue("title", chapterToSave.Title);
                 command.Parameters.AddWithValue("text", chapterToSave.Text);
+                command.Parameters.AddWithValue("wordCount", wordCount);
                 command.Parameters.AddWithValue("id", chapterToSave.Id);
                 command.ExecuteNonQuery();
             }
             catch (Exception ex) { LogError(ex); throw new Exception("Could not save the chapter. See log.txt."); }
         }
 
-        public void CreateChapter(int storyId, int chapterNumber, string title)
+        public int GetTotalWordCountForStory(int storyId)
         {
             try
             {
                 using var connection = new NpgsqlConnection(_connectionString);
                 connection.Open();
-                var sql = "INSERT INTO Chapters (StoryID, ChapterNumber, ChapterTitle, ChapterText) VALUES (@storyId, @chapterNumber, @title, '')";
+                var sql = "SELECT SUM(WordCount) FROM Chapters WHERE StoryID = @storyId";
+                using var command = new NpgsqlCommand(sql, connection);
+                command.Parameters.AddWithValue("storyId", storyId);
+                var result = command.ExecuteScalar();
+                // Handle case where a story has no chapters yet (result is DBNull)
+                return result is DBNull ? 0 : Convert.ToInt32(result);
+            }
+            catch (Exception ex) { LogError(ex); throw new Exception("Could not calculate total word count. See log.txt."); }
+        }
+
+        public void CreateChapter(int storyId, int chapterNumber, string title, string rtfContent)
+        {
+            try
+            {
+                using var connection = new NpgsqlConnection(_connectionString);
+                connection.Open();
+                var sql = "INSERT INTO Chapters (StoryID, ChapterNumber, ChapterTitle, ChapterText) VALUES (@storyId, @chapterNumber, @title, @rtfContent)";
                 using var command = new NpgsqlCommand(sql, connection);
                 command.Parameters.AddWithValue("storyId", storyId);
                 command.Parameters.AddWithValue("chapterNumber", chapterNumber);
                 command.Parameters.AddWithValue("title", title);
+                command.Parameters.AddWithValue("rtfContent", rtfContent);
                 command.ExecuteNonQuery();
             }
-            catch (Exception ex) { LogError(ex); throw new Exception("Could not create new chapter. See log.txt."); }
+            catch (Exception ex) { LogError(ex); throw new Exception("Could not create new chapter with content. See log.txt."); }
         }
 
         public void DeleteChapter(int chapterId)
