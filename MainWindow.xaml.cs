@@ -19,6 +19,7 @@ namespace StoryTracker
         private string? _misspelledWord;
         private readonly ExportService _exportService = new ExportService();
         private readonly EditorService _editorService = new EditorService();
+        private readonly ImportService _importService = new ImportService();
 
         #region Dependency Properties for Global Font
         public static readonly DependencyProperty AppFontSizeProperty =
@@ -823,6 +824,150 @@ namespace StoryTracker
                 }
             }
         }
+        private void ImportOutlineMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var openFileDialog = new Microsoft.Win32.OpenFileDialog
+            {
+                Filter = "Text Documents (*.txt)|*.txt"
+            };
+
+            if (openFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    // Read all lines from the selected file
+                    var lines = File.ReadAllLines(openFileDialog.FileName);
+
+                    if (lines.Length < 2)
+                    {
+                        MessageBox.Show("Outline file must have at least two lines (a title and one chapter).");
+                        return;
+                    }
+
+                    // The first line is the story title
+                    var storyTitle = lines[0];
+                    // The rest of the lines are the chapter titles
+                    var chapterTitles = lines.Skip(1).ToList();
+
+                    // Call the new service method
+                    _dbService.CreateStoryFromOutline(storyTitle, chapterTitles);
+
+                    LoadStories(); // Refresh the story list
+                    AppStatusTextBlock.Text = "Story outline imported successfully.";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Failed to import outline: {ex.Message}");
+                }
+            }
+        }
+        private void ImportDocxMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to import the chapter into.");
+                return;
+            }
+
+            try
+            {
+                string rtfContent = _importService.ImportDocx();
+                if (rtfContent != null)
+                {
+                    // For now, this loads the content into the current editor.
+                    // A full implementation might ask for a chapter title.
+                    var textRange = new TextRange(StoryRichTextBox.Document.ContentStart, StoryRichTextBox.Document.ContentEnd);
+                    using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(rtfContent)))
+                    {
+                        textRange.Load(memoryStream, DataFormats.Rtf);
+                    }
+                    AppStatusTextBlock.Text = "Docx file content loaded into editor.";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to import file: {ex.Message}");
+            }
+        }
+        private void ImportPdfMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null)
+            {
+                MessageBox.Show("Please select a story to import the chapter into.");
+                return;
+            }
+
+            try
+            {
+                string rtfContent = _importService.ImportPdf();
+                if (rtfContent != null)
+                {
+                    var textRange = new TextRange(StoryRichTextBox.Document.ContentStart, StoryRichTextBox.Document.ContentEnd);
+                    using (var memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(rtfContent)))
+                    {
+                        textRange.Load(memoryStream, DataFormats.Rtf);
+                    }
+                    AppStatusTextBlock.Text = "PDF content loaded into editor.";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to import PDF: {ex.Message}");
+            }
+        }
+        private void ExportChapterHtmlMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedChapter != null) _exportService.ExportToHtml(StoryRichTextBox.Document, _selectedChapter.Title);
+        }
+        private void ExportChapterXamlMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedChapter != null) _exportService.ExportToXaml(StoryRichTextBox.Document, _selectedChapter.Title);
+        }
+        private void ExportStoryHtmlMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            // This requires building the full document first
+            // (Full implementation can be added)
+            MessageBox.Show("Full story export to HTML is not yet implemented.");
+        }
+        private void ExportStoryXamlMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            // This requires building the full document first
+            // (Full implementation can be added)
+            MessageBox.Show("Full story export to XML is not yet implemented.");
+        }
+        private void ImportHtmlMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null) return;
+            try
+            {
+                string rtfContent = _importService.ImportHtml();
+                if (rtfContent != null)
+                {
+                    // (Full implementation would create a new chapter)
+                    var textRange = new TextRange(StoryRichTextBox.Document.ContentStart, StoryRichTextBox.Document.ContentEnd);
+                    using (var ms = new MemoryStream(Encoding.ASCII.GetBytes(rtfContent))) { textRange.Load(ms, DataFormats.Rtf); }
+                    AppStatusTextBlock.Text = "HTML content loaded into editor.";
+                }
+            }
+            catch (Exception ex) { MessageBox.Show($"Failed to import file: {ex.Message}"); }
+        }
+        private void ImportXamlMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedStory == null) return;
+            try
+            {
+                string rtfContent = _importService.ImportXaml();
+                if (rtfContent != null)
+                {
+                    // (Full implementation would create a new chapter)
+                    var textRange = new TextRange(StoryRichTextBox.Document.ContentStart, StoryRichTextBox.Document.ContentEnd);
+                    using (var ms = new MemoryStream(Encoding.ASCII.GetBytes(rtfContent))) { textRange.Load(ms, DataFormats.Rtf); }
+                    AppStatusTextBlock.Text = "XAML content loaded into editor.";
+                }
+            }
+            catch (Exception ex) { MessageBox.Show($"Failed to import file: {ex.Message}"); }
+        }
+
         #endregion
 
     }

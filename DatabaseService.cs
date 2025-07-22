@@ -1,6 +1,5 @@
 ﻿using Npgsql;
-using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -227,5 +226,50 @@ namespace StoryTracker
             string logMessage = $"[{DateTime.Now}] - ERROR: {ex.Message}\nSTACK TRACE: {ex.StackTrace}\n\n";
             File.AppendAllText("log.txt", logMessage);
         }
+
+        public void CreateStoryFromOutline(string storyTitle, List<string> chapterTitles)
+        {
+            if (string.IsNullOrWhiteSpace(storyTitle) || !chapterTitles.Any())
+            {
+                throw new ArgumentException("Story outline must contain a title and at least one chapter.");
+            }
+
+            using var connection = new NpgsqlConnection(_connectionString);
+            connection.Open();
+            // Use a transaction to ensure all or none of the commands succeed
+            using var transaction = connection.BeginTransaction();
+            try
+            {
+                // 1. Create the story and get its new ID
+                var storySql = "INSERT INTO Stories (Title, LastUpdated) VALUES (@title, @lastUpdated) RETURNING StoryID";
+                using var storyCommand = new NpgsqlCommand(storySql, connection);
+                storyCommand.Parameters.AddWithValue("title", storyTitle);
+                storyCommand.Parameters.AddWithValue("lastUpdated", DateTime.UtcNow);
+                int storyId = (int)storyCommand.ExecuteScalar();
+
+                // 2. Loop through and create each chapter, linking it to the new story ID
+                int chapterNumber = 1;
+                foreach (var chapterTitle in chapterTitles)
+                {
+                    var chapterSql = "INSERT INTO Chapters (StoryID, ChapterNumber, ChapterTitle, ChapterText) VALUES (@storyId, @chapterNumber, @title, '')";
+                    using var chapterCommand = new NpgsqlCommand(chapterSql, connection);
+                    chapterCommand.Parameters.AddWithValue("storyId", storyId);
+                    chapterCommand.Parameters.AddWithValue("chapterNumber", chapterNumber++);
+                    chapterCommand.Parameters.AddWithValue("title", chapterTitle);
+                    chapterCommand.ExecuteNonQuery();
+                }
+
+                // If all commands succeeded, commit the transaction
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                // If any command failed, roll back the transaction
+                transaction.Rollback();
+                LogError(ex);
+                throw new Exception("Could not import story outline. See log.txt.");
+            }
+        }
+
     }
 }

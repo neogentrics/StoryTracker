@@ -31,7 +31,6 @@ namespace StoryTracker
                 File.WriteAllText(saveFileDialog.FileName, richText);
             }
         }
-
         public void ExportToRtf(RichTextBox richTextBox, string fileName)
         {
             var saveFileDialog = new SaveFileDialog
@@ -49,7 +48,6 @@ namespace StoryTracker
                 }
             }
         }
-
         public void ExportToDocx(FlowDocument document, string fileName)
         {
             var saveFileDialog = new SaveFileDialog
@@ -84,7 +82,6 @@ namespace StoryTracker
                 }
             }
         }
-
         public void ExportToPdf(FlowDocument document, string fileName)
         {
             var saveFileDialog = new SaveFileDialog
@@ -114,6 +111,40 @@ namespace StoryTracker
                             pdfDocument.Close();
                         }
                     }
+                }
+            }
+        }
+        public void ExportToHtml(FlowDocument document, string fileName)
+        {
+            // Note: A true RTF-to-HTML conversion is complex.
+            // This will save the content as plain text within an HTML structure.
+            var saveFileDialog = new SaveFileDialog
+            {
+                FileName = $"{fileName}.html",
+                Filter = "HTML File (*.html)|*.html"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                string plainText = new TextRange(document.ContentStart, document.ContentEnd).Text;
+                string html = $"<html><body><pre>{System.Net.WebUtility.HtmlEncode(plainText)}</pre></body></html>";
+                File.WriteAllText(saveFileDialog.FileName, html);
+            }
+        }
+        public void ExportToXaml(FlowDocument document, string fileName)
+        {
+            var saveFileDialog = new SaveFileDialog
+            {
+                FileName = $"{fileName}.xaml",
+                Filter = "XAML Package (*.xaml)|*.xaml"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                var textRange = new TextRange(document.ContentStart, document.ContentEnd);
+                using (var fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
+                {
+                    textRange.Save(fileStream, DataFormats.XamlPackage);
                 }
             }
         }

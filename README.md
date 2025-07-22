@@ -1,9 +1,7 @@
-Here is the updated `README.md` file for your v2.2.0 release.
-
 ***
-# Story Tracker v2.2.0
+# Story Tracker v2.3.0
 
-A professional, chapter-based authoring tool for writers, built with C# and WPF. This version features a comprehensive import/export system, allowing for seamless integration with other writing tools and formats.
+A professional, chapter-based authoring tool for writers, built with C# and WPF. This version introduces advanced import capabilities, including story outlines and support for a wider range of document formats.
 
 ---
 ## ✨ Features
@@ -19,7 +17,9 @@ A professional, chapter-based authoring tool for writers, built with C# and WPF.
 
 * **Comprehensive Import/Export System:**
     * **Full Story Export:** Export an entire story with all chapters combined into a single `.rtf`, `.docx`, or `.pdf` file.
-    * **Chapter Import/Export:** Import chapters from `.txt` and `.rtf` files, or export individual chapters to `.txt`, `.rtf`, `.docx`, and `.pdf`.
+    * **Advanced Import:** Import chapters from `.docx`, `.pdf` (text only), `.html`, and `.xaml` files.
+    * **Story Outline Import:** Quickly build a new story structure by importing a simple text file with a title and chapter list.
+    * **Chapter Import/Export:** Import chapters from `.txt` and `.rtf` files, or export individual chapters to various formats.
     * **Print Preview & Printing:** Preview and print individual chapters or the entire story.
 
 * **Advanced Customization & Tools:**
@@ -37,7 +37,7 @@ A professional, chapter-based authoring tool for writers, built with C# and WPF.
 1.  Download the `.zip` file from the latest release.
 2.  Unzip the folder and run the `StoryTracker.exe` file.
 3.  On the Login Window, enter the connection details for your PostgreSQL server.
-4.  Use the **"File"** menu to import existing documents or to export/print your work.
+4.  Use the **"File"** menu to import existing documents/outlines or to export/print your work.
 5.  Use the **"Settings"** menu to customize the application's theme and fonts.
 
 ---
@@ -48,61 +48,40 @@ A professional, chapter-based authoring tool for writers, built with C# and WPF.
 * **PostgreSQL** for the database backend
 * **Newtonsoft.Json** for data serialization
 * **Npgsql** for database connectivity
-* **DocX** and **iTextSharp** for file exporting
+* **DocX** and **iTextSharp** for file exporting/importing
 
-* ----------------------------------------------------------
-
-***
-
-Here is the complete project roadmap.
-
-***
+---
 ## **Story Tracker: Official Development Roadmap**
 
 This document outlines the history, current status, and planned features for future versions of the Story Tracker application.
 
----
 ### **v1.x: Foundation & Polish**
 
 * **v1.0.0** - ✅ **Released**
-    * Initial release.
-    * Core functionality for storing stories as single documents.
-    * Basic data structures and database connection.
-
+    * Initial release with core functionality for storing stories as single documents.
 * **v1.1.0** - ✅ **Released**
-    * Implemented a secure, configurable login window.
-    * Added the ability to save/delete encrypted connection profiles.
-    * Introduced the first UI polish, including a dark theme and status bar.
-
+    * Implemented a secure, configurable login window with encrypted profiles.
 * **v1.2.0** - ✅ **Released**
-    * Implemented a full, multi-theme engine with accessibility options.
-    * Added global and editor-specific font customization.
-    * Introduced auto-save, "Last Updated" timestamps, and a live search filter.
-    * Refactored database logic into a `DatabaseService` with error logging.
+    * Implemented a full, multi-theme engine and advanced font customization.
+    * Added auto-save, search, and refactored code into services.
 
 ---
 ### **v2.x: The Chapter & Editor Overhaul**
 
 * **v2.0.0** - ✅ **Released**
-    * Major architectural redesign to a chapter-based system.
-
+    * Major architectural redesign to a chapter-based system with a `RichTextBox`.
 * **v2.1.1** - ✅ **Released**
-    * Implemented story management (Add/Delete) and basic file export (`.txt`, `.rtf`).
+    * Implemented full story/chapter management (Add/Delete) and basic file export.
     * Added spell check and print preview.
-
 * **v2.2.0** - ✅ **Released**
-    * Implemented full-story export to `.rtf`, `.docx`, and `.pdf`.
-    * Implemented chapter import from `.txt` and `.rtf`.
-
-* **v2.3.0** - 🚧 **Current Version**
-    * Implement the "Import Story Outline" feature.
-    * Add support for importing from Microsoft Word (`.docx`) and PDF (`.pdf`).
-    * Add support for importing and exporting to HTML and XML formats.
+    * Implemented full-story export and import for `.txt` and `.rtf`.
+* **v2.3.0** - ✅ **Released**
+    * Implemented advanced import features, including Story Outline import and support for `.docx`, `.pdf`, `.html`, and `.xaml` files.
 
 ---
 ### **v3.x: Professional Authoring & Layout**
 
-* **v3.0** - 📅 **Planned**
+* **v3.0** - 🚧 **Current Version**
     * **Page Layout System:** Implement a "Page Setup" dialog with support for standard book sizes (e.g., 6x9, 8.5x11) and customizable margins.
 
 * **v3.1** - 📅 **Planned**
@@ -118,18 +97,10 @@ This document outlines the history, current status, and planned features for fut
 ### **v4.0 and Beyond: The Cloud & Collaboration Era**
 
 * **v4.0: Collaboration & Accessibility** - 📅 **Planned**
-    * Implement an offline mode with local storage and database synchronization.
-    * Create a full user account system.
-    * Allow users to create and import their own theme and font files.
+    * Implement an offline mode, a full user account system, and allow for custom theme/font importing.
 
 * **v5.0: AI & Publishing** - 📅 **Planned**
-    * Integrate with AI services (like Gemini) for grammar checks, summaries, and idea generation.
-    * Add support for exporting to publishing-specific formats like **ePub**.
-    * Implement a dedicated scriptwriting mode.
+    * Integrate with AI services, add ePub export, and implement a scriptwriting mode.
 
 * **v6.0: Real-Time & Cloud** - 📅 **Planned**
-    * Implement real-time, Google Docs-style collaboration.
-    * Add commenting and "track changes" features.
-    * Develop a cloud-synced web version of the application.
-
-***
+    * Implement real-time collaboration, commenting, and a cloud-synced web version.

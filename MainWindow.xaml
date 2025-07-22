@@ -17,17 +17,27 @@
                 <MenuItem Header="Import Chapter from File...">
                     <MenuItem Header="Plain Text (.txt)..." Click="ImportTxtMenuItem_Click"/>
                     <MenuItem Header="Rich Text Format (.rtf)..." Click="ImportRtfMenuItem_Click"/>
+                    <MenuItem Header="Microsoft Word (.docx)..." Click="ImportDocxMenuItem_Click"/>
+                    <MenuItem Header="PDF Document (.pdf)..." Click="ImportPdfMenuItem_Click"/>
+                    <MenuItem Header="HTML File (.html)..." Click="ImportHtmlMenuItem_Click"/>
+                    <MenuItem Header="XML (XAML Package)..." Click="ImportXamlMenuItem_Click"/>
+                    <Separator/>
+                    <MenuItem Header="Import Story Outline..." Click="ImportOutlineMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="Export Chapter As">
                     <MenuItem Header="Plain Text (.txt)..." Click="ExportTxtMenuItem_Click"/>
                     <MenuItem Header="Rich Text Format (.rtf)..." Click="ExportRtfMenuItem_Click"/>
                     <MenuItem Header="Microsoft Word (.docx)..." Click="ExportStoryDocxMenuItem_Click"/>
                     <MenuItem Header="PDF Document (.pdf)..." Click="ExportStoryPdfMenuItem_Click"/>
+                    <MenuItem Header="HTML File (.html)..." Click="ExportChapterHtmlMenuItem_Click"/>
+                    <MenuItem Header="XML (XAML Package)..." Click="ExportChapterXamlMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="Export Story As">
                     <MenuItem Header="Rich Text Format (.rtf)..." Click="ExportStoryRtfMenuItem_Click"/>
                     <MenuItem Header="Microsoft Word (.docx)..." Click="ExportStoryDocxMenuItem_Click"/>
                     <MenuItem Header="PDF Document (.pdf)..." Click="ExportStoryPdfMenuItem_Click"/>
+                    <MenuItem Header="HTML File (.html)..." Click="ExportStoryHtmlMenuItem_Click"/>
+                    <MenuItem Header="XML (XAML Package)..." Click="ExportStoryXamlMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="Print Preview..." Click="PrintPreviewMenuItem_Click"/>
                 <MenuItem Header="Print Story..." Click="PrintStoryMenuItem_Click"/>
