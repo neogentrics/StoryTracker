@@ -1,11 +1,9 @@
-We are ready to start **v2.2**.
-
-Here is the updated `README.md` file that reflects all the great features you added in the v2.1.1 release.
+Here is the updated `README.md` file for your v2.2.0 release.
 
 ***
-# Story Tracker v2.1.1
+# Story Tracker v2.2.0
 
-A professional, chapter-based authoring tool for writers, built with C# and WPF. This version adds essential productivity features including file exporting and an integrated spell checker, building on the powerful v2.0 foundation.
+A professional, chapter-based authoring tool for writers, built with C# and WPF. This version features a comprehensive import/export system, allowing for seamless integration with other writing tools and formats.
 
 ---
 ## ✨ Features
@@ -19,15 +17,15 @@ A professional, chapter-based authoring tool for writers, built with C# and WPF.
     * Customize font family, size, and color for selected text.
     * Live word and character counts update as you type.
 
-* **Editing & Export Tools:**
-    * **Integrated Spell Checker:** Features a built-in spell checker with a custom dictionary, which can be toggled via the "Edit" menu.
-    * **Chapter Export:** Save the current chapter to your computer in **Plain Text (`.txt`)** or **Rich Text Format (`.rtf`)**.
-    * **Print Preview & Printing:** A "File > Print Preview" option provides a clean, read-only view of your chapter with a direct-to-printer function.
+* **Comprehensive Import/Export System:**
+    * **Full Story Export:** Export an entire story with all chapters combined into a single `.rtf`, `.docx`, or `.pdf` file.
+    * **Chapter Import/Export:** Import chapters from `.txt` and `.rtf` files, or export individual chapters to `.txt`, `.rtf`, `.docx`, and `.pdf`.
+    * **Print Preview & Printing:** Preview and print individual chapters or the entire story.
 
-* **Advanced Customization:**
-    * **Full Theming Engine:** Choose from multiple themes, including Light, Dark, High Contrast, and a semi-transparent "Aero" glass theme. Your choice is saved between sessions.
-    * **Custom Button Styles:** Application buttons feature unique, theme-aware image backgrounds.
-    * **Global Font Control:** Change the font size and family for the entire application UI.
+* **Advanced Customization & Tools:**
+    * **Full Theming Engine:** Choose from multiple themes, including Light, Dark, High Contrast, and a semi-transparent "Aero" glass theme.
+    * **Integrated Spell Checker:** Features a built-in spell checker with a custom dictionary.
+    * **Auto-Save:** Automatically saves your work on the currently opened chapter.
 
 * **Secure & Configurable Login:**
     * Connects to a user-specified PostgreSQL database.
@@ -39,18 +37,18 @@ A professional, chapter-based authoring tool for writers, built with C# and WPF.
 1.  Download the `.zip` file from the latest release.
 2.  Unzip the folder and run the `StoryTracker.exe` file.
 3.  On the Login Window, enter the connection details for your PostgreSQL server.
-4.  Select a story from the left-most list to view its chapters.
-5.  Select a chapter from the middle list to load its content into the rich text editor.
-6.  Use the **"File"** menu to export or preview your work, and the **"Edit"** menu to toggle spell check.
+4.  Use the **"File"** menu to import existing documents or to export/print your work.
+5.  Use the **"Settings"** menu to customize the application's theme and fonts.
 
 ---
 ## 🛠️ Technology Stack
 
 * **C#** with **.NET**
-* **WPF** (Windows Presentation Foundation) for the user interface
+* **WPF** (Windows Presentation Foundation)
 * **PostgreSQL** for the database backend
 * **Newtonsoft.Json** for data serialization
-* **Npgsql** as the .NET data provider for PostgreSQL
+* **Npgsql** for database connectivity
+* **DocX** and **iTextSharp** for file exporting
 
 * ----------------------------------------------------------
 
@@ -87,34 +85,19 @@ This document outlines the history, current status, and planned features for fut
 
 * **v2.0.0** - ✅ **Released**
     * Major architectural redesign to a chapter-based system.
-    * Database refactored with `Stories` and `Chapters` tables.
-    * UI redesigned into a three-column layout.
-    * Replaced `TextBox` with a powerful `RichTextBox`.
-    * Implemented a full formatting toolbar with image-based icons.
 
 * **v2.1.1** - ✅ **Released**
-    * Implemented "Add Story" and "Delete Story" functionality.
-    * Added chapter export to Plain Text (`.txt`) and Rich Text Format (`.rtf`).
-    * Integrated a full-featured spell checker with a custom dictionary.
-    * Added a Print Preview window with a "Print" button.
+    * Implemented story management (Add/Delete) and basic file export (`.txt`, `.rtf`).
+    * Added spell check and print preview.
 
-### **Updated Roadmap: The v2.2.x "Import/Export & Polish" Series**
+* **v2.2.0** - ✅ **Released**
+    * Implemented full-story export to `.rtf`, `.docx`, and `.pdf`.
+    * Implemented chapter import from `.txt` and `.rtf`.
 
-  * **v2.2.0 (Bug Fix & Polish Release)** - 🚧 **Current Version**
-
-      * Fix bug where story-level total word count is not displayed.
-      * Fix bug where button text disappears in the Aero theme.
-      * Add a live-updating total word count for the selected story.
-
-  * **v2.2.1 (Import Release)** - 📅 **Planned**
-
-      * Create a system to import existing `.txt` or `.rtf` files as new chapters.
-      * Implement the "Import Story Outline" feature from a CSV or text file.
-
-  * **v2.2.2 (Advanced Import/Export Release)** - 📅 **Planned**
-
-      * Add support for importing/exporting to Microsoft Word (`.docx`) and PDF (`.pdf`).
-      * Add support for importing/exporting to HTML and XML.
+* **v2.3.0** - 🚧 **Current Version**
+    * Implement the "Import Story Outline" feature.
+    * Add support for importing from Microsoft Word (`.docx`) and PDF (`.pdf`).
+    * Add support for importing and exporting to HTML and XML formats.
 
 ---
 ### **v3.x: Professional Authoring & Layout**
