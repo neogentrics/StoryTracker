@@ -1,49 +1,73 @@
 
-## Updated `README.md` for v2.0.0
+You are absolutely right, my apologies. We are ready to start v2.2.
 
-# Story Tracker v2.0.0
+Here is the updated README.md file that reflects all the great features you added in the v2.1.1 release.
 
-A professional, chapter-based authoring tool for writers, built with C\# and WPF. This application provides a powerful rich text editor and a highly customizable, theme-aware interface to manage and write your stories.
+Story Tracker v2.1.1
+A professional, chapter-based authoring tool for writers, built with C# and WPF. This version adds essential productivity features including file exporting and an integrated spell checker, building on the powerful v2.0 foundation.
 
------
+✨ Features
+Chapter-Based Writing:
 
-## ✨ Features
+Organize your stories into individual chapters.
 
-  * **Chapter-Based Writing:**
-      * Organize your stories into individual **chapters**.
-      * Easily add, delete, and navigate chapters within each story.
-  * **Powerful Rich Text Editor:**
-      * Full formatting controls: **Bold**, *Italic*, Underline, Strikethrough, and more.
-      * Customize font family, size, and color for selected text.
-      * Create bulleted and numbered lists, and adjust text alignment and indentation.
-      * Live word and character counts update as you type.
-  * **Advanced Customization:**
-      * **Full Theming Engine:** Choose from multiple themes, including Light, Dark, High Contrast, and a semi-transparent "Aero" glass theme. Your choice is saved between sessions.
-      * **Custom Button Styles:** Application buttons feature unique, theme-aware image backgrounds.
-      * **Global Font Control:** Change the font size and family for the entire application UI.
-  * **Secure & Configurable Login:**
-      * Connects to a user-specified PostgreSQL database.
-      * Saves and **encrypts** connection profiles for quick and secure access.
+Easily add, delete, and navigate stories and chapters.
 
-## 💻 How to Use
+Powerful Rich Text Editor:
 
-1.  Download the `.zip` file from the latest [release](https://www.google.com/search?q=https://github.com/YOUR_USERNAME/YOUR_REPOSITORY/releases).
-2.  Unzip the folder and run the `StoryTracker.exe` file.
-3.  On the Login Window, enter the connection details for your PostgreSQL server.
-4.  Select a story from the left-most list to view its chapters.
-5.  Select a chapter from the middle list to load its content into the rich text editor.
+Full formatting controls: Bold, Italic, Underline, Strikethrough, Alignment, Lists, and more.
 
-## 🛠️ Technology Stack
+Customize font family, size, and color for selected text.
 
-  * **C\#** with **.NET**
-  * **WPF** (Windows Presentation Foundation) for the user interface
-  * **PostgreSQL** for the database backend
-  * **Newtonsoft.Json** for data serialization
-  * **Npgsql** as the .NET data provider for PostgreSQL
+Live word and character counts update as you type.
 
-    
-----------------------------------------------------------------------------------------------
+Editing & Export Tools:
 
+Integrated Spell Checker: Features a built-in spell checker with a custom dictionary, which can be toggled via the "Edit" menu.
+
+Chapter Export: Save the current chapter to your computer in Plain Text (.txt) or Rich Text Format (.rtf).
+
+Print Preview & Printing: A "File > Print Preview" option provides a clean, read-only view of your chapter with a direct-to-printer function.
+
+Advanced Customization:
+
+Full Theming Engine: Choose from multiple themes, including Light, Dark, High Contrast, and a semi-transparent "Aero" glass theme. Your choice is saved between sessions.
+
+Custom Button Styles: Application buttons feature unique, theme-aware image backgrounds.
+
+Global Font Control: Change the font size and family for the entire application UI.
+
+Secure & Configurable Login:
+
+Connects to a user-specified PostgreSQL database.
+
+Saves and encrypts connection profiles for quick and secure access.
+
+💻 How to Use
+Download the .zip file from the latest release.
+
+Unzip the folder and run the StoryTracker.exe file.
+
+On the Login Window, enter the connection details for your PostgreSQL server.
+
+Select a story from the left-most list to view its chapters.
+
+Select a chapter from the middle list to load its content into the rich text editor.
+
+Use the "File" menu to export or preview your work, and the "Edit" menu to toggle spell check.
+
+🛠️ Technology Stack
+C# with .NET
+
+WPF (Windows Presentation Foundation) for the user interface
+
+PostgreSQL for the database backend
+
+Newtonsoft.Json for data serialization
+
+Npgsql as the .NET data provider for PostgreSQL
+
+*----------------------------------------------------------
 
 ***
 
