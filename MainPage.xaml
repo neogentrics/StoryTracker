@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:StoryTracker.MAUI"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="StoryTracker.MAUI.MainPage"
+             Title="Story Tracker">
+
+    <!-- The complete MenuBar for the application -->
+    <ContentPage.MenuBarItems>
+        <MenuBarItem Text="File">
+            <MenuFlyoutItem Text="Import Chapter from File..." Clicked="OnImportChapterClicked"/>
+            <MenuFlyoutItem Text="Export Chapter As..."/>
+            <MenuFlyoutItem Text="Export Story As..."/>
+            <MenuFlyoutItem Text="Print Preview..."/>
+            <MenuFlyoutItem Text="Print Story..."/>
+        </MenuBarItem>
+        <MenuBarItem Text="Edit">
+            <MenuFlyoutItem Text="Spell Check"/>
+        </MenuBarItem>
+        <MenuBarItem Text="Settings">
+            <MenuFlyoutSubItem Text="Themes">
+                <!-- Theme options will be added here in a future step -->
+            </MenuFlyoutSubItem>
+        </MenuBarItem>
+    </ContentPage.MenuBarItems>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Column 0: Stories -->
+        <VerticalStackLayout Grid.Column="0" Spacing="5" Padding="5">
+            <SearchBar x:Name="SearchEntry" Placeholder="Search by Title..."/>
+            <ListView x:Name="StoryListView" ItemSelected="OnStorySelected">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Title}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                <Button x:Name="AddStoryButton" Text="Add Story" Clicked="OnAddStoryClicked"/>
+                <Button x:Name="DeleteStoryButton" Text="Delete Story" Clicked="OnDeleteStoryClicked"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <toolkit:GridSplitter Grid.Column="1"/>
+
+        <!-- Column 1: Chapters -->
+        <VerticalStackLayout Grid.Column="2" Spacing="5" Padding="5">
+            <Label Text="Chapters" FontAttributes="Bold"/>
+            <ListView x:Name="ChapterListView" ItemSelected="OnChapterSelected">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextCell Text="{Binding Title}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="10">
+                <Button x:Name="AddChapterButton" Text="Add Chapter" Clicked="OnAddChapterClicked"/>
+                <Button x:Name="DeleteChapterButton" Text="Delete Chapter" Clicked="OnDeleteChapterClicked"/>
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+
+        <toolkit:GridSplitter Grid.Column="3"/>
+
+        <!-- Column 2: Details & Editor -->
+        <Grid Grid.Column="4" RowSpacing="5" Padding="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Story Properties -->
+            <Border Grid.Row="0" Stroke="Gray" StrokeThickness="1" Padding="10">
+                <VerticalStackLayout>
+                    <Label Text="Story Properties" FontAttributes="Bold"/>
+                    <Entry x:Name="StoryTitleEntry" Placeholder="Story Title"/>
+                    <Entry x:Name="StoryTypeEntry" Placeholder="Story Type"/>
+                    <Entry x:Name="GenreEntry" Placeholder="Genre"/>
+                    <Entry x:Name="StatusEntry" Placeholder="Status"/>
+                    <Button x:Name="SaveStoryDetailsButton" Text="Save Story Details" Clicked="OnSaveStoryDetailsClicked"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Chapter Editor -->
+            <Border Grid.Row="1" Stroke="Gray" StrokeThickness="1" Padding="10">
+                <VerticalStackLayout Spacing="5">
+                    <Label Text="Chapter Title:" FontAttributes="Bold"/>
+                    <Entry x:Name="ChapterTitleEntry" Placeholder="Chapter Title"/>
+
+                    <!-- Toolbar for the Rich Text Editor -->
+                    <HorizontalStackLayout Spacing="10">
+                        <Button x:Name="BoldButton" Text="B" FontAttributes="Bold" Clicked="BoldButton_Clicked" />
+                        <Button x:Name="ItalicButton" Text="I" FontAttributes="Italic" Clicked="ItalicButton_Clicked" />
+                        <Button x:Name="UnderlineButton" Text="U" Clicked="UnderlineButton_Clicked" />
+                    </HorizontalStackLayout>
+
+                    <!-- Our Custom Rich Text Editor Control -->
+                    <local:RichTextEditorView x:Name="StoryRichEditor" VerticalOptions="FillAndExpand"/>
+
+                    <Button x:Name="SaveChapterButton" Text="Save Chapter" Clicked="OnSaveChapterClicked"/>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentPage>

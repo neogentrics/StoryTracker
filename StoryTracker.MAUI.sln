@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StoryTracker.MAUI", "StoryTracker.MAUI.csproj", "{06C5EB0F-1D11-4AE6-88A0-61397C23EEBD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{06C5EB0F-1D11-4AE6-88A0-61397C23EEBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06C5EB0F-1D11-4AE6-88A0-61397C23EEBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06C5EB0F-1D11-4AE6-88A0-61397C23EEBD}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{06C5EB0F-1D11-4AE6-88A0-61397C23EEBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06C5EB0F-1D11-4AE6-88A0-61397C23EEBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06C5EB0F-1D11-4AE6-88A0-61397C23EEBD}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7670B2EA-4D61-492C-B454-040C9D65CB91}
+	EndGlobalSection
+EndGlobal
