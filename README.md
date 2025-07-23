@@ -79,19 +79,31 @@ This document outlines the history, current status, and planned features for fut
     * Implemented advanced import features, including Story Outline import and support for `.docx`, `.pdf`, `.html`, and `.xaml` files.
 
 ---
-### **v3.x: Professional Authoring & Layout**
+## **Revised Roadmap: v3.x Series**
 
-* **v3.0** - 🚧 **Current Version**
-    * **Page Layout System:** Implement a "Page Setup" dialog with support for standard book sizes (e.g., 6x9, 8.5x11) and customizable margins.
+### **v3.0: The Cross-Platform Migration** - 🚧 **Current Version**
+This release is dedicated to rebuilding the application's user interface in **.NET MAUI** to enable cross-platform support.
+* Rewrite all existing windows (`LoginWindow`, `MainWindow`, `AboutWindow`, etc.) using the .NET MAUI framework.
+* Ensure core business logic (`DatabaseService`, `ImportService`, etc.) is compatible.
+* Establish a single codebase that can be compiled for **Windows**, **macOS**, and **Android**.
+* **Goal:** Have a functional, cross-platform version of the app with the same features as v2.3.
 
-* **v3.1** - 📅 **Planned**
-    * **Page Elements:** Add the ability to define and edit headers, footers, and automatic page numbers for exports.
+---
+### **v3.1: Professional Layout & Export** - 📅 **Planned**
+This release focuses on adding advanced document formatting and layout features, leveraging the new MAUI foundation.
+* **Page Layout System:** Implement a "Page Setup" dialog with support for standard book sizes (6x9, 8.5x11) and customizable margins.
+* **Page Elements:** Add the ability to define and edit headers, footers, and automatic page numbers for exports.
 
-* **v3.2** - 📅 **Planned**
-    * **Advanced Content:** Implement support for inserting images and creating tables within the rich text editor.
+---
+### **v3.2: Advanced Content** - 📅 **Planned**
+* **Image Support:** Implement the ability to insert and manage images within the rich text editor.
+* **Table Support:** Add tools for creating and editing tables.
 
-* **v3.3** - 📅 **Planned**
-    * **Final Formatting Tools:** Add a "Clear Formatting" button and a feature to automatically generate a Table of Contents.
+---
+### **v3.3: Final Authoring Tools** - 📅 **Planned**
+* **Table of Contents Generation:** Create a feature to automatically build a table of contents from chapter titles.
+* **"Clear Formatting" Tool:** Add a button to the editor toolbar to remove all styling from selected text.
+* **Linux Support:** While .NET MAUI has community support for Linux, this release would focus on testing and packaging specifically for major Linux distributions (like Ubuntu and Fedora).
 
 ---
 ### **v4.0 and Beyond: The Cloud & Collaboration Era**
