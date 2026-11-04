@@ -1,0 +1,108 @@
+{
+  "name": "rt-story-tracker",
+  "productName": "RT Story Tracker",
+  "version": "3.0.0-alpha.0",
+  "description": "A place to write a book and keep everything around it, for Windows, macOS and Linux.",
+  "author": "Recon Towers Dev Department <author@neogentrics.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "private": true,
+  "main": "src/main/main.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "better-sqlite3-multiple-ciphers": "^13.0.3"
+  },
+  "devDependencies": {
+    "electron": "^45.2.2",
+    "electron-builder": "^26.18.0",
+    "playwright-core": "^1.64.1"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test \"test/*.test.cjs\"",
+    "test:e2e": "node test/e2e/app.e2e.cjs",
+    "dist:win": "electron-builder --win nsis --x64 --publish never",
+    "dist:mac": "electron-builder --mac dmg --arm64 --x64 --publish never",
+    "dist:linux": "electron-builder --linux AppImage deb --x64 --publish never",
+    "check:install": "node scripts/check-install.cjs"
+  },
+  "build": {
+    "appId": "com.recontowers.storytracker",
+    "productName": "RT Story Tracker",
+    "npmRebuild": false,
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "src/**",
+      "package.json",
+      "LICENSE",
+      "THIRD_PARTY_NOTICES.md",
+      "!node_modules/node-addon-api/**",
+      "!node_modules/better-sqlite3-multiple-ciphers/deps/**",
+      "!node_modules/better-sqlite3-multiple-ciphers/src/**",
+      "!node_modules/better-sqlite3-multiple-ciphers/binding.gyp"
+    ],
+    "copyright": "Copyright © 2026 Recon Towers. All rights reserved.",
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "files": [
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/darwin-*",
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/linux*",
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/win32-arm64.node"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "RT Story Tracker",
+      "license": "LICENSE",
+      "artifactName": "RTStoryTracker-${version}-Setup.exe"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "target": [
+        "dmg"
+      ],
+      "identity": "-",
+      "files": [
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/win32-*",
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/linux*"
+      ]
+    },
+    "dmg": {
+      "artifactName": "RTStoryTracker-${version}-mac-${arch}.dmg"
+    },
+    "linux": {
+      "category": "Office",
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "artifactName": "RTStoryTracker-${version}-linux-${arch}.${ext}",
+      "maintainer": "Recon Towers Dev Department <author@neogentrics.com>",
+      "synopsis": "A place to write a book and keep everything around it",
+      "files": [
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/win32-*",
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/darwin-*",
+        "!node_modules/better-sqlite3-multiple-ciphers/prebuilds/linux*arm64.node"
+      ]
+    },
+    "deb": {
+      "packageCategory": "text"
+    }
+  },
+  "homepage": "https://github.com/neogentrics/StoryTracker",
+  "bugs": "https://github.com/neogentrics/StoryTracker/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neogentrics/StoryTracker.git"
+  }
+}
