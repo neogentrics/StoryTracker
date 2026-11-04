@@ -56,23 +56,36 @@ function createWindow({ show = true } = {}) {
   return window;
 }
 
+function timeout(ms, value) {
+  return new Promise((resolve) => setTimeout(resolve, ms, value));
+}
+
 async function windowState(window) {
   if (window.webContents.isLoading()) {
-    await new Promise((resolve) => window.webContents.once('did-finish-load', resolve));
+    const loaded = new Promise((resolve) => window.webContents.once('did-finish-load', resolve));
+    await Promise.race([loaded, timeout(30000)]);
   }
   for (let tries = 0; tries < 100; tries += 1) {
-    const state = await window.webContents.executeJavaScript("document.body.dataset.state ?? ''");
+    const state = await Promise.race([
+      window.webContents.executeJavaScript("document.body.dataset.state ?? ''"),
+      timeout(5000, ''),
+    ]);
     if (state) return state;
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await timeout(100);
   }
   return 'timed out';
 }
 
+// The window goes first and is closed before the storage work, because that work holds up this process, and a window
+// still loading behind it can stall for good.
 async function selfTest() {
   let report;
   try {
-    report = runSelfTest(path.join(scratch, 'work'), { withMeasure });
+    console.log('Self-test: waiting for the window');
     const state = await windowState(mainWindow);
+    console.log(`Self-test: window is ${state}`);
+    mainWindow.destroy();
+    report = runSelfTest(path.join(scratch, 'work'), { withMeasure });
     report.checks.push({ name: 'opens the window', passed: state === 'ready', detail: state });
     report.ok = report.ok && state === 'ready';
   } catch (error) {
@@ -80,8 +93,9 @@ async function selfTest() {
   }
   report.packaged = app.isPackaged;
   report.version = app.getVersion();
-  fs.writeFileSync(selfTestFile, `${JSON.stringify(report, null, 2)}\n`);
-  mainWindow.destroy();
+  fs.writeFileSync(selfTestFile, `${JSON.stringify(report, null, 2)}
+`);
+  console.log(`Self-test: finished, ok is ${report.ok}`);
   try {
     fs.rmSync(path.join(scratch, 'work'), { recursive: true, force: true, maxRetries: 5 });
     fs.rmSync(scratch, { recursive: true, force: true, maxRetries: 2 });
@@ -111,6 +125,6 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    if (process.platform !== 'darwin' && !selfTestFile) app.quit();
   });
 }
