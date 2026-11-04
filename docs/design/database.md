@@ -53,8 +53,49 @@ five times.
 **What the numbers say:** both are far faster than any author will ever need, and both survived every crash. Speed
 isn't a reason to choose either one. The choice comes down to everything below the table.
 
-**What this test didn't cover:** Mac and Linux, real power cuts (killing a process isn't the same), encrypted SQLite,
-and a real Electron build. Those are step zero of the first version in the [roadmap](../../ROADMAP.md).
+**What this test didn't cover:** Mac, Linux, encrypted SQLite and a real Electron build. All four are now covered in
+[the test with encryption on](#the-test-with-encryption-on). Real power cuts are still open: killing a process isn't the
+same, so that's a hand test in v3.0.
+
+## The test with encryption on
+
+Run on 4 November 2026 by the CI build, on GitHub's machines. Each system built its real installer, installed it, and ran
+the app's own self-test from the installed copy. Run it yourself with `--self-test=<report file> --measure`.
+
+**The chosen setup:** SQLite 3.53.4 through `better-sqlite3-multiple-ciphers` 13.0.3, in the SQLCipher 4 format, with a
+random 256-bit key per project, WAL and full sync. That format was picked so the Android companion can open it with
+SQLCipher's own library.
+
+| Check, on Windows, Mac (Apple Silicon) and Linux (`.deb` and AppImage) | Result |
+|---|---|
+| Installs and opens its window | Passed |
+| Saves, reopens and keeps the writing | Passed |
+| Header of the file is garbled | Passed |
+| A word known to be in the writing appears in no file, including the live journal, backups and search | Passed |
+| The wrong key is refused | Passed |
+| Search works inside the encryption | Passed |
+| Five hard kills while saving: every reported save survives, and the integrity check passes | Passed |
+
+The speed test used 10,500 made-up documents, 62.7 MB of text. Plain SQLite ran in the same build, so each row compares
+the two on one machine. Made-up words index worse than real writing, so don't compare these with the first test.
+
+| | Windows | Mac | Linux |
+|---|---|---|---|
+| Load, encrypted (plain) | 8.3 s (5.6 s) | 7.7 s (2.4 s) | 5.2 s (2.7 s) |
+| Search, encrypted (plain) | 0.22 ms (0.08 ms) | 0.38 ms (0.17 ms) | 0.20 ms (0.06 ms) |
+| Backup, encrypted (plain) | 0.07 s (0.06 s) | 0.20 s (0.28 s) | 0.09 s (0.08 s) |
+| Full check, encrypted (plain) | 2.6 s (1.0 s) | 4.4 s (0.8 s) | 2.3 s (0.9 s) |
+| Size on disk, encrypted (plain) | 179.4 MB (161.2 MB) | The same | The same |
+
+**What the numbers say:** encryption costs about 1.5 to 3 times on a bulk load of roughly 90 novels and about 11% on disk.
+Searches stay well under a millisecond, so an author won't notice any of it.
+
+**Install size:** the database adds 2.2 to 2.8 MB, depending on the system. The empty app's installers are 122 MB on
+Windows, 122 to 129 MB on Mac, and 103 MB (`.deb`) to 129 MB (AppImage) on Linux, nearly all of it Electron.
+
+**Still not covered:** a real power cut, an Intel Mac (its installer is built but wasn't run), and Linux or Windows on
+ARM. The code hasn't had the outside review the [password design](passwords-and-recovery.md#what-to-test-before-it-ships)
+asks for, which has to happen before v3.6.
 
 ## Option A: built-in PostgreSQL
 
@@ -119,7 +160,7 @@ running.
 **Licensing.** SQLite is public domain. For encryption, SQLCipher Community Edition is BSD-style and
 `better-sqlite3-multiple-ciphers` (for Electron) is MIT. Both need their notices shipped.
 
-**Install size.** A few MB, to be measured in step zero.
+**Install size.** 2.2 to 2.8 MB, measured in step zero.
 
 **Windows, Mac, Linux.** Nothing to manage on any of them, and it also runs on Android, which helps the companion keep
 its offline copy.
@@ -153,7 +194,7 @@ swapped, which is good practice anyway. It adds testing work on every release, s
 | No setup for the author | Yes, the app hides it | Yes, nothing to hide |
 | Holds all the data | Yes | Yes |
 | Crash survival in the test | Passed | Passed |
-| Added to the install | 14 to 68 MB, plus backup tools | A few MB |
+| Added to the install | 14 to 68 MB, plus backup tools | 2.2 to 2.8 MB |
 | Runs in the background | 9 processes | None |
 | Password mode that's really garbled | **No built-in way** | **Yes** |
 | App-only file | A dump wrapped in our own file | The database is the file |

@@ -33,6 +33,11 @@ Every project is encrypted, even with no password set. Without a password, the a
 see only garbage. That's privacy from casual looks, not real secrecy, and the app says so. A password is what makes it
 real.
 
+That app key is the same in every copy and sits in the public source code, on purpose. A key kept in the system's
+encrypted storage would be a little harder to get at, but a project with no password would then die with that Windows
+login, and its backups would be useless on a new computer. Losing a book is the worse risk. Setting a password removes
+this slot, so the app key stops working on that project.
+
 ## The ways back in
 
 | Way in | How it works | Needs | Good for |

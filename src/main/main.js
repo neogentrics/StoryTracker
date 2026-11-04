@@ -93,8 +93,7 @@ async function selfTest() {
   }
   report.packaged = app.isPackaged;
   report.version = app.getVersion();
-  fs.writeFileSync(selfTestFile, `${JSON.stringify(report, null, 2)}
-`);
+  fs.writeFileSync(selfTestFile, `${JSON.stringify(report, null, 2)}\n`);
   console.log(`Self-test: finished, ok is ${report.ok}`);
   try {
     fs.rmSync(path.join(scratch, 'work'), { recursive: true, force: true, maxRetries: 5 });

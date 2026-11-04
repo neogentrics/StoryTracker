@@ -26,8 +26,8 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | Release | Theme | Status |
 |---|---|---|
 | [v1.0–v2.3](#v10v23--the-first-app) | The first app | ✅ Released (Windows, needs a PostgreSQL server) |
-| [Step zero](#step-zero--settle-the-foundations) | Settle the foundations | 🚧 Working on now |
-| [v3.0](#v30--write-a-book) | Write a book | Planned |
+| [Step zero](#step-zero--settle-the-foundations) | Settle the foundations | ✅ Done |
+| [v3.0](#v30--write-a-book) | Write a book | Next |
 | [v3.1](#v31--comfortable-writing) | Comfortable writing | Planned |
 | [v3.2](#v32--never-lose-a-word) | Never lose a word | Planned |
 | [v3.3](#v33--get-it-out) | Get it out | Planned |
@@ -60,11 +60,11 @@ Not a release: the choices that are expensive to change later. [Decisions](docs/
 
 | Task | Size | Details |
 |---|:-:|---|
-| Finish the database test | S | The Windows test is [done](docs/design/database.md#the-test). Repeat it on Mac and Linux, with encryption on, inside a real app build. |
-| Project setup | M | The new app in this repo, with tests, CI on all three systems, a `LICENSE`, and a clean README. |
-| Storage rules | M | Permanent IDs, a change log and room for key slots, from the first table. [Sync](docs/design/working-with-rt-markdown-reader.md#sync-what-it-needs-from-storage) and the [lock](docs/design/passwords-and-recovery.md) can't be added later. |
+| ✅ Finish the database test | S | [Done](docs/design/database.md#the-test-with-encryption-on) on Windows, Mac and Linux, with encryption on, from the real installers. |
+| ✅ Project setup | M | The new app in this repo, with tests, CI on all three systems, a `LICENSE`, and a clean README. The old app is in `legacy-wpf`. |
+| ✅ Storage rules | M | Permanent IDs, a change log and room for key slots, from the first table. [Sync](docs/design/working-with-rt-markdown-reader.md#sync-what-it-needs-from-storage) and the [lock](docs/design/passwords-and-recovery.md) can't be added later. |
 
-**Test:** an empty app installs and opens on all three systems, and the test results are in the database design.
+**Test:** an empty app installs and opens on all three systems, and the test results are in the database design. ✅ Passed.
 
 ## v3.0 — Write a book
 

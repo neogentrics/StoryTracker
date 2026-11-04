@@ -3,7 +3,7 @@
 A place to write a book and keep everything around it: characters, timelines, lore, ideas, research and where every book
 stands. For any author, on Windows, Mac and Linux, with nothing to set up and no account.
 
-**Status:** being rebuilt from scratch. There's nothing to install yet. Step zero, the foundation, is in progress.
+**Status:** being rebuilt from scratch. The foundation is done, but there's nothing to write in yet. That's version 3.0.
 
 - [Roadmap](ROADMAP.md): what gets built, in order
 - [Product plan](docs/product-plan.md): who it's for and what it has to do
