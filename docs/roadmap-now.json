@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "v3.4: bring it in",
-    "note": "Building now. One file at a time, with Markdown first, because people bring in files made with AI.",
+    "title": "3.4.0: bring in a real book",
+    "note": "Released. This version’s test: import a real Word manuscript and an AI-made Markdown file, and compare word counts with the originals.",
     "items": [
       {
-        "title": "Word and Markdown",
-        "text": "Your manuscripts come in with their headings and italics, split into chapters, with word counts compared."
+        "title": "A real manuscript",
+        "text": "Import one and read the word check in the Import window. A generated 108,880-word file matched exactly, but no real book has been tried."
       },
       {
-        "title": "AI clean-up",
-        "text": "Chat text, stray symbols and odd headings in AI-made files are shown one by one, and nothing changes unless you say so."
+        "title": "Pages and Scrivener",
+        "text": "Neither has been tried with a real file. A Mac and a real Scrivener project are what they need."
       },
       {
-        "title": "Everything else",
-        "text": "Plain text, RTF, HTML, EPUB, OpenDocument, PDF text, Scrivener, and Pages as best it can."
+        "title": "Tell me what it got wrong",
+        "text": "Chapters split in the wrong place, or clean-ups that flag your writing, are what to look for."
       }
     ]
   },

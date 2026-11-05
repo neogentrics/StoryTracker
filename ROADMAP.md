@@ -31,7 +31,7 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.1](#v31--comfortable-writing) | Comfortable writing | ✅ Released ([3.1.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.1.0)) |
 | [v3.2](#v32--never-lose-a-word) | Never lose a word | ✅ Released ([3.2.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.2.0)) |
 | [v3.3](#v33--get-it-out) | Get it out | ✅ Released ([3.3.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.3.0)) |
-| [v3.4](#v34--bring-it-in) | Bring it in | 🚧 Working on now |
+| [v3.4](#v34--bring-it-in) | Bring it in | 🚧 Released as 3.4.0, being tested by the owner |
 | [v3.5](#v35--find-my-files) | Find my files | Planned |
 | [v3.6](#v36--password-lock) | Password lock | Planned |
 | [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | Planned |
@@ -136,12 +136,12 @@ that can't come out.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Markdown | M | Front matter becomes fields; a long file can be split into chapters at its headings. |
-| 🙋 AI clean-up | M | Finds chat text, stray symbols and odd headings in AI-made files, shows each, and asks. |
-| 🙋 Word | M | Headings, italics and comments. Most manuscripts today. Pictures wait for attachments in v3.5, and the app says how many were left out. |
-| More types | M | Plain text, RTF, HTML, EPUB, OpenDocument, and text from PDFs. |
-| 🙋 Pages, best effort | M | Reads what it can; otherwise explains how to save as Word from Pages. |
-| Scrivener | M | For authors moving over. |
+| ✅ 🙋 Markdown | M | Front matter becomes fields; a long file can be split into chapters at its headings. |
+| ✅ 🙋 AI clean-up | M | Finds chat text, stray symbols and odd headings in AI-made files, shows each, and asks. |
+| ✅ 🙋 Word | M | Headings, italics and comments. Most manuscripts today. Pictures wait for attachments in v3.5, and the app says how many were left out. |
+| ✅ More types | M | Plain text, RTF, HTML, EPUB, OpenDocument, and text from PDFs. |
+| ✅ 🙋 Pages, best effort | M | Reads what it can; otherwise explains how to save as Word from Pages. |
+| ✅ Scrivener | M | For authors moving over. |
 
 **Test:** import a real Word manuscript and an AI-made Markdown file. Compare word counts with the originals.
 

@@ -73,9 +73,10 @@ const row = (window, title) => window.locator('#chapter-list .row', { hasText: t
   // Imported chapters are ordinary chapters: they can be written in and saved, and Ctrl+I is still italics.
   await window.click('.ProseMirror');
   await window.keyboard.press('ControlOrMeta+End');
-  await window.keyboard.press('ControlOrMeta+i');
   await window.keyboard.type(' And on.');
-  await window.waitForFunction(() => document.querySelector('.ProseMirror em:last-of-type')?.textContent.includes('And on.'));
+  await window.keyboard.press('ControlOrMeta+a');
+  await window.keyboard.press('ControlOrMeta+i');
+  await window.waitForFunction(() => document.querySelector('.ProseMirror em')?.textContent === 'It started quietly. And on.');
   assert.equal(await window.$('#import[open]'), null, 'the italics shortcut does not open Import');
   await window.waitForSelector('.save-state[data-state="saved"]', { timeout: 15000 });
 
