@@ -119,14 +119,17 @@ async function typeOnPage(window, text) {
   await row(window, '#chapter-list', 'Opening').waitFor();
   await saved(window);
 
-  // Empty things can go, and things with writing can't.
+  // Anything can go to the Trash, with an Undo, and it comes back.
   await window.click('#add-chapter');
   await window.waitForFunction(() => document.querySelector('#chapter-title').value === 'Chapter 4');
   await row(window, '#chapter-list', 'Chapter 4').hover();
-  await window.click('[aria-label="Remove Chapter 4"]');
+  await window.click('[aria-label="Move Chapter 4 to Trash"]');
   await window.waitForFunction(() => ![...document.querySelectorAll('#chapter-list .row-title')].some((node) => node.textContent === 'Chapter 4'));
-  await row(window, '#chapter-list', 'Opening').hover();
-  assert.equal(await window.$('[aria-label="Remove Opening"]'), null, 'a chapter with writing has no remove button');
+  await window.click('#message-action');
+  await row(window, '#chapter-list', 'Chapter 4').waitFor();
+  await row(window, '#chapter-list', 'Chapter 4').hover();
+  await window.click('[aria-label="Move Chapter 4 to Trash"]');
+  await window.waitForFunction(() => ![...document.querySelectorAll('#chapter-list .row-title')].some((node) => node.textContent === 'Chapter 4'));
 
   // A second book, with its own chapter.
   await window.click('#add-book');

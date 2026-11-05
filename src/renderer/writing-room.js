@@ -1,11 +1,19 @@
 // The three columns: books, then the chapters of the chosen book, then the page.
 import { canHold, findNode, indexTree, resolveDrop, resolveStep } from '../shared/outline.js';
 import { el, formatCount, words } from './dom.js';
+import { openHistory } from './history.js';
+import { icon } from './icons.js';
 import { Page } from './page.js';
+import { openTrash } from './trash.js';
 
 const DRAG_TYPE = 'application/x-rtst-item';
 const lastChapterKey = (projectId) => `lastChapter:${projectId}`;
 const MAX_GOAL = 10000000;
+const KIND_ICONS = { series: 'series', book: 'book', part: 'part', chapter: 'chapter' };
+
+function iconButton(id, name, label, onclick) {
+  return el('button', { class: `bar-button ${id}`, title: label, 'aria-label': label, onclick }, icon(name));
+}
 
 function flatten(nodes, depth = 0) {
   return nodes.flatMap((node) => [{ node, depth }, ...flatten(node.kind === 'book' ? [] : node.children, depth + 1)]);
@@ -20,7 +28,7 @@ function booksOf(node) {
 }
 
 export class WritingRoom {
-  constructor(root, opened, { api, onLibrary, remember }) {
+  constructor(root, opened, { api, onLibrary, onPreferences, remember }) {
     this.api = api;
     this.remember = remember;
     this.projectId = opened.id;
@@ -31,7 +39,8 @@ export class WritingRoom {
     this.progress = opened.progress;
     this.secondPage = null;
 
-    this.message = el('p', { id: 'room-message', class: 'room-message', role: 'alert', hidden: true });
+    this.message = el('div', { id: 'room-message', class: 'room-message', role: 'alert', hidden: true });
+    this.subtitle = el('p', { id: 'room-subtitle', class: 'room-subtitle' });
     this.projectTitle = el('h1', { id: 'project-title', title: 'Double-click to rename' }, opened.title);
     this.projectTitle.addEventListener('dblclick', () => this.startRename(this.outline.id, this.projectTitle));
     this.projectWords = el('span', { id: 'project-words', class: 'header-words' });
@@ -39,6 +48,14 @@ export class WritingRoom {
     this.bookList = el('ul', { id: 'book-list', class: 'rows', 'aria-label': 'Books' });
     this.chapterList = el('ul', { id: 'chapter-list', class: 'rows', 'aria-label': 'Chapters' });
     this.bookHeading = el('h2', { id: 'book-heading' }, 'Chapters');
+    this.filter = el('input', {
+      id: 'chapter-filter',
+      class: 'list-filter',
+      type: 'search',
+      placeholder: 'Filter chapters…',
+      'aria-label': 'Filter chapters',
+      oninput: () => this.applyFilter(),
+    });
     this.pageRoot = el('div', { class: 'pane' });
     this.secondRoot = el('div', { class: 'pane', hidden: true });
     this.pages = el('section', { class: 'column page-column', 'aria-label': 'Page' }, this.pageRoot, this.secondRoot);
@@ -53,10 +70,24 @@ export class WritingRoom {
         el(
           'header',
           { class: 'room-header' },
-          el('button', { id: 'open-library', class: 'on-dark', onclick: () => onLibrary() }, 'Library'),
-          this.projectTitle,
-          this.todayWords,
-          this.projectWords,
+          el(
+            'div',
+            { class: 'bar-side' },
+            iconButton('toggle-lists', 'menu', 'Show or hide the lists', () => this.room.classList.toggle('lists-hidden')),
+            el('button', { id: 'open-library', class: 'bar-primary', onclick: () => onLibrary() }, icon('library'), 'Library'),
+          ),
+          el('div', { class: 'bar-title' }, this.projectTitle, this.subtitle),
+          el(
+            'div',
+            { class: 'bar-side bar-right' },
+            el('span', { class: 'bar-words' }, this.todayWords, this.projectWords),
+            iconButton('find-button', 'search', 'Find and replace', () => this.find()),
+            iconButton('history-button', 'history', 'Earlier versions of this chapter', () => this.showHistory()),
+            iconButton('goals-button', 'goal', 'Goals', () => this.openGoals(this.activePage.chapterId)),
+            iconButton('focus-button', 'focus', 'Focus mode', () => this.toggleFocus()),
+            iconButton('trash-button', 'trash', 'Trash', () => this.showTrash()),
+            iconButton('prefs-button', 'settings', 'Preferences', () => onPreferences()),
+          ),
         ),
         this.message,
         el(
@@ -70,24 +101,26 @@ export class WritingRoom {
             el(
               'div',
               { class: 'column-actions' },
-              el('button', { id: 'add-book', onclick: () => this.addBook() }, '+ Book'),
-              el('button', { id: 'add-series', onclick: () => this.addSeries() }, '+ Series'),
+              el('button', { id: 'add-book', onclick: () => this.addBook() }, icon('plus'), 'Book'),
+              el('button', { id: 'add-series', onclick: () => this.addSeries() }, icon('plus'), 'Series'),
             ),
           ),
           el(
             'section',
             { class: 'column', 'aria-label': 'Chapters' },
             this.bookHeading,
+            this.filter,
             this.chapterList,
             el(
               'div',
               { class: 'column-actions' },
-              el('button', { id: 'add-chapter', onclick: () => this.addChapter() }, '+ Chapter'),
-              el('button', { id: 'add-part', onclick: () => this.addPart() }, '+ Part'),
+              el('button', { id: 'add-chapter', class: 'primary', onclick: () => this.addChapter() }, icon('plus'), 'Chapter'),
+              el('button', { id: 'add-part', onclick: () => this.addPart() }, icon('plus'), 'Part'),
             ),
           ),
           this.pages,
         ),
+        el('button', { class: 'focus-exit', onclick: () => this.toggleFocus() }, icon('close'), 'Leave focus mode'),
       ),
     );
 
@@ -116,8 +149,7 @@ export class WritingRoom {
       onTitle: (id, title) => this.setTitle(id, title),
       onError: (text) => this.showMessage(text),
       onSaved: ({ progress }) => this.setProgress(progress),
-      onGoals: (id) => this.openGoals(id),
-      onFocusMode: () => this.toggleFocus(),
+      onNewChapter: () => this.addChapter(),
       find: {
         scopeBook: () => this.bookId,
         onFlush: () => this.flush(),
@@ -239,8 +271,55 @@ export class WritingRoom {
   }
 
   showMessage(text) {
+    this.message.className = 'room-message';
     this.message.textContent = text;
     this.message.hidden = false;
+  }
+
+  showInfo(text, action) {
+    this.message.className = 'room-message info';
+    this.message.replaceChildren(
+      el('span', {}, text),
+      ...(action ? [el('button', { id: 'message-action', onclick: action.run }, action.label)] : []),
+      el('button', { class: 'message-close', 'aria-label': 'Dismiss', onclick: () => this.clearMessage() }, icon('close')),
+    );
+    this.message.hidden = false;
+  }
+
+  applyFilter() {
+    const wanted = this.filter.value.trim().toLowerCase();
+    for (const row of this.chapterList.children) {
+      const title = row.querySelector('.row-title')?.textContent.toLowerCase() ?? '';
+      row.hidden = Boolean(wanted) && !title.includes(wanted);
+    }
+  }
+
+  async showHistory() {
+    const page = this.activePage;
+    if (!page.chapterId) return;
+    await this.attempt(() =>
+      openHistory({
+        api: this.api,
+        page,
+        onRestored: (outline) => this.afterReplace(outline),
+        onError: (text) => this.showMessage(text),
+      }));
+  }
+
+  showTrash() {
+    return this.attempt(() =>
+      openTrash({
+        title: 'Trash',
+        load: () => this.api.listTrash(),
+        restore: (id) => this.restoreRow(id),
+        onError: (text) => this.showMessage(text),
+      }));
+  }
+
+  async restoreRow(id) {
+    this.outline = await this.api.restoreItem(id);
+    this.renderLists();
+    this.clearMessage();
   }
 
   clearMessage() {
@@ -285,13 +364,13 @@ export class WritingRoom {
     this.bookHeading.textContent = book ? book.title : 'Chapters';
     const chapters = book ? flatten(book.children) : [];
     this.chapterList.replaceChildren(...chapters.map(({ node, depth }) => this.row(node, depth)));
+    this.applyFilter();
     this.showSelection();
     this.showCounts();
   }
 
   row(node, depth) {
     const title = el('span', { class: 'row-title' }, node.title);
-    const empty = node.words === 0;
     const main = el(
       'button',
       {
@@ -299,6 +378,7 @@ export class WritingRoom {
         onclick: (event) => this.chooseRow(node, event),
         ondblclick: () => this.startRename(node.id, title),
       },
+      icon(KIND_ICONS[node.kind]),
       title,
       el('span', { class: 'row-words', dataset: { wordsFor: node.id } }, formatCount(node.words)),
     );
@@ -322,22 +402,20 @@ export class WritingRoom {
         el(
           'button',
           { class: 'row-action', title: 'Rename', 'aria-label': `Rename ${node.title}`, onclick: () => this.startRename(node.id, title) },
-          '✎',
+          icon('pencil'),
         ),
         node.kind === 'chapter'
           ? el(
               'button',
               { class: 'row-action', title: 'Open beside', 'aria-label': `Open ${node.title} beside`, onclick: () => this.openBeside(node.id) },
-              '⧉',
+              icon('beside'),
             )
           : null,
-        empty
-          ? el(
-              'button',
-              { class: 'row-action', title: 'Remove', 'aria-label': `Remove ${node.title}`, onclick: () => this.removeRow(node) },
-              '✕',
-            )
-          : null,
+        el(
+          'button',
+          { class: 'row-action', title: 'Move to Trash', 'aria-label': `Move ${node.title} to Trash`, onclick: () => this.removeRow(node) },
+          icon('trash'),
+        ),
       ),
     );
     return item;
@@ -350,6 +428,13 @@ export class WritingRoom {
       row.classList.toggle('beside', row.dataset.id === this.secondPage?.chapterId);
       row.querySelector('.row-main').setAttribute('aria-current', String(selected));
     }
+    this.showSubtitle();
+  }
+
+  showSubtitle() {
+    const book = this.bookId && findNode(this.outline, this.bookId);
+    const chapter = this.chapterId && findNode(this.outline, this.chapterId);
+    this.subtitle.textContent = [book?.title, chapter?.title].filter(Boolean).join(' · ');
   }
 
   showCounts() {
@@ -425,6 +510,7 @@ export class WritingRoom {
     node.title = title;
     const label = this.chapterList.querySelector(`[data-id="${id}"] .row-title`);
     if (label) label.textContent = title;
+    this.showSubtitle();
   }
 
   // Adding
@@ -529,7 +615,7 @@ export class WritingRoom {
       const openGoes = inside.includes(this.chapterId);
       const bookGoes = inside.includes(this.bookId);
       if (inside.includes(this.secondPage?.chapterId)) await this.closeBeside();
-      this.outline = await this.api.removeEmpty(node.id);
+      this.outline = await this.api.trashItem(node.id);
       if (openGoes) {
         await this.page.clear();
         this.chapterId = null;
@@ -538,6 +624,13 @@ export class WritingRoom {
       this.renderLists();
       const next = !this.chapterId && this.bookId && chaptersOf(findNode(this.outline, this.bookId))[0];
       if (next) await this.openChapter(next.id);
+      this.showInfo(`“${node.title}” is in the Trash.`, {
+        label: 'Undo',
+        run: () => this.attempt(async () => {
+          await this.restoreRow(node.id);
+          if (node.kind === 'chapter') await this.openChapter(node.id);
+        }),
+      });
     });
   }
 

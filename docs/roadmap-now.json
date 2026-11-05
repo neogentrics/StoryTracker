@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "v3.2: never lose a word",
-    "note": "Building now. It comes before import, because the first thing people will trust this app with is years of work.",
+    "title": "v3.2: built, and in testing",
+    "note": "It goes out when you give the word.",
     "items": [
       {
-        "title": "Trash",
-        "text": "Anything deleted waits 30 days, and chapters with writing in them can finally be removed."
+        "title": "Never lose a word",
+        "text": "Trash, earlier versions with compare and restore, and automatic backups to a folder you choose."
       },
       {
-        "title": "History and backups",
-        "text": "Earlier versions of every chapter, plus automatic backups to a folder you choose."
+        "title": "One file",
+        "text": "A whole project in one encrypted .rtstory file. Double-click to open it on another computer."
       },
       {
-        "title": "One file, and a friendlier look",
-        "text": "A whole project in one .rtstory file, and warmer screens up to RT Markdown Reader's standard."
+        "title": "A friendlier look",
+        "text": "Line icons, one clear main button, softer lists and cards, up to RT Markdown Reader’s standard."
       }
     ]
   },

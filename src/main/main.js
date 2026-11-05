@@ -3,6 +3,7 @@ const { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } = require('e
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { Backups } = require('./backups');
 const { registerIpc } = require('./ipc');
 const { buildMenu } = require('./menu');
 const { runSelfTest, writeInWindow } = require('./self-test');
@@ -22,6 +23,8 @@ else if (process.env.RTST_USER_DATA) app.setPath('userData', process.env.RTST_US
 
 let workspace = null;
 let settings = null;
+let backups = null;
+let pendingFile = process.argv.slice(1).find((arg) => arg.toLowerCase().endsWith('.rtstory')) ?? null;
 let libraryError = null;
 let mainWindow = null;
 let flushCount = 0;
@@ -34,6 +37,7 @@ function openLibrary() {
     const root = path.join(app.getPath('userData'), 'library');
     workspace = new Workspace(new Library(root));
     settings = new Settings(root);
+    backups = new Backups(workspace, settings);
     session.defaultSession.setSpellCheckerEnabled(settings.values.spellcheck);
   } catch (error) {
     libraryError = error.message;
@@ -212,7 +216,19 @@ async function checkForUpdatesFromMenu() {
 if (!app.requestSingleInstanceLock()) {
   app.quit();
 } else {
-  app.on('second-instance', () => {
+  // A double-clicked .rtstory file: Windows and Linux pass it to a second copy of the app, and Mac sends this event.
+  const openFile = (file) => {
+    if (mainWindow?.webContents.isLoading() === false) mainWindow.webContents.send('app:openFile', file);
+    else pendingFile = file;
+  };
+  app.on('open-file', (event, file) => {
+    event.preventDefault();
+    openFile(file);
+  });
+
+  app.on('second-instance', (_event, argv) => {
+    const file = argv.slice(1).find((arg) => arg.toLowerCase().endsWith('.rtstory'));
+    if (file) openFile(file);
     if (!mainWindow) return;
     if (mainWindow.isMinimized()) mainWindow.restore();
     mainWindow.focus();
@@ -231,6 +247,13 @@ if (!app.requestSingleInstanceLock()) {
         return settings;
       },
       updater,
+      backups: () => backups,
+      window: () => mainWindow,
+      takeFile: () => {
+        const file = pendingFile;
+        pendingFile = null;
+        return file;
+      },
     });
     Menu.setApplicationMenu(
       buildMenu({
@@ -244,6 +267,7 @@ if (!app.requestSingleInstanceLock()) {
       selfTest();
     } else {
       updater.start();
+      backups?.start();
     }
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) mainWindow = createWindow();

@@ -121,6 +121,7 @@ const PAGE_FONTS = {
 };
 
 const UI_FONTS = {
+  inter: { label: 'Inter', stack: "'Inter', 'Segoe UI', system-ui, sans-serif" },
   system: { label: 'System', stack: "'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif" },
   atkinson: { label: 'Atkinson Hyperlegible', stack: "'Atkinson Hyperlegible', Verdana, sans-serif" },
   arial: PAGE_FONTS.arial,
@@ -133,14 +134,18 @@ const UI_FONTS = {
 const DEFAULT_SETTINGS = {
   theme: 'system',
   pageFont: 'georgia',
-  uiFont: 'system',
+  uiFont: 'inter',
   textSize: 18,
   pageWidth: 46,
   spellcheck: true,
   glass: false,
+  backupFolder: '',
+  backupEvery: 'off',
+  backupKeep: 10,
 };
 
-const LIMITS = { textSize: [14, 28], pageWidth: [32, 64] };
+const LIMITS = { textSize: [14, 28], pageWidth: [32, 64], backupKeep: [1, 100] };
+const BACKUP_EVERY = { off: { label: 'Off' }, hour: { label: 'Every hour' }, day: { label: 'Every day' }, week: { label: 'Every week' } };
 
 // Anything unknown falls back to the default, so a damaged settings file can't stop the app opening.
 function cleanSettings(input) {
@@ -159,7 +164,10 @@ function cleanSettings(input) {
     pageWidth: within('pageWidth'),
     spellcheck: source.spellcheck !== false,
     glass: source.glass === true,
+    backupFolder: typeof source.backupFolder === 'string' ? source.backupFolder : '',
+    backupEvery: known(source.backupEvery, BACKUP_EVERY, 'backupEvery'),
+    backupKeep: Math.round(within('backupKeep')),
   };
 }
 
-module.exports = { DEFAULT_SETTINGS, LIMITS, PAGE_FONTS, THEMES, UI_FONTS, cleanSettings };
+module.exports = { BACKUP_EVERY, DEFAULT_SETTINGS, LIMITS, PAGE_FONTS, THEMES, UI_FONTS, cleanSettings };

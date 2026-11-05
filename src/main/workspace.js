@@ -60,6 +60,7 @@ class Workspace {
     this.closeProject();
     this.project = this.library.openProject(needId(id));
     this.lastReplace = null;
+    this.project.tidy();
     return { id, title: this.project.title(), outline: this.project.outline(), progress: this.progress() };
   }
 
@@ -71,6 +72,10 @@ class Workspace {
   removeSample(id) {
     if (this.project?.id === id) this.closeProject();
     this.library.removeSample(needId(id));
+  }
+
+  listProjectTrash() {
+    return this.library.trashedProjects();
   }
 
   open() {
@@ -105,19 +110,62 @@ class Workspace {
     return this.outline();
   }
 
-  // Only for things with no writing in them. Anything else waits for Trash, so no click can lose a chapter.
-  removeEmpty(id) {
+  trashItem(id) {
     const item = this.need(id);
-    if (item.kind === 'project') throw new Error("A project can't be removed here.");
-    const node = this.findInOutline(id);
-    if (node.words > 0) throw new Error('This has writing in it, so it stays until Trash arrives.');
-    this.project.removeItem(id);
+    if (item.kind === 'project' || item.kind === 'comment') throw new Error("That can't go to the Trash here.");
+    this.project.trashItem(id);
     return this.outline();
   }
 
-  findInOutline(id) {
-    const walk = (node) => (node.id === id ? node : node.children.map(walk).find(Boolean));
-    return walk(this.outline());
+  listTrash() {
+    return this.open().trashed();
+  }
+
+  restoreItem(id) {
+    this.need(id);
+    this.project.restoreItem(id);
+    return this.outline();
+  }
+
+  trashProject(id) {
+    if (this.project?.id === id) this.closeProject();
+    this.library.trashProject(needId(id));
+  }
+
+  restoreProject(id) {
+    this.library.restoreProject(needId(id));
+  }
+
+  listVersions(chapterId) {
+    if (this.need(chapterId).kind !== 'chapter') throw new Error("That isn't a chapter.");
+    return this.project.listVersions(chapterId);
+  }
+
+  // Both sides of a comparison, as the window shows them.
+  getVersion({ chapterId, versionId }) {
+    const version = this.open().getVersion(versionId);
+    if (!version || version.item_id !== chapterId) throw new Error("That version isn't part of this chapter.");
+    return { title: version.title, body: version.body, words: version.words, at: version.at };
+  }
+
+  // What's on the page now is kept first, so restoring can never lose anything.
+  restoreVersion({ chapterId, versionId }) {
+    const version = this.getVersion({ chapterId, versionId });
+    const current = this.need(chapterId);
+    this.project.db.transaction(() => {
+      this.project.keepVersion(current, 'restore');
+      this.project.putItem({ id: chapterId, title: version.title, body: version.body });
+    })();
+    return { outline: this.outline() };
+  }
+
+  packProject(id, file) {
+    this.library.packProject(id, file, this.project?.id === id ? this.project : null);
+  }
+
+  importProject(file, { replace = false } = {}) {
+    if (replace) this.closeProject();
+    return this.library.importProject(file, { replace });
   }
 
   loadChapter(id) {
@@ -131,6 +179,7 @@ class Workspace {
     if (item.kind !== 'chapter') throw new Error("That isn't a chapter.");
     if (typeof body !== 'string' || body.length > MAX_BODY) throw new Error("That chapter can't be saved.");
     if (body && !parseDocument(body)) throw new Error("That chapter can't be saved.");
+    if (body !== item.body) this.project.versionIfDue(item);
     const saved = this.project.putItem({ id, title: cleanTitle(title, item.title), body });
     this.project.addDayWords(saved.words - item.words);
     return { words: saved.words, progress: this.progress() };
@@ -218,6 +267,7 @@ class Workspace {
         const changed = replaceInDocument(toDocument(chapter.body), query, replacement, options);
         if (changed.count === 0) continue;
         old.push({ id: chapter.id, body: chapter.body });
+        project.keepVersion(chapter, 'replace');
         count += changed.count;
         project.putItem({ id: chapter.id, body: JSON.stringify(changed.document) });
       }

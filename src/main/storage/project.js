@@ -5,8 +5,20 @@ const { countWords, plainText } = require('../../shared/text');
 const { copyDatabase, databaseInfo } = require('./database');
 
 const REMOVAL_MARKER_DAYS = 90;
-const FIELDS = ['kind', 'parentId', 'position', 'title', 'body', 'goal'];
-const COLUMNS = { kind: 'kind', parentId: 'parent_id', position: 'position', title: 'title', body: 'body', goal: 'goal' };
+const TRASH_DAYS = 30;
+const VERSION_GAP_MS = 10 * 60 * 1000;
+const EVERY_VERSION_DAYS = 2;
+const DAY_MS = 86400000;
+const FIELDS = ['kind', 'parentId', 'position', 'title', 'body', 'goal', 'trashedAt'];
+const COLUMNS = {
+  kind: 'kind',
+  parentId: 'parent_id',
+  position: 'position',
+  title: 'title',
+  body: 'body',
+  goal: 'goal',
+  trashedAt: 'trashed_at',
+};
 const SMALLEST_GAP = 1e-6;
 
 const wordsIn = (body) => countWords(plainText(body));
@@ -22,6 +34,7 @@ function toItem(row) {
     body: row.body,
     words: row.words,
     goal: row.goal,
+    trashedAt: row.trashed_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     deviceId: row.device_id,
@@ -118,7 +131,8 @@ class Project {
   // The whole tree without the writing itself, with word totals added up from the chapters.
   outline() {
     const rows = this.db
-      .prepare("SELECT id, kind, parent_id, title, words FROM items WHERE kind != 'comment' ORDER BY position, created_at")
+      .prepare(`SELECT id, kind, parent_id, title, words FROM items
+                WHERE kind != 'comment' AND trashed_at IS NULL ORDER BY position, created_at`)
       .all();
     const nodes = new Map(
       rows.map((row) => [row.id, { id: row.id, kind: row.kind, title: row.title, words: row.words, children: [] }]),
@@ -160,12 +174,87 @@ class Project {
   }
 
   summary() {
-    const row = this.db.prepare('SELECT SUM(words) AS words, MAX(updated_at) AS updatedAt FROM items').get();
-    return { title: this.title(), words: row.words ?? 0, updatedAt: row.updatedAt };
+    const { updatedAt } = this.db.prepare('SELECT MAX(updated_at) AS updatedAt FROM items').get();
+    return { title: this.title(), words: this.outline()?.words ?? 0, updatedAt };
+  }
+
+  // Trash
+
+  trashItem(id) {
+    return this.putItem({ id, trashedAt: this.now().toISOString() });
+  }
+
+  restoreItem(id) {
+    const item = this.getItem(id);
+    if (!item?.trashedAt) throw new Error("That isn't in the Trash.");
+    const parent = this.getItem(item.parentId);
+    if (parent?.trashedAt) throw new Error(`Restore “${parent.title}” first. This was inside it.`);
+    return this.putItem({ id, trashedAt: null });
+  }
+
+  trashed() {
+    return this.db
+      .prepare('SELECT * FROM items WHERE trashed_at IS NOT NULL ORDER BY trashed_at DESC')
+      .all()
+      .map(toItem)
+      .map((item) => {
+        const left = TRASH_DAYS - (this.now().getTime() - new Date(item.trashedAt).getTime()) / DAY_MS;
+        return { id: item.id, kind: item.kind, title: item.title, trashedAt: item.trashedAt, daysLeft: Math.max(0, Math.ceil(left)) };
+      });
+  }
+
+  purgeTrash() {
+    const cutoff = new Date(this.now().getTime() - TRASH_DAYS * DAY_MS).toISOString();
+    const old = this.db.prepare('SELECT id FROM items WHERE trashed_at < ?').all(cutoff);
+    old.forEach(({ id }) => this.removeItem(id));
+    return old.length;
+  }
+
+  // Earlier versions
+
+  keepVersion(item, reason) {
+    this.db
+      .prepare('INSERT INTO versions (item_id, title, body, words, reason, at) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(item.id, item.title, item.body, item.words, reason, this.now().toISOString());
+  }
+
+  // Called just before a chapter is overwritten, so what's kept is the writing as it stood. Typing saves every few
+  // seconds, so a copy is only taken when the last one is at least ten minutes old.
+  versionIfDue(item) {
+    if (!item.body) return;
+    const last = this.db.prepare('SELECT at FROM versions WHERE item_id = ? ORDER BY id DESC LIMIT 1').get(item.id);
+    if (last && this.now().getTime() - new Date(last.at).getTime() < VERSION_GAP_MS) return;
+    this.keepVersion(item, 'auto');
+  }
+
+  listVersions(itemId) {
+    return this.db
+      .prepare('SELECT id, title, words, reason, at FROM versions WHERE item_id = ? ORDER BY id DESC')
+      .all(itemId);
+  }
+
+  getVersion(id) {
+    return this.db.prepare('SELECT * FROM versions WHERE id = ?').get(id) ?? null;
+  }
+
+  // Every version from the last two days stays. Older ones thin out to the last of each day.
+  thinVersions() {
+    const cutoff = new Date(this.now().getTime() - EVERY_VERSION_DAYS * DAY_MS).toISOString();
+    return this.db
+      .prepare(`DELETE FROM versions WHERE at < ? AND id NOT IN (
+                  SELECT MAX(id) FROM versions GROUP BY item_id, substr(at, 1, 10)
+                )`)
+      .run(cutoff).changes;
+  }
+
+  tidy() {
+    this.purgeTrash();
+    this.thinVersions();
+    this.pruneRemovalMarkers();
   }
 
   // Removes an item and everything under it. Each one leaves a marker, so a device that was switched off can't bring
-  // it back. The screens only offer this for things with no writing in them, until Trash arrives in v3.2.
+  // it back. The screens never call this directly: things go to the Trash first, and this runs 30 days later.
   removeItem(id) {
     return this.db.transaction(() => {
       const at = this.now().toISOString();
@@ -179,6 +268,7 @@ class Project {
         .all(id);
       for (const row of rows) {
         this.db.prepare('DELETE FROM items WHERE id = ?').run(row.id);
+        this.db.prepare('DELETE FROM versions WHERE item_id = ?').run(row.id);
         this.db
           .prepare('INSERT INTO removals (item_id, kind, removed_at, device_id) VALUES (?, ?, ?, ?)')
           .run(row.id, row.kind, at, this.deviceId);
@@ -234,4 +324,4 @@ class Project {
   }
 }
 
-module.exports = { Project, REMOVAL_MARKER_DAYS };
+module.exports = { Project, REMOVAL_MARKER_DAYS, TRASH_DAYS };

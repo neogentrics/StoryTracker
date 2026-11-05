@@ -7,6 +7,7 @@ import { CommentMark, CommentsPanel } from './comments.js';
 import { el, formatCount, words } from './dom.js';
 import { FindBar } from './find-bar.js';
 import { FindHighlight } from './find-plugin.js';
+import { icon } from './icons.js';
 
 const COUNT_DELAY_MS = 250;
 
@@ -39,20 +40,24 @@ const heading = (level) => ({
 
 const align = (value, label, lines) => ({
   label,
-  face: alignIcon(lines),
+  face: () => alignIcon(lines),
   run: (chain) => chain.setTextAlign(value),
   active: (editor) => editor.isActive({ textAlign: value }),
 });
 
 const TOOLS = [
   [
+    { label: 'Undo', face: () => icon('undo'), run: (chain) => chain.undo(), active: () => false },
+    { label: 'Redo', face: () => icon('redo'), run: (chain) => chain.redo(), active: () => false },
+  ],
+  [
     { label: 'Bold', face: 'B', class: 'face-bold', run: (chain) => chain.toggleBold(), active: (editor) => editor.isActive('bold') },
     { label: 'Italic', face: 'I', class: 'face-italic', run: (chain) => chain.toggleItalic(), active: (editor) => editor.isActive('italic') },
   ],
   [heading(1), heading(2), heading(3)],
   [
-    { label: 'Bulleted list', face: '•', run: (chain) => chain.toggleBulletList(), active: (editor) => editor.isActive('bulletList') },
-    { label: 'Numbered list', face: '1.', run: (chain) => chain.toggleOrderedList(), active: (editor) => editor.isActive('orderedList') },
+    { label: 'Bulleted list', face: () => icon('bullets'), run: (chain) => chain.toggleBulletList(), active: (editor) => editor.isActive('bulletList') },
+    { label: 'Numbered list', face: () => icon('numbers'), run: (chain) => chain.toggleOrderedList(), active: (editor) => editor.isActive('orderedList') },
   ],
   [
     align('left', 'Align left', [[2, 14], [2, 10], [2, 14], [2, 9]]),
@@ -63,7 +68,7 @@ const TOOLS = [
 ];
 
 export class Page {
-  constructor(root, { api, onWords, onTitle, onError, onSaved, onGoals, onFocusMode, onClose, find }) {
+  constructor(root, { api, onWords, onTitle, onError, onSaved, onClose, onNewChapter, find }) {
     this.api = api;
     this.onWords = onWords;
     this.onTitle = onTitle;
@@ -93,9 +98,9 @@ export class Page {
           title: 'Comment on the selected words',
           onmousedown: (event) => event.preventDefault(),
           onclick: () => this.comments.start(),
-        }, 'Comment'),
+        }, icon('comment'), 'Comment'),
       ),
-      onClose ? el('button', { class: 'tool close-pane', type: 'button', title: 'Close this side', 'aria-label': 'Close this side', onclick: onClose }, '✕') : null,
+      onClose ? el('button', { class: 'tool close-pane', type: 'button', title: 'Close this side', 'aria-label': 'Close this side', onclick: onClose }, icon('close')) : null,
     );
     this.titleInput = el('input', {
       id: 'chapter-title',
@@ -119,19 +124,13 @@ export class Page {
     this.body = el('div', { class: 'page-body' }, this.scroller);
     this.counts = el('span', { class: 'word-count' });
     this.saveState = el('span', { class: 'save-state', role: 'status' });
-    this.footer = el(
-      'footer',
-      { class: 'page-footer' },
-      this.counts,
-      el(
-        'span',
-        { class: 'footer-actions' },
-        el('button', { class: 'footer-button goals-button', onclick: () => onGoals(this.chapterId) }, 'Goals'),
-        el('button', { class: 'footer-button focus-button', onclick: () => onFocusMode() }, 'Focus'),
-        this.saveState,
-      ),
+    this.footer = el('footer', { class: 'page-footer' }, this.counts, this.saveState);
+    this.empty = el(
+      'div',
+      { class: 'page-empty' },
+      el('div', { class: 'empty-card' }, icon('book'), el('h2', {}, 'Nothing open yet'), el('p', {}, 'Pick a chapter from the list, or start a new one.'),
+        onNewChapter ? el('button', { class: 'primary', onclick: onNewChapter }, icon('plus'), 'New chapter') : null),
     );
-    this.empty = el('div', { class: 'page-empty' }, 'Pick a chapter, or add one, to start writing.');
     root.append(this.toolbar);
     this.findBar = new FindBar(root, { ...find, api, page: this });
     root.append(this.body, this.footer, this.empty);
@@ -162,7 +161,7 @@ export class Page {
               onmousedown: (event) => event.preventDefault(),
               onclick: () => tool.run(this.editor.chain().focus()).run(),
             },
-            tool.face,
+            typeof tool.face === 'function' ? tool.face() : tool.face,
           );
           this.buttons.push({ button, tool });
           return button;

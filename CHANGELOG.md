@@ -3,6 +3,29 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.2.0] - Unreleased
+
+Never lose a word, and a friendlier look.
+
+### Added
+- **Trash**: anything can be deleted now, even a chapter full of writing. It waits 30 days, and an Undo appears straight
+  away. Whole projects can go to the Trash from the library too.
+- **Earlier versions**: every chapter keeps copies as you write, at most every ten minutes. Compare any two, word by word,
+  and restore one with a click. What was on the page is kept first, so a restore can be undone.
+- **The `.rtstory` file**: a whole project in one encrypted file, to move or back up. Double-click one to open it. If you
+  already have that project, the one it replaces goes to the Trash.
+- **Automatic backups**: every hour, day or week, to a folder you choose, keeping the newest ones. Safe in OneDrive or
+  Dropbox, because a backup is a closed file. Nothing runs until you pick a folder.
+- **Filter** the chapter list by name, and show or hide the lists with one click.
+
+### Changed
+- **A friendlier look**: line icons, a clear main button, the book and chapter in the title bar, softer rounded lists and
+  cards, and the Inter font for the app. Goals, Focus and Find moved to the top of the window, with Undo and Redo above
+  the page.
+
+### Fixed
+- In split view, the left page lost its alignment buttons.
+
 ## [3.1.0] - 2026-11-04
 
 Make it a place to spend a whole day.

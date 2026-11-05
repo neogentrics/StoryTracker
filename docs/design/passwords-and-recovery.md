@@ -95,6 +95,11 @@ setting, and the author can pick that.
 
 Trusted-computer and phone slots stay on those devices, so a copied file offers only the password and recovery key.
 
+As built in 3.2: the marker `RTSTORY` and a line break, then a four-byte header length and a JSON header holding the
+format version, the project ID, and each part's name, size and SHA-256. The parts follow one after another: `keys.json`
+and the encrypted `project.db`. The header holds no title and no writing. A file is unpacked to a temporary folder, its
+checksums are checked, and the project has to open and pass an integrity check before it reaches the library.
+
 ## What to test before it ships
 
 - Every way in, each way out, and every wrong answer

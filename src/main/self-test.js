@@ -65,6 +65,14 @@ function runStorageChecks(dir) {
   search.close();
   check('searches inside the encryption', hits === 1);
 
+  const moved = path.join(dir, 'moved.rtstory');
+  library.packProject(id, moved);
+  const elsewhere = new Library(path.join(dir, 'elsewhere'));
+  elsewhere.importProject(moved);
+  const arrived = elsewhere.openProject(id);
+  check('moves a project in one file', arrived.title() === `Title ${secret}`);
+  arrived.close();
+
   const leaks = filesUnder(dir).filter((item) => contains(item, secret));
   check('no file contains the writing', leaks.length === 0, leaks.map((item) => path.basename(item)).join(', '));
 

@@ -67,6 +67,26 @@ const STEPS = [
       `);
     },
   },
+  {
+    // Trash is a date on the item, and everything under it hides with it. Versions are whole copies of a chapter, kept
+    // beside it. They aren't logged as changes: history belongs to this copy of the project.
+    version: 4,
+    up(db) {
+      db.exec(`
+        ALTER TABLE items ADD COLUMN trashed_at TEXT;
+        CREATE TABLE versions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          item_id TEXT NOT NULL,
+          title TEXT NOT NULL,
+          body TEXT NOT NULL,
+          words INTEGER NOT NULL,
+          reason TEXT NOT NULL,
+          at TEXT NOT NULL
+        );
+        CREATE INDEX versions_by_item ON versions (item_id, id);
+      `);
+    },
+  },
 ];
 
 module.exports = { STEPS };

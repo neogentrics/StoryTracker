@@ -31,6 +31,12 @@ function buildMenu({ send, checkForUpdates, about }) {
         { label: 'New Chapter', accelerator: 'CmdOrCtrl+N', click: () => send('new-chapter') },
         { label: 'New Book', accelerator: 'CmdOrCtrl+Shift+N', click: () => send('new-book') },
         { type: 'separator' },
+        { label: 'Open Project File…', accelerator: 'CmdOrCtrl+O', click: () => send('open-file') },
+        { label: 'Save a Copy of This Project…', accelerator: 'CmdOrCtrl+Shift+S', click: () => send('export') },
+        { type: 'separator' },
+        { label: 'Earlier Versions of This Chapter…', click: () => send('history') },
+        { label: 'Trash', click: () => send('trash') },
+        { type: 'separator' },
         { label: 'Library', accelerator: 'CmdOrCtrl+Shift+L', click: () => send('library') },
         ...(isMac
           ? []

@@ -1,4 +1,8 @@
 /* Fonts carried with the app, so a book looks the same on every computer. */
+@import '@fontsource/inter/latin-400.css';
+@import '@fontsource/inter/latin-500.css';
+@import '@fontsource/inter/latin-600.css';
+@import '@fontsource/inter/latin-700.css';
 @import '@fontsource/literata/latin-400.css';
 @import '@fontsource/literata/latin-400-italic.css';
 @import '@fontsource/literata/latin-700.css';
