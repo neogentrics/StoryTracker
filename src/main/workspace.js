@@ -4,7 +4,7 @@ const path = require('node:path');
 const { cleanDetails, parseDetails } = require('../shared/details');
 const { findInDocument, replaceInDocument } = require('../shared/find');
 const { findNode } = require('../shared/outline');
-const { parseDocument, toDocument } = require('../shared/text');
+const { parseDocument, plainText, toDocument } = require('../shared/text');
 const { SAMPLE_TITLE, fillSample } = require('./sample');
 
 const MAX_TITLE = 500;
@@ -17,6 +17,9 @@ function cleanTitle(title, fallback) {
   if (typeof title !== 'string') throw new Error('A title has to be text.');
   return title.trim().slice(0, MAX_TITLE) || fallback;
 }
+
+const toImported = (blocks) => ({ type: 'doc', content: blocks.length ? blocks : [{ type: 'paragraph' }] });
+const holds = (block, node) => block === node || (block.content ?? []).some((child) => holds(child, node));
 
 function cleanComment(text) {
   if (typeof text !== 'string' || !text.trim()) throw new Error('A comment needs some words.');
@@ -106,6 +109,67 @@ class Workspace {
 
   removeCover(id) {
     this.open().removeCover(needId(id));
+  }
+
+  // The book that imported chapters go into. A brand new book's empty first chapter makes way for them.
+  importTarget(target, title, details) {
+    if (target?.kind === 'book') {
+      const book = this.need(target.id);
+      if (book.kind !== 'book') throw new Error('Choose a book to import into.');
+      const merged = cleanDetails({ ...details, ...parseDetails(book.details) });
+      this.project.putItem({ id: book.id, details: JSON.stringify(merged) });
+      return book.id;
+    }
+    const parent = target?.parentId ?? this.open().id;
+    const book = this.project.addItem({ kind: 'book', parentId: parent, title: cleanTitle(target?.title ?? '', title || 'Imported book') });
+    const clean = cleanDetails(details);
+    if (Object.keys(clean).length) this.project.putItem({ id: book.id, details: JSON.stringify(clean) });
+    return book.id;
+  }
+
+  dropEmptyStart(bookId) {
+    const chapters = this.project.listChildren(bookId);
+    if (chapters.length === 1 && chapters[0].kind === 'chapter' && !plainText(chapters[0].body).trim()) {
+      this.project.removeItem(chapters[0].id);
+    }
+  }
+
+  // Everything lands in one step, so a failure partway leaves the project as it was.
+  importSections({ target, title, details, cover, sections, comments = {}, marks = {} }) {
+    const project = this.open();
+    let bookId;
+    let first = null;
+    let chapters = 0;
+    project.db.transaction(() => {
+      bookId = this.importTarget(target, title, details);
+      this.dropEmptyStart(bookId);
+      if (cover && !project.cover(bookId)) project.setCover(bookId, cover);
+      const toSave = [];
+      let parentId = bookId;
+      for (const section of sections) {
+        if (section.type === 'part') {
+          parentId = project.addItem({ kind: 'part', parentId: bookId, title: section.title }).id;
+          continue;
+        }
+        const chapter = project.addItem({ kind: 'chapter', parentId, title: cleanTitle(section.title, 'Untitled chapter') });
+        toSave.push({ chapter, section });
+        first ??= chapter.id;
+        chapters += 1;
+      }
+      // Each comment marks the words it was on, so its new ID goes on those words before the chapter is saved.
+      for (const [number, text] of Object.entries(comments)) {
+        const words = marks[number];
+        if (!words?.length || !text) continue;
+        const owner = toSave.find(({ section }) => section.blocks.some((block) => holds(block, words[0])));
+        if (!owner) continue;
+        const note = project.addItem({ kind: 'comment', parentId: owner.chapter.id, title: cleanComment(text) });
+        for (const node of words) (node.marks ??= []).push({ type: 'comment', attrs: { id: note.id } });
+      }
+      for (const { chapter, section } of toSave) {
+        project.putItem({ id: chapter.id, body: JSON.stringify(toImported(section.blocks)) });
+      }
+    })();
+    return { bookId, first, chapters, outline: this.outline() };
   }
 
   listProjectTrash() {

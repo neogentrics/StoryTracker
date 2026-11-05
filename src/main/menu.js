@@ -34,6 +34,7 @@ function buildMenu({ send, checkForUpdates, about }) {
         { label: 'Open Project File…', accelerator: 'CmdOrCtrl+O', click: () => send('open-file') },
         { label: 'Save a Copy of This Project…', accelerator: 'CmdOrCtrl+Shift+S', click: () => send('export') },
         { type: 'separator' },
+        { label: 'Import…', accelerator: 'CmdOrCtrl+Shift+I', click: () => send('import') },
         { label: 'Export…', accelerator: 'CmdOrCtrl+E', click: () => send('export-book') },
         { label: 'Print…', accelerator: 'CmdOrCtrl+P', click: () => send('print') },
         { label: 'Book Details…', click: () => send('details') },

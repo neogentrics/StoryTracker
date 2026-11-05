@@ -1285,6 +1285,72 @@ mark,
   box-shadow: var(--soft-shadow);
 }
 
+/* Import */
+
+.import-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+.import-sections {
+  max-height: 45vh;
+  overflow: auto;
+  margin: 0;
+  padding: 0 0.4rem 0 1.6rem;
+}
+
+.import-sections li {
+  padding: 0.1rem 0;
+}
+
+.import-sections li span:first-child {
+  display: inline-block;
+  max-width: 78%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.import-sections .row-words {
+  float: right;
+  color: var(--sheet-ink-soft);
+}
+
+.import-part {
+  list-style: none;
+  margin: 0.4rem 0 0 -1.2rem;
+  font-weight: 700;
+}
+
+.findings {
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.finding {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--panel-edge);
+}
+
+.finding-text {
+  display: grid;
+  min-width: 0;
+  font-size: 0.86rem;
+}
+
+.finding-before,
+.finding-after {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--sheet-ink-soft);
+}
+
 /* Trash */
 
 .trash-list {

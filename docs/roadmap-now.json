@@ -1,27 +1,31 @@
 {
   "now": {
-    "title": "3.3.0: upload it to KDP",
-    "note": "Released. This version’s test: export a book to each format, open them, and upload the EPUB to KDP’s previewer and one other store.",
+    "title": "3.4.0: bring in a real book",
+    "note": "Released. This version’s test: import a real Word manuscript and an AI-made Markdown file, and compare word counts with the originals.",
     "items": [
       {
-        "title": "The KDP previewer",
-        "text": "Upload an EPUB and a print PDF. Every warning it shows gets looked at, and fixed if it can be."
+        "title": "A real manuscript",
+        "text": "Import one and read the word check in the Import window. A generated 108,880-word file matched exactly, but no real book has been tried."
       },
       {
-        "title": "Open each format",
-        "text": "Word and LibreOffice are checked. Calibre and Pages haven’t been tried."
+        "title": "Pages and Scrivener",
+        "text": "Neither has been tried with a real file. A Mac and a real Scrivener project are what they need."
       },
       {
-        "title": "Your book details",
-        "text": "Fill them in once for a book, and author and publisher carry to the next one."
+        "title": "Tell me what it got wrong",
+        "text": "Chapters split in the wrong place, or clean-ups that flag your writing, are what to look for."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.2."
+    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.4."
   },
   "questions": [
+    {
+      "q": "What happens to pictures in an imported file?",
+      "a": "They stay out for now, because chapters can’t hold pictures yet. The Import window says how many were left out, and your original file keeps them. Attachments in v3.5 bring them in."
+    },
     {
       "q": "Why did StoryTracker move off WPF?",
       "a": "WPF only runs on Windows. The new app is Electron and JavaScript, like RT Markdown Reader, so one app runs on Windows, Mac and Linux. The old C# code is kept in <code>legacy-wpf</code>."

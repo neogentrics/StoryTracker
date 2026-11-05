@@ -4,6 +4,7 @@ import { el, formatCount, words } from './dom.js';
 import { openDetails } from './details-dialog.js';
 import { openExport } from './export-dialog.js';
 import { openHistory } from './history.js';
+import { openImport } from './import-dialog.js';
 import { icon } from './icons.js';
 import { Page } from './page.js';
 import { openTrash } from './trash.js';
@@ -84,6 +85,7 @@ export class WritingRoom {
             { class: 'bar-side bar-right' },
             el('span', { class: 'bar-words' }, this.todayWords, this.projectWords),
             iconButton('find-button', 'search', 'Find and replace', () => this.find()),
+            iconButton('import-button', 'import', 'Import', () => this.showImport()),
             iconButton('export-button', 'export', 'Export', () => this.showExport()),
             iconButton('history-button', 'history', 'Earlier versions of this chapter', () => this.showHistory()),
             iconButton('goals-button', 'goal', 'Goals', () => this.openGoals(this.activePage.chapterId)),
@@ -326,6 +328,31 @@ export class WritingRoom {
       await this.flush();
       openExport({ api: this.api, scopes: this.exportScopes(), onError: (text) => this.showMessage(text), ...options });
     });
+  }
+
+  async showImport() {
+    await this.attempt(async () => {
+      await this.flush();
+      const holder = this.bookId && indexTree(this.outline).get(this.bookId)?.parent;
+      await openImport({
+        api: this.api,
+        books: booksOf(this.outline),
+        parentId: holder?.id ?? this.outline.id,
+        emptyBookId: this.bookId && findNode(this.outline, this.bookId)?.words === 0 ? this.bookId : null,
+        onError: (text) => this.showMessage(text),
+        onDone: (result) => this.afterImport(result),
+      });
+    });
+  }
+
+  async afterImport({ outline, first, chapters }) {
+    this.outline = outline;
+    this.chapterId = null;
+    this.bookId = null;
+    await this.page.clear();
+    this.renderLists();
+    if (first) await this.openChapter(first);
+    this.showInfo(`Imported ${chapters === 1 ? '1 chapter' : `${chapters} chapters`}.`);
   }
 
   showDetails(id = this.bookId) {

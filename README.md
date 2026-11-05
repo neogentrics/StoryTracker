@@ -43,6 +43,10 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 <td><img src="docs/screenshots/details.png" alt="The book details form"><br><b>Book details.</b> Everything a store asks for, kept with the book.</td>
 </tr>
 <tr>
+<td><img src="docs/screenshots/import.png" alt="The Import window, listing chat text to clean up and the chapters a file will become"><br><b>Import.</b> Word, Markdown and more, split into chapters and checked word for word.</td>
+<td><img src="docs/screenshots/preferences.png" alt="Preferences, with themes, fonts and page settings"><br><b>Preferences.</b> Themes, fonts and the page, all in one place.</td>
+</tr>
+<tr>
 <td><img src="docs/screenshots/focus.png" alt="Focus mode, with just the page"><br><b>Focus mode.</b> Just the page.</td>
 <td><img src="docs/screenshots/library.png" alt="The library, listing three projects with their word counts"><br><b>Your library.</b> Every project in one place, with nothing to set up.</td>
 </tr>
@@ -74,6 +78,8 @@ open the app from *System Settings → Privacy & Security*.
 | **Goals** | Words a day and words for a chapter |
 | **Comments** | Notes on a selection, kept out of the book and its word count |
 | **Split view** | Two chapters side by side |
+| **Import** | Word, Markdown, plain text, RTF, HTML, EPUB, OpenDocument, PDF text, Scrivener and Pages, split into chapters, with word counts compared. Your original file is never changed |
+| **AI clean-up** | Finds chat text, stray symbols and odd headings in AI-made files, shows you each one, and only changes what you agree to |
 | **Export** | A chapter, book, series or whole project as Word, PDF, EPUB, Markdown, HTML, OpenDocument, RTF, plain text or XML |
 | **Store-ready EPUB** | Cover, contents, metadata and series details, passing the official EPUB validator |
 | **Print layouts** | Six trim sizes, mirrored margins, a contents page with real page numbers, running headers and print preview |
@@ -86,7 +92,7 @@ open the app from *System Settings → Privacy & Security*.
 | **Works offline** | No account, no server, and your writing never leaves your computer |
 | **Updates itself** | On Windows and the Linux AppImage. Mac and the `.deb` tell you when a new version is out |
 
-Coming next: import (3.4), finding your files (3.5) and the password lock (3.6), then characters, timelines and lore. See
+Coming next: finding your files (3.5) and the password lock (3.6), then characters, timelines and lore. See
 the [roadmap](ROADMAP.md).
 
 ## How your writing is kept

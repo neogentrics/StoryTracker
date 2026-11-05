@@ -3,6 +3,34 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.4.0] - 2026-11-04
+
+Your work can come in now, from wherever it's been living.
+
+### Added
+- **Import** (Ctrl+Shift+I) brings in Word, Markdown, plain text, RTF, HTML, EPUB, OpenDocument, text from PDFs, Scrivener
+  projects and, as best it can, Pages files. Your original file is never changed.
+- **See it first**: the Import window lists the chapters a file will become, with their word counts, before anything is
+  saved. Split at chapter titles, at headings, or keep it as one chapter. It can go into a new book or an existing one.
+- **Word counts compared**: for Word files the app counts the words in the file and in the chapters, and tells you if they
+  don't match.
+- **AI clean-up** finds chat text at the top and bottom of a file, text wrapped in a code block, bold used as a heading,
+  headings that start too deep, leftover symbol lines, straight quotes and doubled spaces. Each one is shown, and you can
+  untick anything you want kept.
+- **Word files** bring their headings, bold, italics, underlining, centring and comments, and templates with their own
+  chapter styles are understood. A title styled as one names the book.
+- **E-books** bring their chapters, cover and details. Markdown front matter fills in a book's details. A file only fills
+  gaps in an existing book's details and never replaces them.
+
+### Changed
+- EPUB exports hide the landmarks list, so tools that convert an e-book to text no longer show it as a stray contents list.
+
+### Known limits
+- Pictures don't come in yet. The app tells you how many were left out, and they arrive with attachments in 3.5.
+- A PDF doesn't record headings or paragraphs, so that text is an estimate. Check it against the original.
+- Apple doesn't publish the Pages format. If a Pages file can't be read, the app explains how to export it to Word.
+- A comment from Word lands on the words before its marker, which may be more or less than the words it first covered.
+
 ## [3.3.0] - 2026-11-04
 
 Your work can leave the app now, in any format you need.
