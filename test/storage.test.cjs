@@ -10,6 +10,7 @@ const { WrongKeyError, migrate, openDatabase } = require('../src/main/storage/da
 const { STEPS } = require('../src/main/storage/schema');
 const { addSlot, createKeys, listSlots, openWithAppSlot, openWithSlot, removeSlot } = require('../src/main/storage/keys');
 
+const LATEST = STEPS.at(-1).version;
 const tempDirs = [];
 
 // Removed once every test is over, because Windows won't delete a database that's still open.
@@ -40,7 +41,8 @@ test('a project keeps its title, and a new library has no leftovers', (t) => {
   const { library, id, project } = setup(t);
   assert.equal(project.title(), 'My Book');
   project.close();
-  assert.deepEqual(library.listProjects(), [{ id, state: 'ready', title: 'My Book' }]);
+  const [listed] = library.listProjects();
+  assert.deepEqual([listed.id, listed.state, listed.title, listed.words], [id, 'ready', 'My Book', 0]);
   assert.deepEqual(fs.readdirSync(library.projectsDir), [id]);
 });
 
@@ -190,15 +192,15 @@ test('the device ID stays the same between runs', (t) => {
 test('a new table step backs up first, then keeps the data', (t) => {
   const { library, id, project } = setup(t);
   project.putItem({ id: 'kept', kind: 'note', parentId: id, body: 'Kept' });
-  const steps = [...STEPS, { version: 2, up: (db) => db.exec('CREATE TABLE extra (id TEXT)') }];
+  const steps = [...STEPS, { version: LATEST + 1, up: (db) => db.exec('CREATE TABLE extra (id TEXT)') }];
   const result = migrate(project.db, project.file, { steps });
-  assert.deepEqual([result.from, result.to], [1, 2]);
+  assert.deepEqual([result.from, result.to], [LATEST, LATEST + 1]);
   assert.ok(fs.existsSync(result.backup));
   project.close();
 
   const backup = openDatabase(result.backup, openWithAppSlot(library.projectDir(id)));
   t.after(() => backup.close());
-  assert.equal(backup.pragma('user_version', { simple: true }), 1);
+  assert.equal(backup.pragma('user_version', { simple: true }), LATEST);
   assert.equal(backup.prepare('SELECT body FROM items WHERE id = ?').get('kept').body, 'Kept');
 });
 
@@ -208,7 +210,7 @@ test('a failed step changes nothing', (t) => {
   const steps = [
     ...STEPS,
     {
-      version: 2,
+      version: LATEST + 1,
       up(db) {
         db.exec('CREATE TABLE half_done (id TEXT)');
         throw new Error('Step failed');
@@ -216,7 +218,7 @@ test('a failed step changes nothing', (t) => {
     },
   ];
   assert.throws(() => migrate(project.db, project.file, { steps }), /Step failed/);
-  assert.equal(project.db.pragma('user_version', { simple: true }), 1);
+  assert.equal(project.db.pragma('user_version', { simple: true }), LATEST);
   assert.equal(project.db.prepare("SELECT count(*) AS n FROM sqlite_master WHERE name = 'half_done'").get().n, 0);
   assert.ok(project.getItem('kept'));
 });

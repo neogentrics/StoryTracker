@@ -1,0 +1,68 @@
+name: Release
+
+# Builds the Windows, Mac and Linux apps and publishes them as a GitHub Release, with the latest*.yml files the app's
+# updater reads. Run it by hand (Actions, Release, Run workflow) on the branch to release: it tags that commit as
+# v<version from package.json>. Pushing a tag like v3.0.0 does the same.
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: windows, os: windows-latest, script: 'dist:win', files: "release/RTStoryTracker-*-Setup.exe\nrelease/RTStoryTracker-*-Setup.exe.blockmap\nrelease/latest.yml" }
+          - { name: macos, os: macos-latest, script: 'dist:mac', files: 'release/*.dmg' }
+          - { name: linux, os: ubuntu-latest, script: 'dist:linux', files: "release/*.AppImage\nrelease/*.deb\nrelease/latest-linux.yml" }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run ${{ matrix.script }}
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ matrix.name }}
+          path: ${{ matrix.files }}
+
+  publish:
+    name: Publish the release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Work out the tag
+        id: tag
+        shell: bash
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            echo "name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=v$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          target_commitish: ${{ github.sha }}
+          name: RT Story Tracker ${{ steps.tag.outputs.name }}
+          files: artifacts/*
+          generate_release_notes: true
+          fail_on_unmatched_files: true

@@ -32,9 +32,11 @@ jobs:
       - run: npm test
       - name: End-to-end test (real app)
         if: runner.os != 'Linux'
+        timeout-minutes: 8
         run: npm run test:e2e
       - name: End-to-end test (real app, virtual display)
         if: runner.os == 'Linux'
+        timeout-minutes: 8
         run: xvfb-run -a npm run test:e2e
 
   install:
@@ -80,3 +82,22 @@ jobs:
             release/RTStoryTracker-*.deb
             release/RTStoryTracker-*.AppImage
           retention-days: 14
+
+  update:
+    name: Update from the version before (Windows)
+    needs: test
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run dist:win
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - run: node scripts/check-update.cjs
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'

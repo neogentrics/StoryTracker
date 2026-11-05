@@ -93,6 +93,10 @@ Searches stay well under a millisecond, so an author won't notice any of it.
 **Install size:** the database adds 2.2 to 2.8 MB, depending on the system. The empty app's installers are 122 MB on
 Windows, 122 to 129 MB on Mac, and 103 MB (`.deb`) to 129 MB (AppImage) on Linux, nearly all of it Electron.
 
+**Word counts (v3.0):** step 2 adds a `words` column, worked out from the body on every save. It's derived, so it isn't
+logged as a change, and sync won't need to carry it. The plain-text copy in the [file types design](file-types.md#inside-the-app)
+isn't stored yet, because nothing searches chapters until a later release. A new step can fill it from the bodies.
+
 **Still not covered:** a real power cut, an Intel Mac (its installer is built but wasn't run), and Linux or Windows on
 ARM. The code hasn't had the outside review the [password design](passwords-and-recovery.md#what-to-test-before-it-ships)
 asks for, which has to happen before v3.6.

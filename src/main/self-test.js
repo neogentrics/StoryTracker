@@ -71,6 +71,26 @@ function runStorageChecks(dir) {
   return { checks, info };
 }
 
+function pause(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Types into the real editor of whatever build is running, then reads the chapter back from the database.
+async function writeInWindow(window, workspace, requestFlush) {
+  const page = (code) => window.webContents.executeJavaScript(code);
+  const sentence = 'Written in the installed app.';
+  await page("document.querySelector('#new-title').value = 'Self-test'; document.querySelector('#start-project').click()");
+  for (let tries = 0; !(await page("Boolean(document.querySelector('.ProseMirror'))")); tries += 1) {
+    if (tries > 100) return 'the editor never opened';
+    await pause(100);
+  }
+  await page(`document.querySelector('.ProseMirror').focus(); document.execCommand('insertText', false, '${sentence}')`);
+  if (!(await requestFlush(window))) return 'the window could not save';
+  const book = workspace.outline().children[0];
+  const chapter = workspace.loadChapter(book.children[0].id);
+  return chapter.body.includes(sentence) && chapter.words === 5 ? 'saved' : `read back ${chapter.words} words`;
+}
+
 function runSelfTest(dir, { withMeasure = false } = {}) {
   const started = Date.now();
   const { checks, info } = runStorageChecks(path.join(dir, 'storage'));
@@ -86,4 +106,4 @@ function runSelfTest(dir, { withMeasure = false } = {}) {
   return report;
 }
 
-module.exports = { runSelfTest };
+module.exports = { runSelfTest, writeInWindow };

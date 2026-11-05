@@ -27,7 +27,7 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 |---|---|---|
 | [v1.0–v2.3](#v10v23--the-first-app) | The first app | ✅ Released (Windows, needs a PostgreSQL server) |
 | [Step zero](#step-zero--settle-the-foundations) | Settle the foundations | ✅ Done |
-| [v3.0](#v30--write-a-book) | Write a book | Next |
+| [v3.0](#v30--write-a-book) | Write a book | 🚧 Built, waiting on the power test and first release |
 | [v3.1](#v31--comfortable-writing) | Comfortable writing | Planned |
 | [v3.2](#v32--never-lose-a-word) | Never lose a word | Planned |
 | [v3.3](#v33--get-it-out) | Get it out | Planned |
@@ -72,15 +72,19 @@ Not a release: the choices that are expensive to change later. [Decisions](docs/
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Built-in storage | L | Everything saves by itself to the library. No database to set up, on any system. |
-| Projects, books and chapters | M | A project holds series and books; a book holds parts and chapters. Drag to reorder. Three columns, as in the old app. |
-| 🙋 The editor | L | A page to write on, with bold, italic, headings, lists and alignment. |
-| Word counts | S | Live, per chapter, per book and per project. |
-| Saves itself | S | Every few seconds, with no Save button to forget. |
-| Installers & updates | M | Windows, Mac and Linux installers, and the app updates itself. |
-| A simple first run | S | One screen: start a project, or try a sample. |
+| ✅ 🙋 Built-in storage | L | Everything saves by itself to the library. No database to set up, on any system. |
+| ✅ Projects, books and chapters | M | A project holds series and books; a book holds parts and chapters. Drag to reorder, or use Alt and the arrow keys. Three columns, as in the old app. |
+| ✅ 🙋 The editor | L | A page to write on, with bold, italic, headings, lists and alignment, plus Markdown shortcuts. |
+| ✅ Word counts | S | Live, per chapter, per book and per project. |
+| ✅ Saves itself | S | Two seconds after a pause, and every five during steady typing, with no Save button to forget. Closing or switching chapters saves first. |
+| ✅ Installers & updates | M | Windows, Mac and Linux installers. Windows and the Linux AppImage update themselves. Mac and the `.deb` get a message with a download link, because a Mac app can't replace itself until it's signed. |
+| ✅ A simple first run | S | One screen: start a project, or try a sample. |
 
-**Test:** on a clean computer, install it, write a chapter, pull the power, restart: the chapter is there.
+Only empty chapters, parts, books and series can be removed for now, plus the sample. Anything with writing in it waits for
+[Trash](#v32--never-lose-a-word), so no click can lose a chapter.
+
+**Test:** on a clean computer, install it, write a chapter, pull the power, restart: the chapter is there. Killing the app
+outright is tested on all three systems. Pulling the power is still a hand test.
 
 ## v3.1 — Comfortable writing
 

@@ -10,6 +10,7 @@ const { Project } = require('./project');
 
 const DATABASE_FILE = 'project.db';
 const NEW_PREFIX = '.new-';
+const SAMPLE_FILE = 'sample.json';
 
 class Library {
   constructor(root, { now = () => new Date() } = {}) {
@@ -46,7 +47,7 @@ class Library {
   }
 
   // Built under a temporary name, so a crash halfway through leaves nothing that looks like a project.
-  createProject(title) {
+  createProject(title, { sample = false } = {}) {
     const id = crypto.randomUUID();
     const temp = path.join(this.projectsDir, `${NEW_PREFIX}${id}`);
     fs.mkdirSync(temp);
@@ -54,6 +55,7 @@ class Library {
     const project = this.open(temp, id, projectKey);
     project.putItem({ id, kind: 'project', title });
     project.close();
+    if (sample) writeFileSafely(path.join(temp, SAMPLE_FILE), '{}\n');
     fs.renameSync(temp, this.projectDir(id));
     return id;
   }
@@ -72,12 +74,22 @@ class Library {
       .map((entry) => this.describe(entry.name));
   }
 
+  isSample(id) {
+    return fs.existsSync(path.join(this.projectDir(id), SAMPLE_FILE));
+  }
+
+  // The sample is the only project that can be removed for now, because it holds nothing an author can't get back.
+  removeSample(id) {
+    if (!this.isSample(id)) throw new Error('Only the sample can be removed.');
+    fs.rmSync(this.projectDir(id), { recursive: true, force: true, maxRetries: 5 });
+  }
+
   describe(id) {
     try {
       if (!hasAppSlot(this.projectDir(id))) return { id, state: 'locked', title: null };
       const project = this.openProject(id);
       try {
-        return { id, state: 'ready', title: project.title() };
+        return { id, state: 'ready', sample: this.isSample(id), ...project.summary() };
       } finally {
         project.close();
       }
