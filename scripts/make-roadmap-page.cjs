@@ -30,10 +30,13 @@ function parseRelease(block) {
   const lines = block.split('\n');
   const [, id, theme] = lines[0].match(/^## (.+?) — (.+)$/) ?? [];
   const intro = [];
+  const notes = [];
   const items = [];
   let test = '';
   for (const line of lines.slice(1)) {
-    if (line.startsWith('|')) {
+    if (test && line.trim()) {
+      test += ` ${line.trim()}`;
+    } else if (line.startsWith('|')) {
       const cells = line.split('|').slice(1, -1).map((cell) => cell.trim());
       if (/^(Feature|Task|-+|:?-+:?)$/.test(cells[0]) || cells.length < 3) continue;
       const name = cells[0];
@@ -48,12 +51,11 @@ function parseRelease(block) {
     } else if (line.startsWith('**Test:**')) {
       test = line.replace('**Test:**', '').trim();
     } else if (line.trim() && !line.startsWith('#')) {
-      intro.push(line.trim());
-    } else if (test) {
-      break;
+      (items.length ? notes : intro).push(line.trim());
     }
   }
-  return { id, theme, intro: intro.join(' ').replace('🙋', '').trim(), items, test };
+  const clean = (text) => text.replace(/[✅🙋]\s*/gu, '').trim();
+  return { id, theme, intro: clean(intro.join(' ')), notes: clean(notes.join(' ')), items, test: clean(test) };
 }
 
 const blocks = roadmap.split(/\n(?=## )/).filter((block) => block.startsWith('## '));
@@ -86,6 +88,7 @@ function releaseHtml(release) {
     ${release.intro ? `<p>${inline(release.intro)}</p>` : '<p></p>'}
     ${label ? `<p class="now-label">${inline(label)}</p>` : ''}</div>
     ${release.items.length ? `<div class="items">${release.items.map(itemHtml).join('')}</div>` : ''}
+    ${release.notes ? `<p class="test">${inline(release.notes)}</p>` : ''}
     ${release.test ? `<p class="test"><b>Test:</b> ${inline(release.test)}</p>` : ''}
   </section>`;
 }
