@@ -30,7 +30,7 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.0](#v30--write-a-book) | Write a book | ✅ Released ([3.0.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.0.0)) |
 | [v3.1](#v31--comfortable-writing) | Comfortable writing | ✅ Released ([3.1.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.1.0)) |
 | [v3.2](#v32--never-lose-a-word) | Never lose a word | ✅ Released ([3.2.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.2.0)) |
-| [v3.3](#v33--get-it-out) | Get it out | 🚧 Built, being tested |
+| [v3.3](#v33--get-it-out) | Get it out | 🚧 Released as 3.3.0, being tested by the owner |
 | [v3.4](#v34--bring-it-in) | Bring it in | Planned |
 | [v3.5](#v35--find-my-files) | Find my files | Planned |
 | [v3.6](#v36--password-lock) | Password lock | Planned |
