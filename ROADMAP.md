@@ -241,7 +241,7 @@ before release.
 |---|:-:|---|
 | 🙋 Lore pages | M | Free pages, with links both ways. |
 | 🙋 Story ideas | S | Jot it, tag it, and turn it into a book when it's ready. |
-| 🙋 Dictionaries | M | Glossary and invented words, with meanings. Feeds spell check, and pronunciation for RT Markdown Reader's voices. |
+| 🙋 Dictionaries | M | Glossary and invented words, with meanings and a pronunciation guide, including words from other languages. Feeds spell check and read aloud, and RT Markdown Reader's voices through App Link, so a name is taught once. |
 | 🙋 Research | M | Sources, notes, pictures and PDFs, attached to what they're for. |
 | One search | M | Across chapters, records, lore and research. |
 
@@ -332,7 +332,7 @@ these devices sync with it.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Read aloud | M | Hear a chapter read in a natural voice, on your own computer and offline, using RT Markdown Reader's voices. |
+| 🙋 Read aloud | M | Hear a chapter read in a natural voice, on your own computer and offline, using RT Markdown Reader's voices and the dictionary's pronunciations. |
 | 🙋 Theme and font packs | M | Download more themes and fonts as packs, and share them with RT Markdown Reader. |
 | Your own PostgreSQL server | M | Connect to a server you run yourself. |
 | Marketing & royalties | M | Depends on [decision 18](docs/decisions.md). |
