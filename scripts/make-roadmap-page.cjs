@@ -180,8 +180,8 @@ ${nowRelease ? `<section class="card now-card">
   <div class="kicker"><span class="pulse"></span>Working on now</div>
   <h2>${escape(nowRelease.id)}: ${inline(nowRelease.theme)}</h2>
   <p>${doneItems} of ${nowRelease.items.length} features are out, on Windows, Mac and Linux. What's left before moving on:</p>
-  <ul><li><b>Your testing.</b> Install it and write in it. Anything that's wrong gets fixed before 3.1.</li>
-  <li><b>A real power cut.</b> Write a chapter, pull the power, restart. It's the one test that can't be automated.</li></ul>
+  <ul><li><b>Your testing.</b> Write a real chapter in it, by choice. That's this release's test.</li>
+  <li><b>A real power cut.</b> Still open from 3.0: write a chapter, pull the power, restart.</li></ul>
   <p><b>After that:</b> your own stories and Notion become the test bed, and what you need for how you write goes on this roadmap.</p>
 </section>` : ''}
 <div class="legend"><span>Size:</span><span class="chip s">S</span> about a day <span class="chip m">M</span> a few days <span class="chip l">L</span> a week or more <span class="chip ask">You asked</span> <span class="chip safety">Permission step</span></div>

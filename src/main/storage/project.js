@@ -5,8 +5,8 @@ const { countWords, plainText } = require('../../shared/text');
 const { copyDatabase, databaseInfo } = require('./database');
 
 const REMOVAL_MARKER_DAYS = 90;
-const FIELDS = ['kind', 'parentId', 'position', 'title', 'body'];
-const COLUMNS = { kind: 'kind', parentId: 'parent_id', position: 'position', title: 'title', body: 'body' };
+const FIELDS = ['kind', 'parentId', 'position', 'title', 'body', 'goal'];
+const COLUMNS = { kind: 'kind', parentId: 'parent_id', position: 'position', title: 'title', body: 'body', goal: 'goal' };
 const SMALLEST_GAP = 1e-6;
 
 const wordsIn = (body) => countWords(plainText(body));
@@ -21,6 +21,7 @@ function toItem(row) {
     title: row.title,
     body: row.body,
     words: row.words,
+    goal: row.goal,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     deviceId: row.device_id,
@@ -117,7 +118,7 @@ class Project {
   // The whole tree without the writing itself, with word totals added up from the chapters.
   outline() {
     const rows = this.db
-      .prepare('SELECT id, kind, parent_id, title, words FROM items ORDER BY position, created_at')
+      .prepare("SELECT id, kind, parent_id, title, words FROM items WHERE kind != 'comment' ORDER BY position, created_at")
       .all();
     const nodes = new Map(
       rows.map((row) => [row.id, { id: row.id, kind: row.kind, title: row.title, words: row.words, children: [] }]),
@@ -130,6 +131,32 @@ class Project {
     const root = nodes.get(this.id);
     if (root) total(root);
     return root ?? null;
+  }
+
+  localDay() {
+    const now = this.now();
+    const part = (value) => String(value).padStart(2, '0');
+    return `${now.getFullYear()}-${part(now.getMonth() + 1)}-${part(now.getDate())}`;
+  }
+
+  // Net words, so writing 500 and cutting 200 counts as 300.
+  addDayWords(change) {
+    if (change === 0) return;
+    this.db
+      .prepare(`INSERT INTO writing_days (day, words) VALUES (?, ?)
+                ON CONFLICT (day) DO UPDATE SET words = words + excluded.words`)
+      .run(this.localDay(), change);
+  }
+
+  wordsToday() {
+    return Math.max(0, this.db.prepare('SELECT words FROM writing_days WHERE day = ?').get(this.localDay())?.words ?? 0);
+  }
+
+  chapters() {
+    return this.db
+      .prepare("SELECT * FROM items WHERE kind = 'chapter' ORDER BY position, created_at")
+      .all()
+      .map(toItem);
   }
 
   summary() {

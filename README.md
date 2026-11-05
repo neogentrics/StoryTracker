@@ -27,7 +27,15 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 <td width="50%"><img src="docs/screenshots/formatting.png" alt="A chapter with headings, a numbered list and a centred scene break"><br><b>Format.</b> Headings, lists and alignment, with Markdown shortcuts if you like them.</td>
 </tr>
 <tr>
-<td><img src="docs/screenshots/dark.png" alt="The same chapter in dark mode"><br><b>Day or night.</b> It follows your system's light or dark setting.</td>
+<td><img src="docs/screenshots/theme-glass.png" alt="A chapter in the Dusk theme with Glass on"><br><b>Make it yours.</b> Fifteen themes, Glass with any of them, and twenty fonts.</td>
+<td><img src="docs/screenshots/find.png" alt="Find and replace, with every match marked on the page"><br><b>Find and replace.</b> In a chapter, a book or the whole project, with an Undo.</td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/comments.png" alt="A comment beside the words it's about"><br><b>Comments.</b> Notes on a selection that stay out of the book.</td>
+<td><img src="docs/screenshots/split.png" alt="Two chapters side by side"><br><b>Split view.</b> Two chapters side by side.</td>
+</tr>
+<tr>
+<td><img src="docs/screenshots/focus.png" alt="Focus mode, with just the page"><br><b>Focus mode.</b> Just the page.</td>
 <td><img src="docs/screenshots/library.png" alt="The library, listing three projects with their word counts"><br><b>Your library.</b> Every project in one place, with nothing to set up.</td>
 </tr>
 </table>
@@ -51,13 +59,20 @@ open the app from *System Settings → Privacy & Security*.
 | **Move things around** | Drag a chapter to reorder it, into a part, or to another book. Alt and the arrow keys work too |
 | **Live word counts** | For the chapter, the book and the whole project, as you type |
 | **Saves itself** | A couple of seconds after you pause, and every five seconds while you type. There's no Save button to forget |
+| **Spell check** | With your own dictionary, so invented names stop being marked wrong |
+| **Find and replace** | In a chapter, a book or the whole project. A replace across chapters has an Undo |
+| **Themes and fonts** | Fifteen themes, Glass with any of them, twenty fonts, and control of text size and page width |
+| **Focus mode** | Just the page, until you press Esc |
+| **Goals** | Words a day and words for a chapter |
+| **Comments** | Notes on a selection, kept out of the book and its word count |
+| **Split view** | Two chapters side by side |
 | **Picks up where you left off** | Reopens the project and chapter you were in |
 | **Private by default** | Every project is encrypted on your own computer |
-| **Works offline** | No account, no server, and nothing leaves your computer |
+| **Works offline** | No account, no server, and your writing never leaves your computer |
 | **Updates itself** | On Windows and the Linux AppImage. Mac and the `.deb` tell you when a new version is out |
 
-Coming next: spell check and themes (3.1), version history and backups (3.2), export (3.3), import (3.4) and the password
-lock (3.6), then characters, timelines and lore. See the [roadmap](ROADMAP.md).
+Coming next: version history and backups (3.2), export (3.3), import (3.4) and the password lock (3.6), then characters,
+timelines and lore. See the [roadmap](ROADMAP.md).
 
 ## How your writing is kept
 

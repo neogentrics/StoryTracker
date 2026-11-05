@@ -7,7 +7,7 @@ const CHILD_KINDS = {
   series: ['book'],
   book: ['part', 'chapter'],
   part: ['chapter'],
-  chapter: [],
+  chapter: ['comment'],
 };
 
 function canHold(parentKind, childKind) {

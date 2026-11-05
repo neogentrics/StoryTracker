@@ -27,8 +27,8 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 |---|---|---|
 | [v1.0–v2.3](#v10v23--the-first-app) | The first app | ✅ Released (Windows, needs a PostgreSQL server) |
 | [Step zero](#step-zero--settle-the-foundations) | Settle the foundations | ✅ Done |
-| [v3.0](#v30--write-a-book) | Write a book | 🚧 Released as 3.0.0, being tested by the owner |
-| [v3.1](#v31--comfortable-writing) | Comfortable writing | Planned |
+| [v3.0](#v30--write-a-book) | Write a book | ✅ Released ([3.0.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.0.0)) |
+| [v3.1](#v31--comfortable-writing) | Comfortable writing | 🚧 Built, being tested |
 | [v3.2](#v32--never-lose-a-word) | Never lose a word | Planned |
 | [v3.3](#v33--get-it-out) | Get it out | Planned |
 | [v3.4](#v34--bring-it-in) | Bring it in | Planned |
@@ -92,13 +92,13 @@ Make it a place to spend a whole day.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| Spell check & your own words | M | With a personal dictionary, and *Add to Dictionary* from the right-click menu. Invented names stop being marked wrong. |
-| Find & replace | S | In a chapter, a book, or the whole project. |
-| 🙋 Themes & fonts | M | The old app's themes, Aero glass included, and app-wide font control. |
-| Focus mode | S | Just the page. |
-| Goals | S | Words per day and per chapter. |
-| Comments | M | Notes on a selection that stay out of the book. |
-| Split view | S | Two chapters side by side. |
+| ✅ Spell check & your own words | M | With a personal dictionary, and *Add to Dictionary* from the right-click menu. Invented names stop being marked wrong. |
+| ✅ Find & replace | S | In a chapter, a book, or the whole project. |
+| ✅ 🙋 Themes & fonts | M | RT Markdown Reader's themes and fonts, the old app's themes, a new Slate theme, Glass with any theme, and app-wide font control. |
+| ✅ Focus mode | S | Just the page. |
+| ✅ Goals | S | Words per day and per chapter. |
+| ✅ Comments | M | Notes on a selection that stay out of the book. |
+| ✅ Split view | S | Two chapters side by side. |
 
 **Test:** the owner writes a real chapter in it, by choice.
 
@@ -331,6 +331,8 @@ these devices sync with it.
 
 | Feature | Size | Details |
 |---|:-:|---|
+| 🙋 Read aloud | M | Hear a chapter read in a natural voice, on your own computer and offline, using RT Markdown Reader's voices. |
+| 🙋 Theme and font packs | M | Download more themes and fonts as packs, and share them with RT Markdown Reader. |
 | Your own PostgreSQL server | M | Connect to a server you run yourself. |
 | Marketing & royalties | M | Depends on [decision 18](docs/decisions.md). |
 | Canon checking with AI | M | Read a chapter against the records and flag what doesn't match. |

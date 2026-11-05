@@ -1,4 +1,6 @@
-/* One look for now, following the system's light or dark setting. Themes arrive in v3.1. */
+@import './fonts.css';
+
+/* These colours are only for the first moment. src/shared/themes.js holds the themes, and look.js sets them. */
 :root {
   color-scheme: light dark;
   --ui-font: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
@@ -15,9 +17,15 @@
   --ink: #221f2b;
   --ink-soft: #625c70;
   --sheet: #ffffff;
-  --sheet-edge: rgb(43 35 80 / 14%);
-  --hover: rgb(91 63 214 / 9%);
-  --selected: rgb(91 63 214 / 16%);
+  --sheet-edge: rgb(0 0 0 / 18%);
+  --on-panel: var(--ink);
+  --on-panel-soft: var(--ink-soft);
+  --hover: color-mix(in srgb, currentcolor 9%, transparent);
+  --selected: color-mix(in srgb, currentcolor 17%, transparent);
+  --panel-end: var(--panel);
+  --desk-image: none;
+  --text-size: 18px;
+  --page-width: 46rem;
   --danger: #b3261e;
   --on-danger-bg: #fbe9e7;
 }
@@ -34,9 +42,6 @@
     --ink: #ece9f4;
     --ink-soft: #a9a3b8;
     --sheet: #26232f;
-    --sheet-edge: rgb(0 0 0 / 45%);
-    --hover: rgb(168 150 255 / 12%);
-    --selected: rgb(168 150 255 / 22%);
     --danger: #ffb4ab;
     --on-danger-bg: #4a1c18;
   }
@@ -65,13 +70,37 @@ body {
   font: 15px/1.45 var(--ui-font);
 }
 
+/* Panels can be dark around a light page, so anything on a panel uses the panel's own text colours. */
+.column:not(.page-column),
+.toolbar,
+.find-bar,
+.page-footer,
+.comments {
+  color: var(--on-panel);
+  --ink: var(--on-panel);
+  --ink-soft: var(--on-panel-soft);
+}
+
+.comment-card,
+.column input,
+.toolbar input,
+.find-bar input,
+.find-bar select,
+.comments textarea {
+  color: var(--sheet-ink);
+  --ink: var(--sheet-ink);
+  --ink-soft: var(--sheet-ink-soft);
+}
+
 #app {
   flex: 1;
   min-height: 0;
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
@@ -98,7 +127,10 @@ button:disabled {
   outline-offset: 1px;
 }
 
-input[type='text'] {
+input[type='text'],
+input[type='number'],
+select,
+textarea {
   border: 1px solid var(--panel-edge);
   border-radius: 6px;
   padding: 0.45rem 0.6rem;
@@ -302,7 +334,7 @@ input[type='text'] {
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--panel-edge);
-  background: var(--panel);
+  background: linear-gradient(180deg, var(--panel), var(--panel-end));
 }
 
 .column > h2 {
@@ -436,7 +468,7 @@ input[type='text'] {
   left: 0;
   right: 0;
   height: 2px;
-  background: var(--accent);
+  background: currentcolor;
 }
 
 .drop-before::before {
@@ -448,15 +480,35 @@ input[type='text'] {
 }
 
 .drop-into {
-  outline: 2px solid var(--accent);
+  outline: 2px solid currentcolor;
   outline-offset: -2px;
 }
 
 /* The page */
 
 .page-column {
+  flex-direction: row;
   border-right: 0;
-  background: var(--desk);
+  background: transparent;
+}
+
+.pane {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  container-type: inline-size;
+}
+
+.pane + .pane {
+  border-left: 2px solid var(--panel-edge);
+}
+
+.page-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
 }
 
 .toolbar {
@@ -466,7 +518,7 @@ input[type='text'] {
   gap: 0.75rem;
   padding: 0.35rem 0.6rem;
   border-bottom: 1px solid var(--panel-edge);
-  background: var(--panel);
+  background: linear-gradient(180deg, var(--panel), var(--panel-end));
 }
 
 .tool-group {
@@ -492,7 +544,6 @@ input[type='text'] {
 
 .tool[aria-pressed='true'] {
   background: var(--selected);
-  color: var(--accent);
 }
 
 .face-bold {
@@ -506,13 +557,13 @@ input[type='text'] {
 
 .page-scroll {
   flex: 1;
-  min-height: 0;
+  min-width: 0;
   overflow: auto;
   padding: 1.5rem 1.25rem 3rem;
 }
 
 .sheet {
-  width: min(46rem, 100%);
+  width: min(var(--page-width), 100%);
   min-height: 100%;
   margin: 0 auto;
   padding: 3rem 3.5rem 5rem;
@@ -545,7 +596,7 @@ input[type='text'] {
 .page-text {
   flex: 1;
   outline: 0;
-  font: 18px/1.65 var(--page-font);
+  font: var(--text-size)/1.65 var(--page-font);
   white-space: pre-wrap;
   word-wrap: break-word;
 }
@@ -612,12 +663,23 @@ input[type='text'] {
   gap: 1rem;
   padding: 0.3rem 0.9rem;
   border-top: 1px solid var(--panel-edge);
-  background: var(--panel);
+  background: linear-gradient(180deg, var(--panel), var(--panel-end));
   color: var(--ink-soft);
   font-size: 0.87rem;
 }
 
-#save-state[data-state='failed'] {
+.footer-actions {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.footer-button {
+  padding: 0 0.5rem;
+  color: inherit;
+}
+
+.save-state[data-state='failed'] {
   color: var(--danger);
   font-weight: 600;
 }
@@ -627,4 +689,331 @@ input[type='text'] {
   display: grid;
   place-items: center;
   color: var(--ink-soft);
+}
+
+/* Goals */
+
+.goal-met {
+  font-weight: 600;
+  opacity: 1;
+}
+
+/* Focus mode: just the page */
+
+.room.focus .room-header,
+.room.focus .column:not(.page-column),
+.room.focus .toolbar {
+  display: none;
+}
+
+.room.focus .columns {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Split view */
+
+.row.beside {
+  box-shadow: inset 3px 0 0 currentcolor;
+}
+
+.close-pane {
+  margin-left: auto;
+}
+
+.add-comment {
+  padding-inline: 0.6rem;
+}
+
+/* Find and replace */
+
+.find-bar {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--panel-edge);
+  background: linear-gradient(180deg, var(--panel), var(--panel-end));
+}
+
+.find-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.find-row input[type='text'] {
+  flex: 1;
+  min-width: 10rem;
+  padding: 0.2rem 0.45rem;
+}
+
+.find-count {
+  min-width: 5rem;
+  color: var(--ink-soft);
+  font-size: 0.87rem;
+}
+
+.find-close {
+  margin-left: auto;
+  border: 0;
+}
+
+.find-done {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.find-results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 11rem;
+  overflow: auto;
+}
+
+.find-result {
+  width: 100%;
+  display: grid;
+  gap: 0.05rem;
+  border: 0;
+  padding: 0.25rem 0.4rem;
+  text-align: left;
+}
+
+.find-result-title {
+  font-weight: 600;
+}
+
+.find-result-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  font-size: 0.87rem;
+}
+
+mark,
+.find-match {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: inherit;
+}
+
+.find-current {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+/* Comments */
+
+.comment-mark {
+  border-bottom: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.comments {
+  flex: none;
+  width: 16rem;
+  overflow: auto;
+  padding: 0.6rem;
+  border-left: 1px solid var(--panel-edge);
+  background: linear-gradient(180deg, var(--panel), var(--panel-end));
+}
+
+.comments h2 {
+  margin: 0 0 0.5rem;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.comment-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.comment-card {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.45rem;
+  border: 1px solid var(--panel-edge);
+  border-radius: 6px;
+  background: var(--sheet);
+}
+
+.comment-quote {
+  overflow: hidden;
+  padding: 0;
+  border: 0;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.comment-text,
+.comment-box {
+  width: 100%;
+  resize: vertical;
+  padding: 0.2rem 0.35rem;
+  background: transparent;
+}
+
+.comment-form {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.comment-remove {
+  justify-self: end;
+  padding: 0 0.4rem;
+  border: 0;
+  font-size: 0.82rem;
+}
+
+/* Dialogs */
+
+.dialog {
+  width: min(30rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 3rem);
+  overflow: auto;
+  padding: 1.3rem 1.5rem;
+  border: 1px solid var(--panel-edge);
+  border-radius: 12px;
+  background: var(--sheet);
+  color: var(--ink);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 35%);
+}
+
+.dialog::backdrop {
+  background: rgb(0 0 0 / 40%);
+}
+
+.dialog h2 {
+  margin: 0 0 0.6rem;
+  font: 400 1.35rem/1.2 var(--page-font);
+}
+
+.dialog h3 {
+  margin: 1rem 0 0.4rem;
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 11rem minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 0.45rem;
+}
+
+.check {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.quiet-note {
+  margin: 0.35rem 0;
+  color: var(--ink-soft);
+  font-size: 0.87rem;
+}
+
+.word-form {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.word-form input {
+  flex: 1;
+  min-width: 0;
+}
+
+.word-list {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  max-height: 10rem;
+  overflow: auto;
+}
+
+.word-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.1rem 0;
+}
+
+.word-row button {
+  padding: 0 0.4rem;
+  border: 0;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.8rem;
+}
+
+/* A narrow page, in split view or a small window: comments move underneath, so the writing keeps its width. */
+
+@container (max-width: 44rem) {
+  .page-body {
+    flex-direction: column;
+  }
+
+  .page-scroll {
+    flex: 1 1 60%;
+    min-height: 0;
+    padding-inline: 0.6rem;
+  }
+
+  .sheet {
+    padding: 1.6rem 1.5rem 3rem;
+  }
+
+  .comments {
+    flex: 0 1 40%;
+    width: auto;
+    min-height: 0;
+    border-top: 1px solid var(--panel-edge);
+    border-left: 0;
+  }
+}
+
+/* Glass: the panels and page are frosted over colour. Aero always has it, and it's an option for the other themes. */
+
+@media (prefers-reduced-transparency: no-preference) {
+  html[data-surface='glass'] body {
+    background: var(--desk-image), var(--desk);
+  }
+
+  html[data-surface='glass'] :is(.column:not(.page-column), .toolbar, .find-bar, .page-footer, .comments) {
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--panel) 72%, transparent),
+      color-mix(in srgb, var(--panel-end) 72%, transparent)
+    );
+    backdrop-filter: blur(22px) saturate(1.5);
+  }
+
+  html[data-surface='glass'] .sheet {
+    background: color-mix(in srgb, var(--sheet) 90%, transparent);
+    backdrop-filter: blur(26px) saturate(1.4);
+  }
+}
+
+html[data-theme='contrast'] :is(button, input, select, textarea) {
+  border-color: var(--panel-edge);
 }

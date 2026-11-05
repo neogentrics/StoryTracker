@@ -134,6 +134,62 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   await window.click('.ProseMirror h2');
   await pause(300);
   await shot(window, 'formatting');
+
+  const send = (command) => app.evaluate(({ BrowserWindow }, name) => {
+    BrowserWindow.getAllWindows()[0].webContents.send('menu:command', name);
+  }, command);
+  const row = (title) => window.locator('#chapter-list .row', { hasText: title });
+
+  await row('The Third Stair').locator('.row-main').click();
+  await window.waitForFunction(() => document.querySelector('#chapter-title').value === 'The Third Stair');
+  await send('find');
+  await window.fill('.find-query', 'the');
+  await window.selectOption('.find-scope', 'chapter');
+  await window.fill('.find-replacement', 'that');
+  await pause(300);
+  await shot(window, 'find');
+  await window.click('.find-close');
+
+  await window.click('.ProseMirror p:nth-child(3)', { clickCount: 3 });
+  await window.click('.add-comment');
+  await window.fill('.comment-box', 'Should her father\u2019s name be here twice, or is that the point?');
+  await window.click('.comment-save');
+  await window.waitForSelector('.comment-card');
+  await pause(300);
+  await shot(window, 'comments');
+
+  await row('The Mule').hover();
+  await window.click('[aria-label="Open The Mule beside"]');
+  await window.waitForFunction(() => document.querySelectorAll('.ProseMirror').length === 2);
+  await pause(400);
+  await shot(window, 'split');
+  await window.click('[aria-label="Close this side"]');
+  await window.click('.focus-button');
+  await pause(300);
+  await shot(window, 'focus');
+  await window.keyboard.press('Escape');
+
+  await send('preferences');
+  await window.waitForSelector('#preferences[open]');
+  await pause(300);
+  await shot(window, 'preferences');
+  await window.click('#pref-close');
+
+  const looks = {
+    sepia: { theme: 'sepia' },
+    slate: { theme: 'slate' },
+    blue: { theme: 'blue' },
+    glass: { theme: 'dusk', glass: true },
+  };
+  for (const [name, look] of Object.entries(looks)) {
+    await window.evaluate((settings) => window.storyTracker.saveSettings(settings), look);
+    await app.close();
+    app = await launch(profile);
+    window = await open(app);
+    await window.waitForSelector('.ProseMirror');
+    await pause(400);
+    await shot(window, `theme-${name}`);
+  }
   await app.close();
 
   for (const dir of [profile, firstRun]) fs.rmSync(dir, { recursive: true, force: true, maxRetries: 5 });

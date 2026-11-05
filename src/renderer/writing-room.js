@@ -5,6 +5,7 @@ import { Page } from './page.js';
 
 const DRAG_TYPE = 'application/x-rtst-item';
 const lastChapterKey = (projectId) => `lastChapter:${projectId}`;
+const MAX_GOAL = 10000000;
 
 function flatten(nodes, depth = 0) {
   return nodes.flatMap((node) => [{ node, depth }, ...flatten(node.kind === 'book' ? [] : node.children, depth + 1)]);
@@ -27,15 +28,20 @@ export class WritingRoom {
     this.bookId = null;
     this.chapterId = null;
     this.dragId = null;
+    this.progress = opened.progress;
+    this.secondPage = null;
 
     this.message = el('p', { id: 'room-message', class: 'room-message', role: 'alert', hidden: true });
     this.projectTitle = el('h1', { id: 'project-title', title: 'Double-click to rename' }, opened.title);
     this.projectTitle.addEventListener('dblclick', () => this.startRename(this.outline.id, this.projectTitle));
     this.projectWords = el('span', { id: 'project-words', class: 'header-words' });
+    this.todayWords = el('span', { id: 'today-words', class: 'header-words' });
     this.bookList = el('ul', { id: 'book-list', class: 'rows', 'aria-label': 'Books' });
     this.chapterList = el('ul', { id: 'chapter-list', class: 'rows', 'aria-label': 'Chapters' });
     this.bookHeading = el('h2', { id: 'book-heading' }, 'Chapters');
-    this.pageRoot = el('section', { class: 'column page-column', 'aria-label': 'Page' });
+    this.pageRoot = el('div', { class: 'pane' });
+    this.secondRoot = el('div', { class: 'pane', hidden: true });
+    this.pages = el('section', { class: 'column page-column', 'aria-label': 'Page' }, this.pageRoot, this.secondRoot);
 
     this.addDropZone(this.bookList, () => this.outline.id);
     this.addDropZone(this.chapterList, () => this.bookId);
@@ -49,6 +55,7 @@ export class WritingRoom {
           { class: 'room-header' },
           el('button', { id: 'open-library', class: 'on-dark', onclick: () => onLibrary() }, 'Library'),
           this.projectTitle,
+          this.todayWords,
           this.projectWords,
         ),
         this.message,
@@ -79,16 +86,146 @@ export class WritingRoom {
               el('button', { id: 'add-part', onclick: () => this.addPart() }, '+ Part'),
             ),
           ),
-          this.pageRoot,
+          this.pages,
         ),
       ),
     );
 
-    this.page = new Page(this.pageRoot, {
-      api,
+    this.room = root.querySelector('.room');
+    this.page = this.makePage(this.pageRoot);
+    this.activePage = this.page;
+    this.pageRoot.addEventListener('focusin', () => {
+      this.activePage = this.page;
+    });
+    this.secondRoot.addEventListener('focusin', () => {
+      this.activePage = this.secondPage ?? this.page;
+    });
+    this.keys = (event) => {
+      if (event.key === 'Escape' && this.room.classList.contains('focus') && !document.querySelector('dialog[open]')) {
+        this.toggleFocus();
+      }
+    };
+    document.addEventListener('keydown', this.keys);
+    this.showProgress();
+  }
+
+  makePage(root, extra = {}) {
+    return new Page(root, {
+      api: this.api,
       onWords: (id, count) => this.setWords(id, count),
       onTitle: (id, title) => this.setTitle(id, title),
-      onError: (text) => this.showMessage(`Your latest changes aren’t saved yet: ${text}`),
+      onError: (text) => this.showMessage(text),
+      onSaved: ({ progress }) => this.setProgress(progress),
+      onGoals: (id) => this.openGoals(id),
+      onFocusMode: () => this.toggleFocus(),
+      find: {
+        scopeBook: () => this.bookId,
+        onFlush: () => this.flush(),
+        onOpenChapter: (id) => this.openChapter(id),
+        onReplaced: (outline) => this.afterReplace(outline),
+      },
+      ...extra,
+    });
+  }
+
+  leave() {
+    document.removeEventListener('keydown', this.keys);
+  }
+
+  setProgress(progress) {
+    this.progress = progress;
+    this.showProgress();
+  }
+
+  showProgress() {
+    const { today, dailyGoal } = this.progress;
+    const met = dailyGoal > 0 && today >= dailyGoal;
+    this.todayWords.textContent = dailyGoal ? `${formatCount(today)} of ${words(dailyGoal)} today` : `${words(today)} today`;
+    this.todayWords.classList.toggle('goal-met', met);
+  }
+
+  toggleFocus() {
+    this.room.classList.toggle('focus');
+    this.activePage.focus();
+  }
+
+  openGoals(chapterId) {
+    document.getElementById('goals')?.remove();
+    const number = (id, label, value) => {
+      const input = el('input', { id, type: 'number', min: '0', max: String(MAX_GOAL), step: '50', value: String(value), 'aria-label': label });
+      return { input, row: el('label', { class: 'field' }, el('span', {}, label), input) };
+    };
+    const daily = number('goal-daily', 'Words a day, for this project', this.progress.dailyGoal);
+    const chapterPage = [this.page, this.secondPage].find((page) => page?.chapterId === chapterId);
+    const chapter = number('goal-chapter', 'Words for this chapter', chapterPage?.goal ?? 0);
+    const dialog = el(
+      'dialog',
+      { id: 'goals', class: 'dialog' },
+      el('h2', {}, 'Goals'),
+      el('p', { class: 'quiet-note' }, 'Leave a goal at 0 to have none.'),
+      daily.row,
+      chapter.row,
+      el(
+        'div',
+        { class: 'dialog-actions' },
+        el('button', { type: 'button', onclick: () => dialog.close() }, 'Cancel'),
+        el('button', { id: 'goals-save', class: 'primary', onclick: () => this.saveGoals(dialog, chapterPage, daily.input, chapter.input) }, 'Save'),
+      ),
+    );
+    dialog.addEventListener('close', () => dialog.remove());
+    document.body.append(dialog);
+    dialog.showModal();
+  }
+
+  saveGoals(dialog, chapterPage, daily, chapter) {
+    const whole = (input) => Math.max(0, Math.min(MAX_GOAL, Math.round(Number(input.value) || 0)));
+    return this.attempt(async () => {
+      this.setProgress(await this.api.setGoal({ id: this.outline.id, goal: whole(daily) }));
+      if (chapterPage) {
+        this.setProgress(await this.api.setGoal({ id: chapterPage.chapterId, goal: whole(chapter) }));
+        chapterPage.goal = whole(chapter);
+      }
+      this.showCounts();
+      dialog.close();
+    });
+  }
+
+  find({ replacing = false } = {}) {
+    if (this.activePage.chapterId) this.activePage.findBar.open({ replacing });
+  }
+
+  async afterReplace(outline) {
+    this.outline = outline;
+    await this.page.reload();
+    await this.secondPage?.reload();
+    this.renderLists();
+  }
+
+  openBeside(id) {
+    if (id === this.chapterId) {
+      this.showMessage('That chapter is already open.');
+      return null;
+    }
+    return this.attempt(async () => {
+      if (!this.secondPage) {
+        this.secondRoot.hidden = false;
+        this.secondPage = this.makePage(this.secondRoot, { onClose: () => this.closeBeside() });
+      }
+      await this.secondPage.open(id);
+      this.showSelection();
+      this.showCounts();
+    });
+  }
+
+  closeBeside() {
+    return this.attempt(async () => {
+      await this.secondPage?.flush();
+      this.secondPage?.editor?.destroy();
+      this.secondPage = null;
+      this.secondRoot.replaceChildren();
+      this.secondRoot.hidden = true;
+      this.activePage = this.page;
+      this.showSelection();
     });
   }
 
@@ -121,8 +258,9 @@ export class WritingRoom {
     }
   }
 
-  flush() {
-    return this.page.flush();
+  async flush() {
+    await this.page.flush();
+    await this.secondPage?.flush();
   }
 
   bookOf(id) {
@@ -158,7 +296,7 @@ export class WritingRoom {
       'button',
       {
         class: 'row-main',
-        onclick: () => this.chooseRow(node),
+        onclick: (event) => this.chooseRow(node, event),
         ondblclick: () => this.startRename(node.id, title),
       },
       title,
@@ -186,6 +324,13 @@ export class WritingRoom {
           { class: 'row-action', title: 'Rename', 'aria-label': `Rename ${node.title}`, onclick: () => this.startRename(node.id, title) },
           '✎',
         ),
+        node.kind === 'chapter'
+          ? el(
+              'button',
+              { class: 'row-action', title: 'Open beside', 'aria-label': `Open ${node.title} beside`, onclick: () => this.openBeside(node.id) },
+              '⧉',
+            )
+          : null,
         empty
           ? el(
               'button',
@@ -202,6 +347,7 @@ export class WritingRoom {
     for (const row of [...this.bookList.children, ...this.chapterList.children]) {
       const selected = row.dataset.id === this.bookId || row.dataset.id === this.chapterId;
       row.classList.toggle('selected', selected);
+      row.classList.toggle('beside', row.dataset.id === this.secondPage?.chapterId);
       row.querySelector('.row-main').setAttribute('aria-current', String(selected));
     }
   }
@@ -210,9 +356,12 @@ export class WritingRoom {
     const chapter = this.chapterId && findNode(this.outline, this.chapterId);
     const book = this.bookId && findNode(this.outline, this.bookId);
     if (chapter && book) this.page.showCounts(chapter.words, book.words);
+    const second = this.secondPage?.chapterId && findNode(this.outline, this.secondPage.chapterId);
+    if (second) this.secondPage.showCounts(second.words, this.bookOf(second.id)?.words ?? second.words);
   }
 
-  chooseRow(node) {
+  chooseRow(node, event) {
+    if (node.kind === 'chapter' && (event.ctrlKey || event.metaKey)) return this.openBeside(node.id);
     if (node.kind === 'chapter') return this.openChapter(node.id);
     if (node.kind === 'book') return this.openBook(node.id);
     return null;
@@ -235,6 +384,7 @@ export class WritingRoom {
 
   openChapter(id, { focus = false } = {}) {
     return this.attempt(async () => {
+      if (id === this.secondPage?.chapterId) await this.closeBeside();
       await this.page.open(id);
       const bookId = this.bookOf(id)?.id ?? null;
       const sameBook = bookId === this.bookId;
@@ -366,6 +516,7 @@ export class WritingRoom {
       await this.flush();
       this.outline = await this.api.rename({ id, title });
       if (id === this.chapterId) this.page.setTitle(findNode(this.outline, id).title);
+      if (id === this.secondPage?.chapterId) this.secondPage.setTitle(findNode(this.outline, id).title);
       if (id === this.outline.id) this.projectTitle.textContent = this.outline.title;
       this.renderLists();
     });
@@ -377,6 +528,7 @@ export class WritingRoom {
       const inside = [...indexTree(node).keys()];
       const openGoes = inside.includes(this.chapterId);
       const bookGoes = inside.includes(this.bookId);
+      if (inside.includes(this.secondPage?.chapterId)) await this.closeBeside();
       this.outline = await this.api.removeEmpty(node.id);
       if (openGoes) {
         await this.page.clear();

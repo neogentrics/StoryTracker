@@ -15,6 +15,8 @@ function buildMenu({ send, checkForUpdates, about }) {
           submenu: [
             { label: 'About RT Story Tracker', click: about },
             { type: 'separator' },
+            { label: 'Preferences…', accelerator: 'Cmd+,', click: () => send('preferences') },
+            { type: 'separator' },
             { role: 'hide' },
             { role: 'hideOthers' },
             { role: 'unhide' },
@@ -30,13 +32,35 @@ function buildMenu({ send, checkForUpdates, about }) {
         { label: 'New Book', accelerator: 'CmdOrCtrl+Shift+N', click: () => send('new-book') },
         { type: 'separator' },
         { label: 'Library', accelerator: 'CmdOrCtrl+Shift+L', click: () => send('library') },
-        ...(isMac ? [] : [{ type: 'separator' }, { role: 'quit' }]),
+        ...(isMac
+          ? []
+          : [
+              { label: 'Preferences…', accelerator: 'Ctrl+,', click: () => send('preferences') },
+              { type: 'separator' },
+              { role: 'quit' },
+            ]),
       ],
     },
-    { role: 'editMenu' },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+        { role: 'selectAll' },
+        { type: 'separator' },
+        { label: 'Find…', accelerator: 'CmdOrCtrl+F', click: () => send('find') },
+        { label: 'Replace…', accelerator: isMac ? 'Cmd+Alt+F' : 'Ctrl+H', click: () => send('replace') },
+      ],
+    },
     {
       label: 'View',
       submenu: [
+        { label: 'Focus Mode', accelerator: 'CmdOrCtrl+Shift+F', click: () => send('focus') },
+        { type: 'separator' },
         { role: 'zoomIn' },
         { role: 'zoomOut' },
         { role: 'resetZoom' },

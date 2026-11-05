@@ -1,11 +1,12 @@
 'use strict';
-const { app, BrowserWindow, dialog, ipcMain, Menu, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } = require('electron');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { registerIpc } = require('./ipc');
 const { buildMenu } = require('./menu');
 const { runSelfTest, writeInWindow } = require('./self-test');
+const { Settings } = require('./settings');
 const { Library } = require('./storage/library');
 const { Updater } = require('./updater');
 const { Workspace } = require('./workspace');
@@ -20,6 +21,7 @@ if (scratch) app.setPath('userData', path.join(scratch, 'profile'));
 else if (process.env.RTST_USER_DATA) app.setPath('userData', process.env.RTST_USER_DATA);
 
 let workspace = null;
+let settings = null;
 let libraryError = null;
 let mainWindow = null;
 let flushCount = 0;
@@ -29,7 +31,10 @@ const updater = new Updater((status) => mainWindow?.webContents.send('update:sta
 
 function openLibrary() {
   try {
-    workspace = new Workspace(new Library(path.join(app.getPath('userData'), 'library')));
+    const root = path.join(app.getPath('userData'), 'library');
+    workspace = new Workspace(new Library(root));
+    settings = new Settings(root);
+    session.defaultSession.setSpellCheckerEnabled(settings.values.spellcheck);
   } catch (error) {
     libraryError = error.message;
   }
@@ -67,9 +72,14 @@ function spellingMenu(window, params) {
     label: word,
     click: () => window.webContents.replaceMisspelling(word),
   }));
+  const word = params.misspelledWord;
+  const add = word
+    ? [{ label: `Add “${word}” to Dictionary`, click: () => window.webContents.session.addWordToSpellCheckerDictionary(word) }]
+    : [];
   const template = [
     ...fixes,
-    ...(fixes.length ? [{ type: 'separator' }] : []),
+    ...add,
+    ...(fixes.length || word ? [{ type: 'separator' }] : []),
     { role: 'cut', enabled: params.editFlags.canCut },
     { role: 'copy', enabled: params.editFlags.canCopy },
     { role: 'paste', enabled: params.editFlags.canPaste },
@@ -215,6 +225,10 @@ if (!app.requestSingleInstanceLock()) {
       workspace: () => {
         if (!workspace) throw new Error(libraryError ?? 'The library has not opened.');
         return workspace;
+      },
+      settings: () => {
+        if (!settings) throw new Error(libraryError ?? 'The library has not opened.');
+        return settings;
       },
       updater,
     });

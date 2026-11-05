@@ -3,6 +3,26 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.1.0] - Unreleased
+
+Make it a place to spend a whole day.
+
+### Added
+- **Spell check with your own words**: right-click a word for suggestions or *Add to Dictionary*, so invented names stop
+  being marked wrong. *Preferences* lists your words and turns checking off.
+- **Find and replace** (Ctrl+F, Ctrl+H) in a chapter, a book or the whole project, with match case and whole words. A
+  replace across chapters keeps a copy of the project first and has an Undo.
+- **Fifteen themes**: RT Markdown Reader's, the old app's and a new one, Slate. High Contrast stays flat, and the rest
+  have panels that run from one colour to another.
+- **Glass**: frosted panels over colour, with any theme but High Contrast.
+- **Twenty fonts for the page**, with text size and page width, and a choice of font for the app itself. Five of the fonts
+  come with the app, so a book looks the same on every computer.
+- **Focus mode** (Ctrl+Shift+F): just the page. Esc brings everything back.
+- **Goals**: words a day for a project and words for a chapter, with the day's count at the top of the window.
+- **Comments**: notes on a selection, kept out of the book and its word count.
+- **Split view**: two chapters side by side, each saving its own text.
+- **Preferences** (Ctrl+,).
+
 ## [3.0.0] - 2026-11-04
 
 A new app, built from scratch for Windows, Mac and Linux. Nothing to set up and no server to run.

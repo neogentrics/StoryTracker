@@ -53,6 +53,20 @@ const STEPS = [
       }
     },
   },
+  {
+    // A goal is a word target: per day on the project, and per chapter on a chapter. Words written each day are kept by
+    // the local date, because a goal for "today" means the author's today.
+    version: 3,
+    up(db) {
+      db.exec(`
+        ALTER TABLE items ADD COLUMN goal INTEGER NOT NULL DEFAULT 0;
+        CREATE TABLE writing_days (
+          day TEXT PRIMARY KEY,
+          words INTEGER NOT NULL DEFAULT 0
+        );
+      `);
+    },
+  },
 ];
 
 module.exports = { STEPS };

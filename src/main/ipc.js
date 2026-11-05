@@ -1,5 +1,5 @@
 'use strict';
-const { ipcMain } = require('electron');
+const { ipcMain, session } = require('electron');
 
 // Errors come back as plain results, so the window can show the app's own words and not Electron's wrapper around them.
 function handle(channel, work) {
@@ -12,7 +12,7 @@ function handle(channel, work) {
   });
 }
 
-function registerIpc({ status, workspace, updater }) {
+function registerIpc({ status, workspace, updater, settings }) {
   handle('app:status', status);
   handle('library:list', () => workspace().listProjects());
   handle('library:removeSample', (id) => workspace().removeSample(id));
@@ -26,6 +26,26 @@ function registerIpc({ status, workspace, updater }) {
   handle('item:removeEmpty', (id) => workspace().removeEmpty(id));
   handle('chapter:load', (id) => workspace().loadChapter(id));
   handle('chapter:save', (input) => workspace().saveChapter(input));
+  handle('item:setGoal', (input) => workspace().setGoal(input));
+  handle('comment:list', (id) => workspace().listComments(id));
+  handle('comment:add', (input) => workspace().addComment(input));
+  handle('comment:edit', (input) => workspace().editComment(input));
+  handle('comment:remove', (id) => workspace().removeComment(id));
+  handle('find:search', (input) => workspace().search(input));
+  handle('find:replaceAll', (input) => workspace().replaceAll(input));
+  handle('find:undo', () => workspace().undoReplace());
+  handle('settings:get', () => settings().values);
+  handle('settings:save', (changes) => {
+    const saved = settings().save(changes);
+    session.defaultSession.setSpellCheckerEnabled(saved.spellcheck);
+    return saved;
+  });
+  handle('dictionary:list', async () => {
+    const words = await session.defaultSession.listWordsInSpellCheckerDictionary();
+    return words.sort((a, b) => a.localeCompare(b));
+  });
+  handle('dictionary:add', (word) => session.defaultSession.addWordToSpellCheckerDictionary(String(word)));
+  handle('dictionary:remove', (word) => session.defaultSession.removeWordFromSpellCheckerDictionary(String(word)));
   handle('update:install', () => updater.installNow());
 }
 
