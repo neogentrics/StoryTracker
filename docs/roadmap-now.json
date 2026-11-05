@@ -8,8 +8,8 @@
         "text": "Install 3.1.0 and write something you'd keep. Tell me what gets in the way."
       },
       {
-        "title": "Watch the update",
-        "text": "A copy of 3.0.0 on Windows should offer 3.1.0 by itself. It's the first update from a real release."
+        "title": "The update worked",
+        "text": "Done. 3.0.0 on your PC found the GitHub release, updated itself to 3.1.0 and kept your project."
       },
       {
         "title": "The power cut",
