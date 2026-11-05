@@ -262,6 +262,6 @@ test('comments stay out of the outline and the word count', () => {
 test('a comment goes with its chapter', () => {
   const { space, first } = book();
   const comment = space.addComment({ chapterId: first, text: 'A note' });
-  space.removeEmpty(first);
+  space.project.removeItem(first);
   assert.ok(space.project.removalMarkers().some((row) => row.itemId === comment.id));
 });

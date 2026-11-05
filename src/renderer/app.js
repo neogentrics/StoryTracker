@@ -2,6 +2,7 @@ import { el } from './dom.js';
 import { applyLook } from './look.js';
 import { openPreferences } from './prefs.js';
 import { renderFailure, renderHome } from './home.js';
+import { openTrash } from './trash.js';
 import { WritingRoom } from './writing-room.js';
 
 const api = window.storyTracker;
@@ -21,7 +22,7 @@ function ready() {
 
 async function enterRoom(opened) {
   remember.set(LAST_PROJECT, opened.id);
-  room = new WritingRoom(root, opened, { api, onLibrary: leaveRoom, remember });
+  room = new WritingRoom(root, opened, { api, onLibrary: leaveRoom, onPreferences: () => openPreferences(api), remember });
   await room.start();
   ready();
 }
@@ -33,6 +34,16 @@ async function showHome() {
     onOpen: (id) => run(async () => enterRoom(await api.openProject(id))),
     onCreate: (title) => run(async () => enterRoom(await api.createProject(title))),
     onSample: () => run(async () => enterRoom(await api.createSample())),
+    onOpenFile: () => openProjectFile(),
+    onTrashProject: (project) => {
+      if (window.confirm(`Move “${project.title}” to the Trash? It waits there for 30 days.`)) {
+        run(async () => {
+          await api.trashProject(project.id);
+          await showHome();
+        });
+      }
+    },
+    onShowTrash: () => showProjectTrash(),
     onRemoveSample: (id) => {
       const sure = window.confirm('Remove the sample? Anything you wrote in it goes with it.');
       if (sure) run(async () => {
@@ -51,6 +62,45 @@ async function run(work) {
   } catch (error) {
     renderFailure(root, error.message);
     document.body.dataset.state = 'failed';
+  }
+}
+
+function showProjectTrash() {
+  return run(() =>
+    openTrash({
+      title: 'Projects in the Trash',
+      load: () => api.listProjectTrash(),
+      restore: async (id) => {
+        await api.restoreProject(id);
+        if (!room) await showHome();
+      },
+      onError: (text) => window.alert(text),
+    }));
+}
+
+// A project file from the menu, a double-click, or a backup. If it replaces the open project, that closes first.
+async function openProjectFile(file) {
+  try {
+    await room?.flush();
+    const id = await api.importProject(file);
+    if (!id) return;
+    room?.leave();
+    room = null;
+    await enterRoom(await api.openProject(id));
+  } catch (error) {
+    if (room) room.showMessage(error.message);
+    else window.alert(error.message);
+  }
+}
+
+async function exportProject() {
+  if (!room) return;
+  try {
+    await room.flush();
+    const file = await api.exportProject();
+    if (file) room.showInfo(`Saved a copy to ${file}`);
+  } catch (error) {
+    room.showMessage(error.message);
   }
 }
 
@@ -102,16 +152,30 @@ function onMenu(command) {
   if (command === 'find') room?.find();
   if (command === 'replace') room?.find({ replacing: true });
   if (command === 'focus') room?.toggleFocus();
+  if (command === 'history') room?.showHistory();
+  if (command === 'trash') {
+    if (room) room.showTrash();
+    else showProjectTrash();
+  }
+  if (command === 'export') exportProject();
+  if (command === 'open-file') openProjectFile();
 }
 
 async function start() {
   api.onFlush(() => room?.flush());
   api.onUpdate(showUpdate);
   api.onMenu(onMenu);
+  api.onOpenFile((file) => openProjectFile(file));
   await run(async () => {
     applyLook(await api.settings());
     const status = await api.status();
     showUpdate(status.update);
+    const file = await api.takeFile();
+    if (file) {
+      await showHome();
+      await openProjectFile(file);
+      return;
+    }
     const last = remember.get(LAST_PROJECT);
     if (last) {
       const projects = await api.listProjects();

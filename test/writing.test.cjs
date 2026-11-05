@@ -189,19 +189,9 @@ test('a step moves one place and stops at the ends', () => {
   assert.equal(resolveStep(root, 'c2', 1), null);
 });
 
-test('only empty things can be removed', () => {
-  const { space, bookId, add, chapterOne } = book();
-  const part = add('part', 'Part One');
-  const inPart = add('chapter', 'In the part', part);
-  space.saveChapter({ id: inPart, title: 'In the part', body: body('some writing') });
-  assert.throws(() => space.removeEmpty(inPart), /stays until Trash/);
-  assert.throws(() => space.removeEmpty(part), /stays until Trash/);
-  assert.throws(() => space.removeEmpty(bookId), /stays until Trash/);
-  assert.throws(() => space.removeEmpty(space.project.id), /can't be removed/);
-
-  const outline = space.removeEmpty(chapterOne);
-  assert.equal(findNode(outline, chapterOne), null);
-  assert.ok(space.project.removalMarkers().some((row) => row.itemId === chapterOne));
+test('a project itself can\'t go in its own Trash', () => {
+  const { space } = book();
+  assert.throws(() => space.trashItem(space.project.id), /can't go to the Trash/);
 });
 
 test('the window can only save chapters, and only real documents', () => {
@@ -240,7 +230,8 @@ test('a project from step zero gets its word counts on opening', () => {
   const id = library.createProject('Old');
   const project = library.openProject(id);
   project.putItem({ id: 'old-chapter', kind: 'chapter', parentId: id, body: body('three old words') });
-  project.db.exec('ALTER TABLE items DROP COLUMN words; ALTER TABLE items DROP COLUMN goal; DROP TABLE writing_days');
+  project.db.exec(`ALTER TABLE items DROP COLUMN words; ALTER TABLE items DROP COLUMN goal; DROP TABLE writing_days;
+                   ALTER TABLE items DROP COLUMN trashed_at; DROP TABLE versions`);
   project.db.pragma('user_version = 1');
   project.close();
 

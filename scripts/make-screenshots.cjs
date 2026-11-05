@@ -65,6 +65,10 @@ function makeLibrary() {
 
   const partOne = add('part', firstBook.id, 'Part One: Leaving');
   space.move({ id: opening, parentId: partOne });
+  save(opening, 'The Third Stair', doc(
+    plain('Marit found the ledger under the stairs, which had always complained.'),
+    plain('The rest held names, and most of them she knew.'),
+  ));
   save(opening, 'The Third Stair', LEDGER);
   save(add('chapter', partOne, 'The Mule'), 'The Mule', MULE);
   save(add('chapter', partOne, 'Low Pan'), 'Low Pan', doc(plain('The baker saw her coming and put the kettle on, which was the worst thing he could have done.')));
@@ -174,6 +178,21 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   await pause(300);
   await shot(window, 'preferences');
   await window.click('#pref-close');
+
+  await window.click('.history-button');
+  await window.waitForSelector('.history-view ins');
+  await pause(300);
+  await shot(window, 'history');
+  await window.click('#history-close');
+
+  await row('Low Pan').hover();
+  await window.click('[aria-label="Move Low Pan to Trash"]');
+  await window.click('.trash-button');
+  await window.waitForSelector('#trash[open]');
+  await pause(300);
+  await shot(window, 'trash');
+  await window.click('[aria-label="Restore Low Pan"]');
+  await window.click('#trash-close');
 
   const looks = {
     sepia: { theme: 'sepia' },

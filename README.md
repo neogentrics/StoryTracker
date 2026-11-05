@@ -35,6 +35,10 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 <td><img src="docs/screenshots/split.png" alt="Two chapters side by side"><br><b>Split view.</b> Two chapters side by side.</td>
 </tr>
 <tr>
+<td><img src="docs/screenshots/history.png" alt="Two versions of a chapter compared word by word"><br><b>Earlier versions.</b> Compare any two, and go back with one click.</td>
+<td><img src="docs/screenshots/trash.png" alt="The Trash, with a chapter waiting to be restored"><br><b>Trash.</b> Deleted things wait 30 days.</td>
+</tr>
+<tr>
 <td><img src="docs/screenshots/focus.png" alt="Focus mode, with just the page"><br><b>Focus mode.</b> Just the page.</td>
 <td><img src="docs/screenshots/library.png" alt="The library, listing three projects with their word counts"><br><b>Your library.</b> Every project in one place, with nothing to set up.</td>
 </tr>
@@ -66,19 +70,24 @@ open the app from *System Settings → Privacy & Security*.
 | **Goals** | Words a day and words for a chapter |
 | **Comments** | Notes on a selection, kept out of the book and its word count |
 | **Split view** | Two chapters side by side |
+| **Earlier versions** | Every chapter keeps copies as you write. Compare any two and restore with a click |
+| **Trash** | Deleted things wait 30 days, with an Undo straight away |
+| **Automatic backups** | Every hour, day or week, to a folder you choose |
+| **The `.rtstory` file** | A whole project in one encrypted file, to move or back up. Double-click to open |
 | **Picks up where you left off** | Reopens the project and chapter you were in |
 | **Private by default** | Every project is encrypted on your own computer |
 | **Works offline** | No account, no server, and your writing never leaves your computer |
 | **Updates itself** | On Windows and the Linux AppImage. Mac and the `.deb` tell you when a new version is out |
 
-Coming next: version history and backups (3.2), export (3.3), import (3.4) and the password lock (3.6), then characters,
-timelines and lore. See the [roadmap](ROADMAP.md).
+Coming next: export (3.3), import (3.4) and the password lock (3.6), then characters, timelines and lore. See the
+[roadmap](ROADMAP.md).
 
 ## How your writing is kept
 
 Every project is an encrypted database in the app's own folder, with its own random key. A project with no password can be
 opened by any copy of this app, so that's privacy from a casual look, not secrecy. The password lock in 3.6 is what makes it
-real. Only things with no writing in them can be removed for now, so no click can lose a chapter.
+real. Deleted things wait 30 days in the Trash, every chapter keeps its earlier versions, and backups go to a folder you
+choose.
 
 Tests kill the app outright while it's saving, on all three systems, and every reported save survives. The numbers are in
 the [database design](docs/design/database.md#the-test-with-encryption-on).

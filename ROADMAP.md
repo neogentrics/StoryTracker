@@ -28,8 +28,8 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v1.0–v2.3](#v10v23--the-first-app) | The first app | ✅ Released (Windows, needs a PostgreSQL server) |
 | [Step zero](#step-zero--settle-the-foundations) | Settle the foundations | ✅ Done |
 | [v3.0](#v30--write-a-book) | Write a book | ✅ Released ([3.0.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.0.0)) |
-| [v3.1](#v31--comfortable-writing) | Comfortable writing | 🚧 Released as 3.1.0, being tested by the owner |
-| [v3.2](#v32--never-lose-a-word) | Never lose a word | Planned |
+| [v3.1](#v31--comfortable-writing) | Comfortable writing | ✅ Released ([3.1.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.1.0)) |
+| [v3.2](#v32--never-lose-a-word) | Never lose a word | 🚧 Released as 3.2.0, being tested by the owner |
 | [v3.3](#v33--get-it-out) | Get it out | Planned |
 | [v3.4](#v34--bring-it-in) | Bring it in | Planned |
 | [v3.5](#v35--find-my-files) | Find my files | Planned |
@@ -80,9 +80,6 @@ Not a release: the choices that are expensive to change later. [Decisions](docs/
 | ✅ Installers & updates | M | Windows, Mac and Linux installers. Windows and the Linux AppImage update themselves. Mac and the `.deb` get a message with a download link, because a Mac app can't replace itself until it's signed. |
 | ✅ A simple first run | S | One screen: start a project, or try a sample. |
 
-Only empty chapters, parts, books and series can be removed for now, plus the sample. Anything with writing in it waits for
-[Trash](#v32--never-lose-a-word), so no click can lose a chapter.
-
 **Test:** on a clean computer, install it, write a chapter, pull the power, restart: the chapter is there. Killing the app
 outright is tested on all three systems. Pulling the power is still a hand test.
 
@@ -108,10 +105,11 @@ Comes before import, because the first thing people will trust it with is years 
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🛡️ Version history | M | Every chapter keeps its earlier versions; compare any two and restore with one click. |
-| 🛡️ Automatic backups | M | On a schedule, to a folder you choose. A closed backup is safe in OneDrive or Dropbox. |
-| The `.rtstory` file | M | A whole project in one file, to back up or move. Double-click to open. |
-| Trash | S | Deleted things wait 30 days. |
+| ✅ 🛡️ Version history | M | Every chapter keeps its earlier versions; compare any two and restore with one click. |
+| ✅ 🛡️ Automatic backups | M | On a schedule, to a folder you choose. A closed backup is safe in OneDrive or Dropbox. |
+| ✅ The `.rtstory` file | M | A whole project in one file, to back up or move. Double-click to open. |
+| ✅ Trash | S | Deleted things wait 30 days. |
+| ✅ 🙋 A friendlier look | M | Warmer, easier screens with clear buttons and icons, up to the standard of RT Markdown Reader's. |
 
 **Test:** delete a chapter, restore it. Move a project to another computer with one file. Restore an old backup.
 

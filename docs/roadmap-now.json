@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "3.1.0: your first real chapter",
-    "note": "Released. This version's test is you writing a real chapter in it, by choice. Whatever you find gets fixed in a 3.1.1 before 3.2 starts.",
+    "title": "3.2.0: try to lose something",
+    "note": "Released. This version's test: delete a chapter and restore it, move a project with one file, and restore an old backup.",
     "items": [
       {
-        "title": "Write in it",
-        "text": "Install 3.1.0 and write something you'd keep. Tell me what gets in the way."
+        "title": "Delete and restore",
+        "text": "Move a chapter to the Trash, bring it back, and try an earlier version."
       },
       {
-        "title": "The update worked",
-        "text": "Done. 3.0.0 on your PC found the GitHub release, updated itself to 3.1.0 and kept your project."
+        "title": "Set up backups",
+        "text": "Preferences, then Backups: pick a folder and a schedule. Nothing runs until you do."
       },
       {
-        "title": "The power cut",
-        "text": "Still open from 3.0: write a chapter on a spare computer, cut the power, restart."
+        "title": "Tell me about the look",
+        "text": "The window was rebuilt from RT Markdown Reader's. Say what still doesn't feel right."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test, and the open decisions below. None of them hold up 3.2."
+    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.2."
   },
   "questions": [
     {

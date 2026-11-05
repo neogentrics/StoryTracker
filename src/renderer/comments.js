@@ -72,7 +72,7 @@ export class CommentsPanel {
   card(comment) {
     const ranges = rangesOf(this.page.editor, comment.id);
     const quote = ranges.map((range) => range.text).join(' ');
-    const text = el('textarea', { class: 'comment-text', rows: '2', 'aria-label': 'Comment' });
+    const text = el('textarea', { class: 'comment-text', rows: '3', 'aria-label': 'Comment' });
     text.value = comment.text;
     text.addEventListener('change', () => this.edit(comment, text));
     return el(

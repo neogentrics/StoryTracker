@@ -1,4 +1,4 @@
-import { LIMITS, PAGE_FONTS, THEMES, UI_FONTS } from '../shared/themes.js';
+import { BACKUP_EVERY, LIMITS, PAGE_FONTS, THEMES, UI_FONTS } from '../shared/themes.js';
 import { el } from './dom.js';
 import { applyLook } from './look.js';
 
@@ -61,6 +61,28 @@ export async function openPreferences(api) {
     await showWords();
   };
 
+  const folder = el('span', { id: 'backup-folder', class: 'backup-folder' });
+  const backupNote = el('p', { id: 'backup-note', class: 'quiet-note', role: 'status' });
+  const showBackups = async () => {
+    folder.textContent = settings.backupFolder || 'No folder chosen yet';
+    const { last, error } = await api.backupStatus();
+    if (error) backupNote.textContent = `The last backup had a problem. ${error}`;
+    else backupNote.textContent = last ? `Last backup: ${new Date(last).toLocaleString()}` : 'No backups yet.';
+  };
+  const chooseFolder = async () => {
+    settings = await api.chooseBackupFolder();
+    await showBackups();
+  };
+  const backupNow = async () => {
+    try {
+      const { saved, error } = await api.backupNow();
+      await showBackups();
+      if (!error && saved === 0) backupNote.textContent = 'Nothing has changed since the last backup.';
+    } catch (error) {
+      backupNote.textContent = error.message;
+    }
+  };
+
   const themes = { system: { label: 'Same as this computer' }, ...THEMES };
   const dialog = el(
     'dialog',
@@ -106,10 +128,28 @@ export async function openPreferences(api) {
       el('form', { class: 'word-form', onsubmit: addWord }, newWord, el('button', { type: 'submit' }, 'Add')),
       words,
     ),
+    el(
+      'section',
+      {},
+      el('h3', {}, 'Backups'),
+      el('p', { class: 'quiet-note' }, 'Each project is saved as a closed .rtstory file, which is safe in OneDrive or Dropbox. To bring one back, use File, then Open Project File.'),
+      el('div', { class: 'word-form' }, folder, el('button', { id: 'backup-choose', onclick: chooseFolder }, 'Choose folder…')),
+      field('How often', select('pref-backup-every', BACKUP_EVERY, settings.backupEvery, (value) => change('backupEvery', value))),
+      field('Keep the newest', el('input', {
+        id: 'pref-backup-keep',
+        type: 'number',
+        min: String(LIMITS.backupKeep[0]),
+        max: String(LIMITS.backupKeep[1]),
+        value: String(settings.backupKeep),
+        onchange: (event) => change('backupKeep', Number(event.target.value)),
+      })),
+      el('div', { class: 'word-form' }, el('button', { id: 'backup-now', onclick: backupNow }, 'Back up now'), backupNote),
+    ),
     el('div', { class: 'dialog-actions' }, el('button', { id: 'pref-close', class: 'primary', onclick: () => dialog.close() }, 'Done')),
   );
   dialog.addEventListener('close', () => dialog.remove());
   document.body.append(dialog);
   await showWords();
+  await showBackups();
   dialog.showModal();
 }
