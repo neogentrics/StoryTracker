@@ -1,0 +1,62 @@
+RT Story Tracker — Proprietary Software License
+Copyright (c) 2026 Recon Towers. All rights reserved.
+
+1. OWNERSHIP
+   This software, including its source code, object code, compiled binaries, user interface,
+   designs, graphics, icons, documentation and all related materials (together, the "Software"),
+   is the exclusive property of Recon Towers ("the Owner") and is protected by copyright and
+   other intellectual-property laws. The Software is licensed, not sold.
+
+2. SOURCE IS VISIBLE FOR REFERENCE ONLY
+   The source code is published so that it can be viewed and evaluated. Making the source code
+   publicly visible does NOT grant any license to it. Except for the limited rights in Section 3,
+   no right, title or interest in the Software is granted to you.
+
+3. PERMITTED USE
+   You may download and install the official compiled releases published by the Owner and use
+   them on your own devices, for personal or internal business purposes, free of charge.
+
+4. RESTRICTIONS
+   Without the Owner's prior written permission you may NOT:
+     a. copy, reproduce or republish the source code, in whole or in part;
+     b. modify, adapt, translate or create derivative works based on the Software;
+     c. distribute, sublicense, sell, rent, lease, lend or otherwise make the Software or any
+        part of it available to any third party, including as a hosted or online service;
+     d. incorporate any part of the Software into another product, project or service;
+     e. use the Software, its name, logo or branding to build or promote a competing product;
+     f. remove or alter any copyright, trademark or proprietary notice in the Software; or
+     g. reverse engineer, decompile or disassemble compiled releases, except to the extent that
+        applicable law expressly permits this despite this limitation.
+   Viewing and forking this repository on GitHub is permitted only to the extent required by the
+   GitHub Terms of Service; a fork confers none of the rights restricted above.
+
+5. CONTRIBUTIONS
+   The Owner does not accept unsolicited code contributions. If you submit an issue, suggestion,
+   pull request or other feedback, you grant the Owner a perpetual, irrevocable, worldwide,
+   royalty-free license to use it for any purpose, without obligation to you.
+
+6. THIRD-PARTY COMPONENTS
+   The Software includes open-source components (for example Electron, Chromium and SQLite)
+   that are licensed to you under their own terms.
+   Those terms apply only to those components and are reproduced in the notices distributed with
+   the Software (see THIRD_PARTY_NOTICES.md). Nothing in this license restricts your rights under
+   those open-source licenses.
+
+7. TRADEMARKS
+   "Recon Towers", "RT Story Tracker" and the associated logos are trademarks of the Owner.
+
+8. NO WARRANTY
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NON-INFRINGEMENT.
+
+9. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+   OR THE USE OF OR OTHER DEALINGS IN THE SOFTWARE.
+
+10. TERMINATION
+   Any use of the Software in breach of this license automatically terminates your rights under
+   it. On termination you must stop using and delete all copies of the Software.
+
+For permissions, licensing or commercial enquiries: author@neogentrics.com
