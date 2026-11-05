@@ -3,7 +3,10 @@ import StarterKit from '@tiptap/starter-kit';
 import TextAlign from '@tiptap/extension-text-align';
 import { Saver } from '../shared/saver.js';
 import { countWords, plainText, toDocument } from '../shared/text.js';
-import { el, words } from './dom.js';
+import { CommentMark, CommentsPanel } from './comments.js';
+import { el, formatCount, words } from './dom.js';
+import { FindBar } from './find-bar.js';
+import { FindHighlight } from './find-plugin.js';
 
 const COUNT_DELAY_MS = 250;
 
@@ -60,11 +63,12 @@ const TOOLS = [
 ];
 
 export class Page {
-  constructor(root, { api, onWords, onTitle, onError }) {
+  constructor(root, { api, onWords, onTitle, onError, onSaved, onGoals, onFocusMode, onClose, find }) {
     this.api = api;
     this.onWords = onWords;
     this.onTitle = onTitle;
     this.onError = onError;
+    this.onSaved = onSaved;
     this.editor = null;
     this.chapterId = null;
     this.countTimer = null;
@@ -72,11 +76,27 @@ export class Page {
 
     this.saver = new Saver({
       read: () => ({ id: this.chapterId, title: this.titleInput.value, body: JSON.stringify(this.editor.getJSON()) }),
-      write: (input) => this.api.saveChapter(input),
+      write: async (input) => this.onSaved(await this.api.saveChapter(input)),
       onState: (state) => this.showState(state),
     });
 
-    this.toolbar = el('div', { class: 'toolbar', role: 'toolbar', 'aria-label': 'Formatting' }, this.buildTools());
+    this.toolbar = el(
+      'div',
+      { class: 'toolbar', role: 'toolbar', 'aria-label': 'Formatting' },
+      this.buildTools(),
+      el(
+        'div',
+        { class: 'tool-group' },
+        el('button', {
+          class: 'tool add-comment',
+          type: 'button',
+          title: 'Comment on the selected words',
+          onmousedown: (event) => event.preventDefault(),
+          onclick: () => this.comments.start(),
+        }, 'Comment'),
+      ),
+      onClose ? el('button', { class: 'tool close-pane', type: 'button', title: 'Close this side', 'aria-label': 'Close this side', onclick: onClose }, '✕') : null,
+    );
     this.titleInput = el('input', {
       id: 'chapter-title',
       class: 'chapter-title',
@@ -96,12 +116,33 @@ export class Page {
     this.host = el('div', { class: 'editor-host' });
     this.sheet = el('div', { class: 'sheet' }, this.titleInput, this.host);
     this.scroller = el('div', { class: 'page-scroll' }, this.sheet);
-    this.counts = el('span', { id: 'word-count' });
-    this.saveState = el('span', { id: 'save-state', role: 'status' });
-    this.footer = el('footer', { class: 'page-footer' }, this.counts, this.saveState);
+    this.body = el('div', { class: 'page-body' }, this.scroller);
+    this.counts = el('span', { class: 'word-count' });
+    this.saveState = el('span', { class: 'save-state', role: 'status' });
+    this.footer = el(
+      'footer',
+      { class: 'page-footer' },
+      this.counts,
+      el(
+        'span',
+        { class: 'footer-actions' },
+        el('button', { class: 'footer-button goals-button', onclick: () => onGoals(this.chapterId) }, 'Goals'),
+        el('button', { class: 'footer-button focus-button', onclick: () => onFocusMode() }, 'Focus'),
+        this.saveState,
+      ),
+    );
     this.empty = el('div', { class: 'page-empty' }, 'Pick a chapter, or add one, to start writing.');
-    root.append(this.toolbar, this.scroller, this.footer, this.empty);
+    root.append(this.toolbar);
+    this.findBar = new FindBar(root, { ...find, api, page: this });
+    root.append(this.body, this.footer, this.empty);
+    this.comments = new CommentsPanel(this.body, { api, page: this, onError });
     this.showEditor(false);
+  }
+
+  selectedText() {
+    if (!this.editor) return '';
+    const { from, to } = this.editor.state.selection;
+    return this.editor.state.doc.textBetween(from, to, '\n');
   }
 
   buildTools() {
@@ -132,7 +173,7 @@ export class Page {
 
   showEditor(visible) {
     this.toolbar.hidden = !visible;
-    this.scroller.hidden = !visible;
+    this.body.hidden = !visible;
     this.footer.hidden = !visible;
     this.empty.hidden = visible;
   }
@@ -160,7 +201,10 @@ export class Page {
   }
 
   showCounts(chapterWords, bookWords) {
-    this.counts.textContent = `${words(chapterWords)} in this chapter · ${words(bookWords)} in this book`;
+    const chapter = this.goal
+      ? `${formatCount(chapterWords)} of ${words(this.goal)} in this chapter`
+      : `${words(chapterWords)} in this chapter`;
+    this.counts.textContent = `${chapter} · ${words(bookWords)} in this book`;
   }
 
   // A new editor for each chapter keeps Undo inside that chapter, so it can never bring back another chapter's text.
@@ -172,6 +216,8 @@ export class Page {
       extensions: [
         StarterKit.configure({ code: false, codeBlock: false, link: false, heading: { levels: [1, 2, 3] } }),
         TextAlign.configure({ types: ['heading', 'paragraph'] }),
+        CommentMark,
+        FindHighlight,
       ],
       content: toDocument(chapter.body),
       editorProps: {
@@ -196,14 +242,27 @@ export class Page {
   async open(chapterId) {
     await this.flush();
     const chapter = await this.api.loadChapter(chapterId);
-    this.chapterId = chapterId;
+    this.show(chapter);
+    return chapter;
+  }
+
+  show(chapter) {
+    this.chapterId = chapter.id;
+    this.goal = chapter.goal;
     this.titleInput.value = chapter.title;
     this.buildEditor(chapter);
     this.showEditor(true);
     this.saveState.textContent = STATUS.saved;
     this.saveState.dataset.state = 'saved';
     this.scroller.scrollTop = 0;
-    return chapter;
+    this.comments.load(chapter.id).catch((error) => this.onError(error.message));
+    this.findBar.refresh();
+  }
+
+  // For after a replace across the project: what's on disk is newer than what's on screen.
+  async reload() {
+    if (!this.chapterId) return;
+    this.show(await this.api.loadChapter(this.chapterId));
   }
 
   async clear() {

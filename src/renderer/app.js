@@ -1,4 +1,6 @@
 import { el } from './dom.js';
+import { applyLook } from './look.js';
+import { openPreferences } from './prefs.js';
 import { renderFailure, renderHome } from './home.js';
 import { WritingRoom } from './writing-room.js';
 
@@ -59,6 +61,7 @@ async function leaveRoom() {
     room?.showMessage(`Stayed here, because your latest changes aren’t saved yet: ${error.message}`);
     return;
   }
+  room?.leave();
   room = null;
   localStorage.removeItem(LAST_PROJECT);
   await run(async () => {
@@ -95,6 +98,10 @@ function onMenu(command) {
   if (command === 'library') leaveRoom();
   if (command === 'new-chapter') room?.newChapterFromMenu();
   if (command === 'new-book') room?.newBookFromMenu();
+  if (command === 'preferences') openPreferences(api);
+  if (command === 'find') room?.find();
+  if (command === 'replace') room?.find({ replacing: true });
+  if (command === 'focus') room?.toggleFocus();
 }
 
 async function start() {
@@ -102,6 +109,7 @@ async function start() {
   api.onUpdate(showUpdate);
   api.onMenu(onMenu);
   await run(async () => {
+    applyLook(await api.settings());
     const status = await api.status();
     showUpdate(status.update);
     const last = remember.get(LAST_PROJECT);

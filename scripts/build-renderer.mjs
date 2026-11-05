@@ -21,5 +21,7 @@ await build({
   minify: true,
   legalComments: 'linked',
   logLevel: 'warning',
+  loader: { '.woff2': 'file', '.woff': 'file' },
+  assetNames: 'fonts/[name]-[hash]',
   define: { 'process.env.NODE_ENV': '"production"' },
 });

@@ -13,6 +13,7 @@ app's [licence](LICENSE) limits your rights under them.
 | [ProseMirror](https://prosemirror.net/), with orderedmap, rope-sequence and w3c-keyname | The editor | MIT, below |
 | [linkifyjs](https://linkify.js.org/) | Part of the editor kit | MIT, below |
 | [electron-updater](https://www.electron.build/auto-update) and builder-util-runtime | Updating the app | MIT, below |
+| Literata, Lora, EB Garamond, Atkinson Hyperlegible and Courier Prime, through [Fontsource](https://fontsource.org/) | Fonts for the page and the app | SIL Open Font License 1.1, below |
 
 ## better-sqlite3-multiple-ciphers
 
@@ -57,3 +58,18 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Fonts
+
+Copyright 2017 The Literata Project Authors (https://github.com/googlefonts/literata) Literata-Italic[opsz,wght].ttf: Copyright 2017 The Literata Project Authors (https://github.com/googlefonts/literata)
+
+Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyrillic), with Reserved Font Name "Lora". Lora-Italic[wght].ttf: Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyrillic), with Reserved Font Name "Lora".
+
+Copyright 2017 The EB Garamond Project Authors (https://github.com/octaviopardo/EBGaramond12) EBGaramond-Italic[wght].ttf: Copyright 2017 The EB Garamond Project Authors (https://github.com/octaviopardo/EBGaramond12)
+
+Copyright 2020 Braille Institute of America, Inc. AtkinsonHyperlegible-Italic.ttf: Copyright 2020 Braille Institute of America, Inc. AtkinsonHyperlegible-Bold.ttf: Copyright 2020 Braille Institute of America, Inc. AtkinsonHyperlegible-BoldItalic.ttf: Copyright 2020 Braille Institute of America, Inc.
+
+Copyright 2015 The Courier Prime Project Authors (https://github.com/quoteunquoteapps/CourierPrime). CourierPrime-Italic.ttf: Copyright 2015 The Courier Prime Project Authors (https://github.com/quoteunquoteapps/CourierPrime). CourierPrime-Bold.ttf: Copyright 2015 The Courier Prime Project Authors (https://github.com/quoteunquoteapps/CourierPrime). CourierPrime-BoldItalic.ttf: Copyright 2015 The Courier Prime Project Authors (https://github.com/quoteunquoteapps/CourierPrime).
+
+These fonts are licensed under the SIL Open Font License, Version 1.1. The licence is available with a FAQ at
+<https://openfontlicense.org>. The fonts may be used, shared and bundled with software, and may not be sold by themselves.

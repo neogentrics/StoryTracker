@@ -22,7 +22,7 @@ const launch = async () => {
 
 const pageText = (window) => window.textContent('.ProseMirror');
 const chapterTitles = (window) => window.$$eval('#chapter-list .row-title', (rows) => rows.map((row) => row.textContent));
-const saved = (window) => window.waitForSelector('#save-state[data-state="saved"]', { timeout: 15000 });
+const saved = (window) => window.waitForSelector('.save-state[data-state="saved"]', { timeout: 15000 });
 const row = (window, list, title) => window.locator(`${list} .row`, { hasText: title });
 
 async function typeOnPage(window, text) {
@@ -43,7 +43,7 @@ async function typeOnPage(window, text) {
 
   // Writing and live word counts.
   await typeOnPage(window, 'The first line of the book');
-  await window.waitForFunction(() => document.querySelector('#word-count').textContent.startsWith('6 words in this chapter'));
+  await window.waitForFunction(() => document.querySelector('.word-count').textContent.startsWith('6 words in this chapter'));
   assert.match(await window.textContent('#project-words'), /^6 words/);
   await saved(window);
 
