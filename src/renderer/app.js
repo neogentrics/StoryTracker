@@ -159,6 +159,7 @@ function onMenu(command) {
   }
   if (command === 'export') exportProject();
   if (command === 'export-book') room?.showExport();
+  if (command === 'import') room?.showImport();
   if (command === 'print') room?.showExport({ format: 'pdf', preview: true });
   if (command === 'details') room?.showDetails();
   if (command === 'open-file') openProjectFile();

@@ -5,6 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 const { Backups } = require('./backups');
 const { exportFile } = require('./export');
+const { Importer } = require('./import');
 const { registerIpc } = require('./ipc');
 const { buildMenu } = require('./menu');
 const { runSelfTest, writeInWindow } = require('./self-test');
@@ -171,6 +172,15 @@ async function exportFromHere() {
   return 'exported';
 }
 
+// The readers for Word, e-books and PDF are libraries that load from inside the installed app, so this proves them there.
+async function importFromHere() {
+  for (const format of ['pdf', 'epub', 'docx']) {
+    const { importedWords } = await new Importer().inspect(path.join(scratch, `self-test.${format}`));
+    if (importedWords < 5) return `${format} came back with ${importedWords} words`;
+  }
+  return 'imported';
+}
+
 // The window goes first and is closed before the storage work, because that work holds up this process, and a window
 // still loading behind it can stall for good.
 async function selfTest() {
@@ -186,13 +196,16 @@ async function selfTest() {
     console.log(`Self-test: writing is ${writing}`);
     const printed = await Promise.race([exportFromHere().catch((error) => error.message), timeout(120000, 'timed out')]);
     console.log(`Self-test: print export is ${printed}`);
+    const imported = await Promise.race([importFromHere().catch((error) => error.message), timeout(60000, 'timed out')]);
+    console.log(`Self-test: import is ${imported}`);
     workspace.closeProject();
     mainWindow.destroy();
     report = runSelfTest(path.join(scratch, 'work'), { withMeasure });
     report.checks.push({ name: 'opens the window', passed: state === 'ready', detail: state });
     report.checks.push({ name: 'writes and saves a chapter in the window', passed: writing === 'saved', detail: writing });
     report.checks.push({ name: 'exports a print PDF, an e-book and a Word file', passed: printed === 'exported', detail: printed });
-    report.ok = report.ok && state === 'ready' && writing === 'saved' && printed === 'exported';
+    report.checks.push({ name: 'reads those three files back in', passed: imported === 'imported', detail: imported });
+    report.ok = report.ok && state === 'ready' && writing === 'saved' && printed === 'exported' && imported === 'imported';
   } catch (error) {
     report = { ok: false, error: error.stack };
   }

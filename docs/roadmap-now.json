@@ -19,9 +19,13 @@
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.2."
+    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.4."
   },
   "questions": [
+    {
+      "q": "What happens to pictures in an imported file?",
+      "a": "They stay out for now, because chapters can’t hold pictures yet. The Import window says how many were left out, and your original file keeps them. Attachments in v3.5 bring them in."
+    },
     {
       "q": "Why did StoryTracker move off WPF?",
       "a": "WPF only runs on Windows. The new app is Electron and JavaScript, like RT Markdown Reader, so one app runs on Windows, Mac and Linux. The old C# code is kept in <code>legacy-wpf</code>."

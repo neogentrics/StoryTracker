@@ -5,8 +5,20 @@ const os = require('node:os');
 const path = require('node:path');
 const { EXPORT_FORMATS } = require('../shared/details');
 const { checkExport, exportEverything, exportFile, safeName } = require('./export');
+const { IMPORT_EXTENSIONS, Importer } = require('./import');
 
 const MAX_COVER = 50 * 1024 * 1024;
+const importer = new Importer();
+
+async function chooseImport(window) {
+  const { canceled, filePaths } = await dialog.showOpenDialog(window(), {
+    title: 'Import a file',
+    properties: ['openFile'],
+    filters: [{ name: 'Writing', extensions: IMPORT_EXTENSIONS }],
+  });
+  if (canceled) return null;
+  return importer.inspect(filePaths[0]);
+}
 
 // Errors come back as plain results, so the window can show the app's own words and not Electron's wrapper around them.
 function handle(channel, work) {
@@ -183,6 +195,9 @@ function registerIpc({ status, workspace, updater, settings, backups, window, ta
   handle('export:everything', () => everything(workspace, window));
   handle('export:preview', (input) => preview(workspace, input));
   handle('export:reveal', (file) => shell.showItemInFolder(String(file)));
+  handle('import:choose', () => chooseImport(window));
+  handle('import:preview', (input) => importer.preview(input));
+  handle('import:commit', (input) => importer.commit(workspace(), input));
   handle('update:install', () => updater.installNow());
 }
 

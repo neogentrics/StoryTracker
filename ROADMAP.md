@@ -138,7 +138,7 @@ that can't come out.
 |---|:-:|---|
 | 🙋 Markdown | M | Front matter becomes fields; a long file can be split into chapters at its headings. |
 | 🙋 AI clean-up | M | Finds chat text, stray symbols and odd headings in AI-made files, shows each, and asks. |
-| 🙋 Word | M | Headings, italics, pictures and comments. Most manuscripts today. |
+| 🙋 Word | M | Headings, italics and comments. Most manuscripts today. Pictures wait for attachments in v3.5, and the app says how many were left out. |
 | More types | M | Plain text, RTF, HTML, EPUB, OpenDocument, and text from PDFs. |
 | 🙋 Pages, best effort | M | Reads what it can; otherwise explains how to save as Word from Pages. |
 | Scrivener | M | For authors moving over. |
@@ -154,7 +154,7 @@ that can't come out.
 | 🙋 Folder scan | L | Reads names and contents, and sorts them into series, books, chapters, versions and attachments. The originals are never touched. |
 | 🙋 The plan & *Ask me* | M | Shows what it thinks as a tree. What it's unsure of, it asks. Drag to fix. |
 | Older versions go into history | M | `v1`, `v2`, `Final`, `Copy`: the newest is the chapter, the rest are its history. |
-| Pictures and other files | M | Covers, audio and PDFs become attachments, stored apart so projects stay quick. |
+| Pictures and other files | M | Covers, audio and PDFs become attachments, stored apart so projects stay quick. Pictures left out of a v3.4 import can come in here. |
 | The report | S | Every file accounted for. Stop and resume at any time. |
 
 **Test:** the owner's Stories folder (6.2 GB): every file is accounted for, and the originals are unchanged.

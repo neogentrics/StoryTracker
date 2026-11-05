@@ -186,6 +186,33 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   await shot(window, 'export');
   await window.click('#export-close');
 
+  const draft = path.join(profile, 'salt-road-draft.md');
+  fs.writeFileSync(draft, [
+    "Sure! Here's the next part of the story:",
+    '',
+    '**Chapter Five**',
+    '',
+    'The ferryman kept his money in a boot, and he didn\'t say why.',
+    '',
+    'Marit paid him  anyway, and the river took its time.',
+    '',
+    '**Chapter Six**',
+    '',
+    'By morning there were two names left, and the mule had opinions about both.',
+    '',
+    '---',
+    '',
+    'Would you like me to continue with Chapter Seven?',
+  ].join('\n'));
+  await app.evaluate(({ dialog }, file) => {
+    dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [file] });
+  }, draft);
+  await window.click('.import-button');
+  await window.waitForSelector('#import[open]');
+  await pause(400);
+  await shot(window, 'import');
+  await window.click('#import-cancel');
+
   await window.locator('#book-list .row', { hasText: 'The Ledger' }).hover();
   await window.click('[aria-label="Details of The Ledger"]');
   await window.waitForSelector('#details[open]');

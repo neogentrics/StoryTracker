@@ -21,6 +21,7 @@ li p { text-indent: 0; }
 .dedication { text-align: center; font-style: italic; margin-top: 25%; } .dedication p { text-indent: 0; }
 .matter p { text-indent: 0; margin-bottom: .8em; }
 .cover { margin: 0; padding: 0; text-align: center; } .cover img { max-width: 100%; max-height: 100%; }
+#landmarks { display: none; }
 nav ol { list-style: none; padding-left: 0; } nav ol ol { padding-left: 1.2em; } nav a { text-decoration: none; }
 `;
 
