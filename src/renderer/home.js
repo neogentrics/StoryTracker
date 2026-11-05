@@ -28,7 +28,7 @@ function projectRow(project, { onOpen, onRemoveSample, onTrashProject }) {
   );
 }
 
-export function renderHome(root, { projects, onOpen, onCreate, onSample, onRemoveSample, onOpenFile, onTrashProject, onShowTrash }) {
+export function renderHome(root, { projects, onOpen, onCreate, onSample, onRemoveSample, onOpenFile, onFindFiles, onTrashProject, onShowTrash }) {
   const first = projects.length === 0;
   const hasSample = projects.some((project) => project.sample);
   const title = el('input', {
@@ -69,6 +69,7 @@ export function renderHome(root, { projects, onOpen, onCreate, onSample, onRemov
           'div',
           { class: 'home-links' },
           hasSample ? null : el('button', { id: 'try-sample', class: 'link' }, icon('sample'), 'Try a sample'),
+          el('button', { id: 'find-files', class: 'link', onclick: onFindFiles }, icon('folder'), 'Find my files'),
           el('button', { id: 'open-file', class: 'link', onclick: onOpenFile }, icon('open'), 'Open a project file'),
           el('button', { id: 'open-trash', class: 'link', onclick: onShowTrash }, icon('trash'), 'Trash'),
         ),

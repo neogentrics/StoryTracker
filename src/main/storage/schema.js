@@ -103,6 +103,36 @@ const STEPS = [
       `);
     },
   },
+  {
+    // An attachment is an item, so it gets the Trash and sync for free, and this table says which stored file holds it.
+    // Two items with the same contents share a file. A folder import writes down each file as it goes, so it can resume.
+    version: 6,
+    up(db) {
+      db.exec(`
+        CREATE TABLE attachment_files (
+          sha256 TEXT PRIMARY KEY,
+          file TEXT NOT NULL,
+          size INTEGER NOT NULL
+        );
+        CREATE TABLE folder_imports (
+          id TEXT PRIMARY KEY,
+          root TEXT NOT NULL,
+          state TEXT NOT NULL,
+          status TEXT NOT NULL,
+          started_at TEXT NOT NULL,
+          finished_at TEXT
+        );
+        CREATE TABLE folder_import_files (
+          import_id TEXT NOT NULL,
+          file_id TEXT NOT NULL,
+          outcome TEXT NOT NULL,
+          item_id TEXT,
+          note TEXT NOT NULL DEFAULT '',
+          PRIMARY KEY (import_id, file_id)
+        );
+      `);
+    },
+  },
 ];
 
 module.exports = { STEPS };

@@ -31,8 +31,8 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.1](#v31--comfortable-writing) | Comfortable writing | ✅ Released ([3.1.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.1.0)) |
 | [v3.2](#v32--never-lose-a-word) | Never lose a word | ✅ Released ([3.2.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.2.0)) |
 | [v3.3](#v33--get-it-out) | Get it out | ✅ Released ([3.3.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.3.0)) |
-| [v3.4](#v34--bring-it-in) | Bring it in | 🚧 Released as 3.4.0, being tested by the owner |
-| [v3.5](#v35--find-my-files) | Find my files | Planned |
+| [v3.4](#v34--bring-it-in) | Bring it in | ✅ Released ([3.4.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.4.0)) |
+| [v3.5](#v35--find-my-files) | Find my files | 🚧 Released as 3.5.0, being tested by the owner |
 | [v3.6](#v36--password-lock) | Password lock | Planned |
 | [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | Planned |
 | [v3.8](#v38--records) | Records | Planned |
@@ -151,13 +151,13 @@ that can't come out.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Folder scan | L | Reads names and contents, and sorts them into series, books, chapters, versions and attachments. The originals are never touched. |
-| 🙋 The plan & *Ask me* | M | Shows what it thinks as a tree. What it's unsure of, it asks. Drag to fix. |
-| Older versions go into history | M | `v1`, `v2`, `Final`, `Copy`: the newest is the chapter, the rest are its history. |
-| Pictures and other files | M | Covers, audio and PDFs become attachments, stored apart so projects stay quick. Pictures left out of a v3.4 import can come in here. |
-| The report | S | Every file accounted for. Stop and resume at any time. |
+| ✅ 🙋 Folder scan | L | Reads names and contents, and sorts them into series, books, chapters, versions and attachments. The originals are never touched. |
+| ✅ 🙋 The plan & *Ask me* | M | Shows what it thinks as a tree. What it's unsure of, it asks. Drag to fix. |
+| ✅ Older versions go into history | M | `v1`, `v2`, `Final`, `Copy`: the newest is the chapter, the rest are its history. |
+| ✅ Pictures and other files | M | Covers, audio and PDFs become attachments, stored apart so projects stay quick. Pictures in Word, EPUB and OpenDocument imports are kept this way too. |
+| ✅ The report | S | Every file accounted for. Stop and resume at any time. |
 
-**Test:** the owner's Stories folder (6.2 GB): every file is accounted for, and the originals are unchanged.
+**Test:** the owner's Stories folder (6.2 GB): every file is accounted for, and the originals are unchanged. **Passed** on 2026-11-05: all 2,526 files accounted for and none changed, checked by contents and date before and after. Whether each book's chapters came out right is the owner's to judge.
 
 ## v3.6 — Password lock
 

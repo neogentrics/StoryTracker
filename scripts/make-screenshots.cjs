@@ -213,6 +213,44 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   await shot(window, 'import');
   await window.click('#import-cancel');
 
+  const found = path.join(profile, 'My Stories');
+  const place = (rel, content) => {
+    const full = path.join(found, ...rel.split('/'));
+    fs.mkdirSync(path.dirname(full), { recursive: true });
+    fs.writeFileSync(full, content);
+  };
+  for (let number = 1; number <= 5; number += 1) {
+    place(`Series_The_Glass_Coast/Book_1_The_Lamplighter/Chapter ${number}.md`, `Chapter ${number} of the lamplighter.\n`);
+    place(`Series_The_Glass_Coast/Book_2_Harbour_Lights/Chapter ${number}.md`, `Chapter ${number} of the harbour.\n`);
+  }
+  place('Series_The_Glass_Coast/Book_1_The_Lamplighter/Chapter 1 v2.md', 'A better first chapter.\n');
+  place('Series_The_Glass_Coast/Book_1_The_Lamplighter/Covers/Front Cover.png', fs.readFileSync(path.join(root, 'build', 'icon.png')));
+  place('Series_The_Glass_Coast/Book_1_The_Lamplighter/Art/map of the coast.psd', 'map');
+  place('Series_The_Glass_Coast/Book_1_The_Lamplighter/Audio/chapter one.mp3', 'audio');
+  place('Series_The_Glass_Coast/Book_1_The_Lamplighter/odds and ends.md', 'Some loose words.\n');
+  place('Standalone/Winter Tales/first.md', 'One.\n');
+  place('Standalone/Winter Tales/second.md', 'Two.\n');
+  place('Standalone/Winter Tales/third.md', 'Three.\n');
+  await app.evaluate(({ dialog }, folder) => {
+    dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [folder] });
+  }, found);
+  await send('find-files');
+  await window.waitForSelector('#plan-tree');
+  await pause(400);
+  await shot(window, 'find-my-files');
+  await window.click('#plan-cancel');
+
+  await app.evaluate(({ dialog }, files) => {
+    dialog.showOpenDialog = async () => ({ canceled: false, filePaths: files });
+  }, [path.join(root, 'build', 'icon.png'), path.join(root, 'docs', 'screenshots', 'writing.png'), path.join(root, 'LICENSE')]);
+  await window.click('.attachments-button');
+  await window.waitForSelector('#attachments[open]');
+  await window.click('#attachment-add');
+  await window.waitForFunction(() => document.querySelectorAll('.attachment-row').length === 3);
+  await pause(500);
+  await shot(window, 'attachments');
+  await window.click('#attachments-close');
+
   await window.locator('#book-list .row', { hasText: 'The Ledger' }).hover();
   await window.click('[aria-label="Details of The Ledger"]');
   await window.waitForSelector('#details[open]');

@@ -285,11 +285,11 @@ test('a single chapter exports alone', async () => {
   assert.ok(!output.includes('Opening with'));
 });
 
-test('export everything leaves nothing behind', () => {
+test('export everything leaves nothing behind', async () => {
   const { space, bookId } = book();
   space.setCover(bookId, { type: 'image/png', data: PNG, width: 1600, height: 2560 });
   const folder = tempDir();
-  const { folder: root } = exportEverything(space.project, folder);
+  const { folder: root } = await exportEverything(space.project, folder);
   const inBook = fs.readdirSync(path.join(root, 'The Salt Road'));
   assert.deepEqual(inBook.sort(), ['001 The Ledger.md', '002 Part One - The Mule.md', 'cover.png']);
   assert.match(read(path.join(root, 'comments.csv')), /"The Mule","SECRET NOTE"/);

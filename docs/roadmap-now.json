@@ -1,30 +1,30 @@
 {
   "now": {
-    "title": "3.4.0: bring in a real book",
-    "note": "Released. This version’s test: import a real Word manuscript and an AI-made Markdown file, and compare word counts with the originals.",
+    "title": "3.5.0: point it at your files",
+    "note": "Released. The test on the real Stories folder passed: every file accounted for, and none of them changed.",
     "items": [
       {
-        "title": "A real manuscript",
-        "text": "Import one and read the word check in the Import window. A generated 108,880-word file matched exactly, but no real book has been tried."
+        "title": "Look over the plan",
+        "text": "Run Find my files on your own folder and answer Ask me. Wrong guesses about books and chapters are what to look for."
       },
       {
-        "title": "Pages and Scrivener",
-        "text": "Neither has been tried with a real file. A Mac and a real Scrivener project are what they need."
+        "title": "Read a few chapters",
+        "text": "The test checked files, not story text. Only you can say whether a book’s chapters are right."
       },
       {
-        "title": "Tell me what it got wrong",
-        "text": "Chapters split in the wrong place, or clean-ups that flag your writing, are what to look for."
+        "title": "Still open from earlier",
+        "text": "A real Word manuscript in Import, Pages on a Mac, and a real Scrivener project."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.4."
+    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.5."
   },
   "questions": [
     {
       "q": "What happens to pictures in an imported file?",
-      "a": "They stay out for now, because chapters can’t hold pictures yet. The Import window says how many were left out, and your original file keeps them. Attachments in v3.5 bring them in."
+      "a": "From v3.5 they stay with the book as attachments, encrypted like the rest of the project. They sit beside the writing and don’t appear on the page yet."
     },
     {
       "q": "Why did StoryTracker move off WPF?",

@@ -49,8 +49,16 @@ const safeName = (text) => String(text).replace(/[<>:"/\\|?*\u0000-\u001f]/g, ' 
 const csvCell = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
 const number = (at) => String(at).padStart(3, '0');
 
+// Two attachments can share a name, and neither should overwrite the other.
+function freeName(dir, name) {
+  const { name: stem, ext } = path.parse(name);
+  let candidate = path.join(dir, name);
+  for (let copy = 2; fs.existsSync(candidate); copy += 1) candidate = path.join(dir, `${stem} ${copy}${ext}`);
+  return candidate;
+}
+
 // The way out with nothing held back: every book as Markdown files, plus covers, comments and word counts as CSV.
-function exportEverything(project, folder) {
+async function exportEverything(project, folder) {
   const outline = project.outline();
   const root = path.join(folder, safeName(outline.title));
   fs.mkdirSync(root, { recursive: true });
@@ -77,13 +85,21 @@ function exportEverything(project, folder) {
         files += 1;
         const item = project.getItem(section.id);
         words.push([book.title, section.title, item.words]);
-        for (const note of project.listChildren(section.id)) comments.push([book.title, section.title, note.title]);
+        for (const note of project.listChildren(section.id)) {
+          if (note.kind === 'comment') comments.push([book.title, section.title, note.title]);
+        }
       }
     }
   }
   const csv = (rows) => `${rows.map((row) => row.map(csvCell).join(',')).join('\n')}\n`;
   fs.writeFileSync(path.join(root, 'word-counts.csv'), csv(words));
   fs.writeFileSync(path.join(root, 'comments.csv'), csv(comments));
+  for (const attachment of project.listAttachments(project.id)) {
+    const dir = path.join(root, 'attachments', safeName(attachment.owner));
+    fs.mkdirSync(dir, { recursive: true });
+    await project.attachments.saveTo(project.attachment(attachment.id).file, freeName(dir, safeName(attachment.name)));
+    files += 1;
+  }
   return { folder: root, files: files + 2 };
 }
 

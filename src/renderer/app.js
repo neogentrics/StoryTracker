@@ -35,6 +35,12 @@ async function showHome() {
     onCreate: (title) => run(async () => enterRoom(await api.createProject(title))),
     onSample: () => run(async () => enterRoom(await api.createSample())),
     onOpenFile: () => openProjectFile(),
+    onFindFiles: () => run(async () => {
+      const folder = await api.chooseFolder();
+      if (!folder) return;
+      await enterRoom(await api.createProject(folder.name));
+      await room.findFiles({ chosen: folder });
+    }),
     onTrashProject: (project) => {
       if (window.confirm(`Move “${project.title}” to the Trash? It waits there for 30 days.`)) {
         run(async () => {
@@ -160,6 +166,8 @@ function onMenu(command) {
   if (command === 'export') exportProject();
   if (command === 'export-book') room?.showExport();
   if (command === 'import') room?.showImport();
+  if (command === 'find-files') room?.findFiles();
+  if (command === 'attachments') room?.showAttachments();
   if (command === 'print') room?.showExport({ format: 'pdf', preview: true });
   if (command === 'details') room?.showDetails();
   if (command === 'open-file') openProjectFile();
