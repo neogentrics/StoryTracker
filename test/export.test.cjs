@@ -202,6 +202,9 @@ test('OpenDocument is a valid package', async () => {
   assert.equal(strFromU8(files.mimetype), 'application/vnd.oasis.opendocument.text');
   assert.ok(strFromU8(files['content.xml']).includes('The mule took it badly.'));
   assert.ok(strFromU8(files['meta.xml']).includes('Marit Vale'));
+  // A font named without its family makes LibreOffice drop the text, which no check of the XML alone can see.
+  assert.ok(strFromU8(files['styles.xml']).includes('fo:font-family="Georgia"'));
+  assert.ok(!strFromU8(files['styles.xml']).includes('style:font-name'));
 });
 
 // A one-pixel PNG, sized up in its details, is enough to test the wiring.

@@ -248,9 +248,8 @@ function odtStyles(layout) {
     `<style:style style:name="${name}" style:family="paragraph"><style:paragraph-properties ${properties}/><style:text-properties ${text}/></style:style>`;
   return `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3">
-<office:font-face-decls><style:font-face style:name="${font}" style:font-family-generic="roman"/></office:font-face-decls>
 <office:styles>
-<style:default-style style:family="paragraph"><style:paragraph-properties fo:line-height="${Math.round(layout.lineHeight * 100)}%"/><style:text-properties style:font-name="${font}" fo:font-size="${layout.fontSize}pt"/></style:default-style>
+<style:default-style style:family="paragraph"><style:paragraph-properties fo:line-height="${Math.round(layout.lineHeight * 100)}%"/><style:text-properties fo:font-family="${font}" fo:font-size="${layout.fontSize}pt"/></style:default-style>
 ${paragraph('Body', 'fo:margin-bottom="0.08in"')}
 ${paragraph('Centre', 'fo:text-align="center"')}
 ${paragraph('CentreBreak', 'fo:text-align="center" fo:break-before="page" fo:margin-top="2in"')}
