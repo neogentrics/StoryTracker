@@ -1,0 +1,22 @@
+{
+  "now": {
+    "title": "3.1.0: your first real chapter",
+    "note": "Released. This version's test is you writing a real chapter in it, by choice. Whatever you find gets fixed in a 3.1.1 before 3.2 starts.",
+    "items": [
+      { "title": "Write in it", "text": "Install 3.1.0 and write something you'd keep. Tell me what gets in the way." },
+      { "title": "Watch the update", "text": "A copy of 3.0.0 on Windows should offer 3.1.0 by itself. It's the first update from a real release." },
+      { "title": "The power cut", "text": "Still open from 3.0: write a chapter on a spare computer, cut the power, restart." }
+    ]
+  },
+  "waiting": { "title": "A test and {decisions} decisions", "text": "The power-cut test, and the open decisions below. None of them hold up 3.2." },
+  "questions": [
+    { "q": "Why did StoryTracker move off WPF?", "a": "WPF only runs on Windows. The new app is Electron and JavaScript, like RT Markdown Reader, so one app runs on Windows, Mac and Linux. The old C# code is kept in <code>legacy-wpf</code>." },
+    { "q": "Does it use the same themes as RT Markdown Reader?", "a": "The same set, as copies. It has all of RT Markdown Reader's themes, the old app's Plum, Evergreen, Blue/Orange and Aero, and a new one, Slate, plus Glass with any theme but High Contrast. A theme added to one app doesn't reach the other by itself. Packs, under Later, would change that." },
+    { "q": "Will it read text aloud?", "a": "It's under Later, using RT Markdown Reader's offline voices. From v3.7 you can also send a chapter to RT Markdown Reader and have it read there." },
+    { "q": "Can more themes and fonts be downloaded?", "a": "Theme and font packs are under Later." },
+    { "q": "Were these features taken from RT Markdown Reader?", "a": "Partly. Most came from what you said you need, and the plan reuses its export, themes, AI services, connector and sync. Nobody has gone through its feature list one by one yet." },
+    { "q": "How do I hand an AI a chapter as Markdown?", "a": "Markdown export arrives in v3.3, App Link sends a chapter to RT Markdown Reader in v3.7 (both apps have to be up to date), and Claude can work with the book directly in v3.13." },
+    { "q": "Will it make EPUBs that KDP accepts?", "a": "Yes, in v3.3. It does the job of a tool like Kindle Create in our own way, with nothing else to install." },
+    { "q": "Can it be tested on real stories?", "a": "Yes, once the basics work. Your stories and Notion become the test bed, and what you need for how you write goes on this roadmap." }
+  ]
+}
