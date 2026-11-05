@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "v3.2: built, and in testing",
-    "note": "It goes out when you give the word.",
+    "title": "3.2.0: try to lose something",
+    "note": "Released. This version's test: delete a chapter and restore it, move a project with one file, and restore an old backup.",
     "items": [
       {
-        "title": "Never lose a word",
-        "text": "Trash, earlier versions with compare and restore, and automatic backups to a folder you choose."
+        "title": "Delete and restore",
+        "text": "Move a chapter to the Trash, bring it back, and try an earlier version."
       },
       {
-        "title": "One file",
-        "text": "A whole project in one encrypted .rtstory file. Double-click to open it on another computer."
+        "title": "Set up backups",
+        "text": "Preferences, then Backups: pick a folder and a schedule. Nothing runs until you do."
       },
       {
-        "title": "A friendlier look",
-        "text": "Line icons, one clear main button, softer lists and cards, up to RT Markdown Reader’s standard."
+        "title": "Tell me about the look",
+        "text": "The window was rebuilt from RT Markdown Reader's. Say what still doesn't feel right."
       }
     ]
   },
