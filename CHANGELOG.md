@@ -35,7 +35,7 @@ Tell it where your files are, and it works out the rest or asks.
 ### Known limits
 - Pictures sit beside the writing as attachments. They don't appear on the page yet.
 - Zip files stay as attachments and aren't unpacked.
-- Two exact copies are treated as one file wherever they are, and the report lists each copy.
+- Two exact copies are treated as one file wherever they are, even in different books, and the report lists each copy.
 
 ## [3.4.0] - 2026-11-04
 

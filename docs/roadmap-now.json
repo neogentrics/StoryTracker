@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "v3.5: find my files",
-    "note": "Building now. Tell it where your files are, and it works out the rest or asks.",
+    "title": "3.5.0: point it at your files",
+    "note": "Released. The test on the real Stories folder passed: every file accounted for, and none of them changed.",
     "items": [
       {
-        "title": "Folder scan",
-        "text": "It reads names and sorts everything into series, books, chapters, versions and attachments. Your originals are never touched."
+        "title": "Look over the plan",
+        "text": "Run Find my files on your own folder and answer Ask me. Wrong guesses about books and chapters are what to look for."
       },
       {
-        "title": "The plan and Ask me",
-        "text": "You see what it thinks as a tree, and anything it isn’t sure of becomes a question instead of a guess."
+        "title": "Read a few chapters",
+        "text": "The test checked files, not story text. Only you can say whether a book’s chapters are right."
       },
       {
-        "title": "Attachments and the report",
-        "text": "Pictures, audio and PDFs stay with the book, and every file is accounted for at the end."
+        "title": "Still open from earlier",
+        "text": "A real Word manuscript in Import, Pages on a Mac, and a real Scrivener project."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.4."
+    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.5."
   },
   "questions": [
     {
