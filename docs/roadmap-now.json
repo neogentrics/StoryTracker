@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "3.1.0: your first real chapter",
-    "note": "Released. This version's test is you writing a real chapter in it, by choice. Whatever you find gets fixed in a 3.1.1 before 3.2 starts.",
+    "title": "v3.2: never lose a word",
+    "note": "Building now. It comes before import, because the first thing people will trust this app with is years of work.",
     "items": [
       {
-        "title": "Write in it",
-        "text": "Install 3.1.0 and write something you'd keep. Tell me what gets in the way."
+        "title": "Trash",
+        "text": "Anything deleted waits 30 days, and chapters with writing in them can finally be removed."
       },
       {
-        "title": "The update worked",
-        "text": "Done. 3.0.0 on your PC found the GitHub release, updated itself to 3.1.0 and kept your project."
+        "title": "History and backups",
+        "text": "Earlier versions of every chapter, plus automatic backups to a folder you choose."
       },
       {
-        "title": "The power cut",
-        "text": "Still open from 3.0: write a chapter on a spare computer, cut the power, restart."
+        "title": "One file, and a friendlier look",
+        "text": "A whole project in one .rtstory file, and warmer screens up to RT Markdown Reader's standard."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test, and the open decisions below. None of them hold up 3.2."
+    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.2."
   },
   "questions": [
     {
