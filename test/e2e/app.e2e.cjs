@@ -16,16 +16,13 @@ const launch = () =>
     env: { ...process.env, RTST_USER_DATA: profile },
   });
 
-async function statusText(window) {
-  await window.waitForSelector('body[data-state]');
-  return window.textContent('#status');
-}
-
 (async () => {
   let app = await launch();
   let window = await app.firstWindow();
+  await window.waitForSelector('body[data-state="ready"]');
   assert.equal(await window.title(), 'RT Story Tracker');
-  assert.match(await statusText(window), /library is ready, with 0 projects/);
+  assert.ok(await window.isVisible('#start-project'), 'the first run offers a project');
+  assert.ok(await window.isVisible('#try-sample'), 'the first run offers a sample');
   assert.equal(await window.evaluate(() => typeof window.require), 'undefined', 'no Node in the window');
   assert.equal(await window.evaluate(() => typeof window.process), 'undefined', 'no Node in the window');
   await app.close();
@@ -35,7 +32,8 @@ async function statusText(window) {
 
   app = await launch();
   window = await app.firstWindow();
-  assert.match(await statusText(window), /with 1 project/);
+  await window.waitForSelector('.project-row');
+  assert.match(await window.textContent('.project-row'), /From the test/);
   await app.close();
 
   fs.rmSync(profile, { recursive: true, force: true, maxRetries: 5 });

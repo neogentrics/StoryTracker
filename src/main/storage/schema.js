@@ -3,6 +3,8 @@
 // Rules from docs/design/working-with-rt-markdown-reader.md: every item has a permanent random ID, every change is
 // logged, and a removal leaves a marker, because sync can't be added to a database that didn't record these.
 
+const { countWords, plainText } = require('../../shared/text');
+
 const STEPS = [
   {
     version: 1,
@@ -38,6 +40,17 @@ const STEPS = [
           device_id TEXT NOT NULL
         );
       `);
+    },
+  },
+  {
+    // The word count is worked out from the body on every save, so it's never logged or synced as a change.
+    version: 2,
+    up(db) {
+      db.exec('ALTER TABLE items ADD COLUMN words INTEGER NOT NULL DEFAULT 0');
+      const update = db.prepare('UPDATE items SET words = ? WHERE id = ?');
+      for (const row of db.prepare("SELECT id, body FROM items WHERE body != ''").all()) {
+        update.run(countWords(plainText(row.body)), row.id);
+      }
     },
   },
 ];

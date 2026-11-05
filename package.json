@@ -1,7 +1,7 @@
 {
   "name": "rt-story-tracker",
   "productName": "RT Story Tracker",
-  "version": "3.0.0-alpha.0",
+  "version": "3.0.0",
   "description": "A place to write a book and keep everything around it, for Windows, macOS and Linux.",
   "author": "Recon Towers Dev Department <author@neogentrics.com>",
   "license": "SEE LICENSE IN LICENSE",
@@ -11,20 +11,27 @@
     "node": ">=22"
   },
   "dependencies": {
-    "better-sqlite3-multiple-ciphers": "^13.0.3"
+    "better-sqlite3-multiple-ciphers": "^13.0.3",
+    "electron-updater": "^6.8.11"
   },
   "devDependencies": {
+    "@tiptap/core": "^3.32.2",
+    "@tiptap/extension-text-align": "^3.32.2",
+    "@tiptap/pm": "^3.32.2",
+    "@tiptap/starter-kit": "^3.32.2",
     "electron": "^45.2.2",
     "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
     "playwright-core": "^1.64.1"
   },
   "scripts": {
-    "start": "electron .",
+    "build:renderer": "node scripts/build-renderer.mjs",
+    "start": "npm run build:renderer && electron .",
     "test": "node --test \"test/*.test.cjs\"",
-    "test:e2e": "node test/e2e/app.e2e.cjs",
-    "dist:win": "electron-builder --win nsis --x64 --publish never",
-    "dist:mac": "electron-builder --mac dmg --arm64 --x64 --publish never",
-    "dist:linux": "electron-builder --linux AppImage deb --x64 --publish never",
+    "test:e2e": "npm run build:renderer && node test/e2e/app.e2e.cjs && node test/e2e/write.e2e.cjs",
+    "dist:win": "npm run build:renderer && electron-builder --win nsis --x64 --publish never",
+    "dist:mac": "npm run build:renderer && electron-builder --mac dmg --arm64 --x64 --publish never",
+    "dist:linux": "npm run build:renderer && electron-builder --linux AppImage deb --x64 --publish never",
     "check:install": "node scripts/check-install.cjs"
   },
   "build": {
@@ -36,7 +43,9 @@
       "buildResources": "build"
     },
     "files": [
-      "src/**",
+      "src/main/**",
+      "src/shared/**",
+      "dist/renderer/**",
       "package.json",
       "LICENSE",
       "THIRD_PARTY_NOTICES.md",
@@ -98,7 +107,15 @@
     },
     "deb": {
       "packageCategory": "text"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "neogentrics",
+        "repo": "StoryTracker",
+        "releaseType": "release"
+      }
+    ]
   },
   "homepage": "https://github.com/neogentrics/StoryTracker",
   "bugs": "https://github.com/neogentrics/StoryTracker/issues",
