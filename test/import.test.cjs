@@ -53,7 +53,7 @@ async function importInto(space, file, options = {}) {
   const importer = new Importer();
   const first = await importer.inspect(file);
   const accepted = options.accepted ?? first.findings.map((item) => item.id);
-  const result = importer.commit(space, { token: first.token, accepted, mode: options.mode ?? first.mode, target: options.target ?? { kind: 'new', parentId: space.open().id } });
+  const result = await importer.commit(space, { token: first.token, accepted, mode: options.mode ?? first.mode, target: options.target ?? { kind: 'new', parentId: space.open().id } });
   return { ...result, inspected: first };
 }
 
@@ -160,7 +160,7 @@ test('accepting a clean-up changes the words that come in', async () => {
   const kept = importer.preview({ token: first.token, accepted: [] });
   const cleaned = importer.preview({ token: first.token, accepted: first.findings.map((item) => item.id) });
   assert.ok(kept.importedWords > cleaned.importedWords);
-  const made = importer.commit(space, { token: first.token, accepted: first.findings.map((item) => item.id), mode: cleaned.mode, target: { kind: 'new', parentId: space.open().id } });
+  const made = await importer.commit(space, { token: first.token, accepted: first.findings.map((item) => item.id), mode: cleaned.mode, target: { kind: 'new', parentId: space.open().id } });
   assert.equal(body(space, made.first), 'The story.');
 });
 
@@ -204,7 +204,7 @@ test('a Word manuscript: title, chapters, italics and comments, with every word 
   assert.deepEqual(first.sections.map((section) => section.title), ['Chapter 1', 'Chapter 2']);
   assert.equal(first.comments, 1);
   assert.equal(first.importedWords + first.titleWords, first.originalWords, 'every word is accounted for');
-  const made = importer.commit(space, { token: first.token, accepted: [], mode: first.mode, target: { kind: 'new', parentId: space.open().id } });
+  const made = await importer.commit(space, { token: first.token, accepted: [], mode: first.mode, target: { kind: 'new', parentId: space.open().id } });
   const saved = space.loadChapter(made.first);
   assert.ok(saved.body.includes('"italic"'));
   const [note] = space.listComments(made.first);
@@ -236,8 +236,8 @@ test('a template\'s own styles count: chapters, contents, centring and pictures'
   assert.equal(first.title, 'The Book');
   assert.deepEqual(first.sections.map((section) => section.title), ['The Start', 'The End']);
   assert.equal(first.importedWords + first.titleWords, first.originalWords, 'a contents page isn\'t counted as missing');
-  assert.ok(first.notes.some((note) => /1 picture won/.test(note)));
-  const made = importer.commit(space, { token: first.token, accepted: [], mode: first.mode, target: { kind: 'new', parentId: space.open().id } });
+  assert.ok(first.notes.some((note) => /1 picture will be kept/.test(note)));
+  const made = await importer.commit(space, { token: first.token, accepted: [], mode: first.mode, target: { kind: 'new', parentId: space.open().id } });
   const saved = JSON.parse(space.loadChapter(made.first).body);
   assert.equal(saved.content[1].attrs.textAlign, 'center');
 });

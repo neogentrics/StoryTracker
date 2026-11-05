@@ -3,11 +3,11 @@
 // downward, so a move can't put something inside itself.
 
 const CHILD_KINDS = {
-  project: ['series', 'book'],
-  series: ['book'],
-  book: ['part', 'chapter'],
-  part: ['chapter'],
-  chapter: ['comment'],
+  project: ['series', 'book', 'attachment'],
+  series: ['book', 'attachment'],
+  book: ['part', 'chapter', 'attachment'],
+  part: ['chapter', 'attachment'],
+  chapter: ['comment', 'attachment'],
 };
 
 function canHold(parentKind, childKind) {

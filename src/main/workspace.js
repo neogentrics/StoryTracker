@@ -7,6 +7,9 @@ const { findNode } = require('../shared/outline');
 const { parseDocument, plainText, toDocument } = require('../shared/text');
 const { SAMPLE_TITLE, fillSample } = require('./sample');
 
+const MAX_PREVIEW = 30 * 1024 * 1024;
+const PREVIEW_TYPES = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
+
 const MAX_TITLE = 500;
 const MAX_BODY = 64 * 1024 * 1024;
 const FIRST_CHAPTER = 'Chapter 1';
@@ -18,6 +21,8 @@ function cleanTitle(title, fallback) {
   return title.trim().slice(0, MAX_TITLE) || fallback;
 }
 
+const FILE_TYPES = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.pdf': 'application/pdf', '.mp3': 'audio/mpeg' };
+const typeOf = (file) => FILE_TYPES[path.extname(file).toLowerCase()] ?? '';
 const toImported = (blocks) => ({ type: 'doc', content: blocks.length ? blocks : [{ type: 'paragraph' }] });
 const holds = (block, node) => block === node || (block.content ?? []).some((child) => holds(child, node));
 
@@ -128,7 +133,7 @@ class Workspace {
   }
 
   dropEmptyStart(bookId) {
-    const chapters = this.project.listChildren(bookId);
+    const chapters = this.project.listChildren(bookId).filter((item) => item.kind !== 'attachment');
     if (chapters.length === 1 && chapters[0].kind === 'chapter' && !plainText(chapters[0].body).trim()) {
       this.project.removeItem(chapters[0].id);
     }
@@ -140,12 +145,13 @@ class Workspace {
     let bookId;
     let first = null;
     let chapters = 0;
+    let made = [];
     project.db.transaction(() => {
       bookId = this.importTarget(target, title, details);
       this.dropEmptyStart(bookId);
       if (cover && !project.cover(bookId)) project.setCover(bookId, cover);
       const toSave = [];
-      let parentId = bookId;
+      let parentId = target?.partId ?? bookId;
       for (const section of sections) {
         if (section.type === 'part') {
           parentId = project.addItem({ kind: 'part', parentId: bookId, title: section.title }).id;
@@ -168,8 +174,42 @@ class Workspace {
       for (const { chapter, section } of toSave) {
         project.putItem({ id: chapter.id, body: JSON.stringify(toImported(section.blocks)) });
       }
+      made = toSave.map(({ chapter }) => chapter);
     })();
-    return { bookId, first, chapters, outline: this.outline() };
+    return { bookId, first, chapters, made, outline: this.outline() };
+  }
+
+  // A new project starts with an empty book, which is only in the way once real books have come in.
+  dropEmptyBooks() {
+    const books = this.outline().children.filter((node) => node.kind === 'book');
+    if (books.length + this.outline().children.filter((node) => node.kind === 'series').length < 2) return;
+    for (const book of books) {
+      const only = book.children.length === 1 ? this.project.getItem(book.children[0].id) : null;
+      const empty = book.children.length === 0 || (only?.kind === 'chapter' && !plainText(only.body).trim());
+      if (empty && this.project.listChildren(book.id).every((item) => item.kind !== 'attachment')) this.project.removeItem(book.id);
+    }
+  }
+
+  async addAttachments({ parentId, files }) {
+    this.need(parentId);
+    const added = [];
+    for (const file of files) added.push(await this.project.addAttachment(parentId, { name: path.basename(file), source: file, type: typeOf(file) }));
+    return added.length;
+  }
+
+  listAttachments(id) {
+    return this.open().listAttachments(needId(id));
+  }
+
+  async previewAttachment(id) {
+    const { file, size, type } = this.open().attachment(needId(id));
+    if (!PREVIEW_TYPES.has(type) || size > MAX_PREVIEW) return null;
+    return `data:${type};base64,${(await this.project.attachments.read(file)).toString('base64')}`;
+  }
+
+  saveAttachment(id, destination) {
+    const { file } = this.open().attachment(needId(id));
+    return this.project.attachments.saveTo(file, destination);
   }
 
   listProjectTrash() {
@@ -257,8 +297,12 @@ class Workspace {
     return { outline: this.outline() };
   }
 
-  packProject(id, file) {
-    this.library.packProject(id, file, this.project?.id === id ? this.project : null);
+  packProject(id, file, options) {
+    this.library.packProject(id, file, this.project?.id === id ? this.project : null, options);
+  }
+
+  packProjectLater(id, file) {
+    return this.library.packProjectLater(id, file, this.open());
   }
 
   importProject(file, { replace = false } = {}) {
@@ -301,7 +345,10 @@ class Workspace {
   listComments(chapterId) {
     const chapter = this.need(chapterId);
     if (chapter.kind !== 'chapter') throw new Error("That isn't a chapter.");
-    return this.project.listChildren(chapterId).map((item) => ({ id: item.id, text: item.title, createdAt: item.createdAt }));
+    return this.project
+      .listChildren(chapterId)
+      .filter((item) => item.kind === 'comment')
+      .map((item) => ({ id: item.id, text: item.title, createdAt: item.createdAt }));
   }
 
   addComment({ chapterId, text }) {

@@ -106,6 +106,7 @@ async function readDocx(file) {
   const mammoth = require('mammoth');
   const buffer = fs.readFileSync(file);
   let contentsWords = 0;
+  const pictures = [];
   const transformDocument = mammoth.transforms.paragraph((paragraph) => {
     if (/^toc/i.test(paragraph.styleName ?? '')) contentsWords += countWords(wordText(paragraph));
     return ALIGNED[paragraph.alignment] && !paragraph.styleName ? { ...paragraph, styleName: ALIGNED[paragraph.alignment] } : paragraph;
@@ -113,11 +114,15 @@ async function readDocx(file) {
   const { value: html } = await mammoth.convertToHtml({ buffer }, {
     styleMap: WORD_STYLES,
     transformDocument,
-    convertImage: mammoth.images.imgElement(async () => ({ src: '' })),
+    convertImage: mammoth.images.imgElement(async (image) => {
+      const extension = /\/(\w+)/.exec(image.contentType ?? '')?.[1] ?? 'png';
+      pictures.push({ name: `Picture ${pictures.length + 1}.${extension}`, type: image.contentType ?? '', data: await image.read() });
+      return { src: '' };
+    }),
   });
   const { value: raw } = await mammoth.extractRawText({ buffer });
   const { blocks, context } = htmlToBlocks(html.replace(COMMENT_LIST, ''));
-  return { blocks, context, comments: commentsIn(html), originalWords: countWords(raw) - contentsWords };
+  return { blocks, context, pictures, comments: commentsIn(html), originalWords: countWords(raw) - contentsWords };
 }
 
 // Mammoth lists comments at the end as definitions. Each one's ID matches the marker left in the text.
@@ -192,6 +197,9 @@ function readEpub(file) {
     const size = imageSize(data);
     if (size) cover = { type: coverItem['media-type'], data, ...size };
   }
+  const pictures = [...items.values()]
+    .filter((item) => /^image\//.test(item['media-type'] ?? '') && item !== coverItem && files[decodeURI(`${base}${item.href}`)])
+    .map((item) => ({ name: path.posix.basename(item.href), type: item['media-type'], data: Buffer.from(files[decodeURI(`${base}${item.href}`)]) }));
   const details = {};
   const creator = value(meta.creator);
   if (creator) details.author = String(creator);
@@ -204,6 +212,7 @@ function readEpub(file) {
     sections,
     cover,
     context,
+    pictures,
     notes: skipped ? [`${skipped} cover, title or contents pages were left out.`] : [],
   };
 }
@@ -326,7 +335,10 @@ function readOdt(file) {
   const context = newContext();
   const root = tree.find((node) => nameOf(node) === 'office:document-content');
   const body = root['office:document-content'].find((node) => nameOf(node) === 'office:body');
-  return { blocks: odtBlocks(body['office:body'], styles, context), context };
+  const pictures = Object.keys(files)
+    .filter((name) => /^Pictures\/[^/]+\.(png|jpe?g|gif)$/i.test(name))
+    .map((name) => ({ name: path.posix.basename(name), type: /\.png$/i.test(name) ? 'image/png' : /\.gif$/i.test(name) ? 'image/gif' : 'image/jpeg', data: Buffer.from(files[name]) }));
+  return { blocks: odtBlocks(body['office:body'], styles, context), context, pictures };
 }
 
 // PDF: the words are in there, but a PDF doesn't record what's a heading or where a paragraph ends, so this is an estimate.
@@ -579,4 +591,4 @@ async function readFormat(file) {
 
 const IMPORT_EXTENSIONS = ['docx', 'md', 'markdown', 'txt', 'rtf', 'html', 'htm', 'epub', 'odt', 'pdf', 'pages', 'scrivx'];
 
-module.exports = { IMPORT_EXTENSIONS, iwaBytes, markdownToBlocks, readFormat, sentencesIn, splitFrontMatter, textToBlocks };
+module.exports = { IMPORT_EXTENSIONS, imageSize, iwaBytes, markdownToBlocks, readFormat, sentencesIn, splitFrontMatter, textToBlocks };

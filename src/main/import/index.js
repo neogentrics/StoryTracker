@@ -4,7 +4,7 @@
 const crypto = require('node:crypto');
 const { countWords } = require('../../shared/text');
 const { applyCleanups, findCleanups } = require('./cleanup');
-const { IMPORT_EXTENSIONS, markdownToBlocks, readFormat, splitFrontMatter, textToBlocks } = require('./formats');
+const { IMPORT_EXTENSIONS, imageSize, markdownToBlocks, readFormat, splitFrontMatter, textToBlocks } = require('./formats');
 const { splitBlocks, splitOptions, wordsIn } = require('./split');
 
 function resolve(source, accepted) {
@@ -28,27 +28,42 @@ function bookTitle(resolved, mode) {
 
 const summary = (section) => ({ type: section.type, title: section.title, words: section.blocks ? wordsIn(section.blocks) : 0 });
 
+// Reads a file and takes off what isn't the writing: front matter, and a title styled as one.
+async function readPrepared(file) {
+  const source = await readFormat(file);
+  if (source.text !== undefined) {
+    if (!source.plain) {
+      const { body, title, details } = splitFrontMatter(source.text);
+      Object.assign(source, { text: body, title: title ?? source.title, details });
+    }
+    source.findings = findCleanups(source.text);
+  }
+  const titleBlock = source.blocks?.find((block) => block.bookTitle);
+  if (titleBlock) {
+    source.title = titleBlock.content.map((node) => node.text ?? '').join('').trim() || source.title;
+    source.bookTitleWords = countWords(source.title);
+    source.blocks = source.blocks.filter((block) => block !== titleBlock);
+  }
+  return source;
+}
+
+// For a folder import: the file as it is, with nothing cleaned up, because nobody is there to agree to it.
+async function readSource(file) {
+  return resolve(await readPrepared(file), []);
+}
+
+function sectionsOf(source, mode, title) {
+  if (source.sections) return source.sections;
+  return sectionsFor({ ...source, title }, mode ?? splitOptions(source.blocks)[0].mode);
+}
+
 class Importer {
   constructor() {
     this.pending = new Map();
   }
 
   async inspect(file) {
-    const source = await readFormat(file);
-    if (source.text !== undefined) {
-      if (!source.plain) {
-        const { body, title, details } = splitFrontMatter(source.text);
-        Object.assign(source, { text: body, title: title ?? source.title, details });
-      }
-      source.findings = findCleanups(source.text);
-    }
-    // A title styled as one in Word names the book, and doesn't become a chapter.
-    const titleBlock = source.blocks?.find((block) => block.bookTitle);
-    if (titleBlock) {
-      source.title = titleBlock.content.map((node) => node.text ?? '').join('').trim() || source.title;
-      source.bookTitleWords = countWords(source.title);
-      source.blocks = source.blocks.filter((block) => block !== titleBlock);
-    }
+    const source = await readPrepared(file);
     const token = crypto.randomUUID();
     this.pending.clear();
     this.pending.set(token, source);
@@ -68,9 +83,11 @@ class Importer {
     const options = resolved.sections ? [] : splitOptions(resolved.blocks);
     const chosen = mode && options.some((option) => option.mode === mode) ? mode : options[0]?.mode ?? 'none';
     const sections = sectionsFor(resolved, chosen);
-    const pictures = resolved.context?.pictures ?? 0;
+    const kept = resolved.pictures?.length ?? 0;
+    const lost = kept ? 0 : resolved.context?.pictures ?? 0;
     const notes = [...(resolved.notes ?? [])];
-    if (pictures) notes.push(`${pictures} ${pictures === 1 ? 'picture' : 'pictures'} won’t come in yet. Pictures arrive with attachments in 3.5.`);
+    if (kept) notes.push(`${kept} ${kept === 1 ? 'picture' : 'pictures'} will be kept with the book as attachments.`);
+    if (lost) notes.push(`${lost} ${lost === 1 ? 'picture stays' : 'pictures stay'} in the original file. Add them under Attachments if you want them here.`);
     const importedWords = sections.reduce((sum, section) => sum + (section.blocks ? wordsIn(section.blocks) : 0), 0);
     const titleWords = sections.reduce((sum, section) => sum + (section.named ? 0 : countWords(section.title)), source.bookTitleWords ?? 0);
     return {
@@ -89,15 +106,18 @@ class Importer {
   }
 
   // `target` is a new book under a parent, or an existing book to add to.
-  commit(workspace, { token, accepted = [], mode, target }) {
+  async commit(workspace, { token, accepted = [], mode, target }) {
     const source = this.need(token);
     const resolved = resolve(source, accepted);
     const sections = sectionsFor(resolved, mode);
     if (sections.length === 0) throw new Error('There is nothing in that file to import.');
     const made = workspace.importSections({ target, title: bookTitle(resolved, mode), details: resolved.details, cover: resolved.cover, sections, comments: resolved.comments, marks: resolved.context?.commentMarks });
+    for (const picture of resolved.pictures ?? []) {
+      await workspace.open().addAttachment(made.bookId, { name: picture.name, source: picture.data, type: picture.type, from: picture.name });
+    }
     this.pending.delete(token);
     return made;
   }
 }
 
-module.exports = { IMPORT_EXTENSIONS, Importer };
+module.exports = { IMPORT_EXTENSIONS, Importer, imageSize, readSource, sectionsOf };

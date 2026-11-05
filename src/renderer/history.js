@@ -8,6 +8,7 @@ const REASONS = {
   auto: 'Saved along the way',
   restore: 'Before a restore',
   replace: 'Before a replace',
+  imported: 'From your files',
 };
 
 const when = (iso) => new Date(iso).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });

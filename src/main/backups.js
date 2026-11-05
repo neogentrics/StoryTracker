@@ -27,6 +27,7 @@ class Backups {
     this.state = this.read();
     this.lastError = null;
     this.timers = [];
+    this.copying = Promise.resolve();
   }
 
   read() {
@@ -85,7 +86,8 @@ class Backups {
       try {
         const dir = path.join(backupFolder, folderName(project));
         fs.mkdirSync(dir, { recursive: true });
-        this.workspace.packProject(project.id, path.join(dir, `${stamp(this.now())}${FILE_ENDING}`));
+        this.workspace.packProject(project.id, path.join(dir, `${stamp(this.now())}${FILE_ENDING}`), { attachments: false });
+        this.copyAttachments(project, dir);
         this.keepNewest(dir, backupKeep);
         this.state.projects[project.id] = { at: this.now().toISOString(), updatedAt: project.updatedAt };
         saved += 1;
@@ -95,6 +97,13 @@ class Backups {
     }
     if (saved) this.write();
     return { saved, error: this.lastError };
+  }
+
+  // Can take a while the first time, so it carries on behind the app.
+  copyAttachments(project, dir) {
+    this.copying = this.copying
+      .then(() => this.workspace.library.copyAttachments(project.id, dir))
+      .catch((error) => { this.lastError = `${project.title}: ${error.message}`; });
   }
 
   keepNewest(dir, keep) {

@@ -44,8 +44,9 @@ function toItem(row) {
 }
 
 class Project {
-  constructor(db, { id, file, deviceId, now = () => new Date() }) {
+  constructor(db, { id, file, deviceId, attachments, now = () => new Date() }) {
     this.db = db;
+    this.attachments = attachments;
     this.id = id;
     this.file = file;
     this.deviceId = deviceId;
@@ -134,7 +135,7 @@ class Project {
   outline() {
     const rows = this.db
       .prepare(`SELECT id, kind, parent_id, title, words FROM items
-                WHERE kind != 'comment' AND trashed_at IS NULL ORDER BY position, created_at`)
+                WHERE kind NOT IN ('comment', 'attachment') AND trashed_at IS NULL ORDER BY position, created_at`)
       .all();
     const nodes = new Map(
       rows.map((row) => [row.id, { id: row.id, kind: row.kind, title: row.title, words: row.words, children: [] }]),
@@ -249,6 +250,20 @@ class Project {
     this.keepVersion(item, 'auto');
   }
 
+  // A version from an author's own files, with the date it really had. These are never thinned out.
+  addOlderVersion(itemId, { title, body, at }) {
+    this.db
+      .prepare('INSERT INTO versions (item_id, title, body, words, reason, at) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(itemId, title, body, wordsIn(body), 'imported', at);
+  }
+
+  // A version from an author's own files, with the date it really had. These are never thinned out.
+  addOlderVersion(itemId, { title, body, at }) {
+    this.db
+      .prepare('INSERT INTO versions (item_id, title, body, words, reason, at) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(itemId, title, body, wordsIn(body), 'imported', at);
+  }
+
   listVersions(itemId) {
     return this.db
       .prepare('SELECT id, title, words, reason, at FROM versions WHERE item_id = ? ORDER BY id DESC')
@@ -263,7 +278,7 @@ class Project {
   thinVersions() {
     const cutoff = new Date(this.now().getTime() - EVERY_VERSION_DAYS * DAY_MS).toISOString();
     return this.db
-      .prepare(`DELETE FROM versions WHERE at < ? AND id NOT IN (
+      .prepare(`DELETE FROM versions WHERE at < ? AND reason != 'imported' AND id NOT IN (
                   SELECT MAX(id) FROM versions GROUP BY item_id, substr(at, 1, 10)
                 )`)
       .run(cutoff).changes;
@@ -273,6 +288,90 @@ class Project {
     this.purgeTrash();
     this.thinVersions();
     this.pruneRemovalMarkers();
+    this.tidyAttachments();
+  }
+
+  // `source` is a path or a Buffer. Contents already in the project aren't stored twice.
+  async addAttachment(parentId, { name, source, type = '', from = '' }) {
+    const stored = await this.attachments.store(source);
+    const known = this.db.prepare('SELECT file FROM attachment_files WHERE sha256 = ?').get(stored.sha256);
+    if (known) this.attachments.remove(stored.file);
+    else this.db.prepare('INSERT INTO attachment_files (sha256, file, size) VALUES (?, ?, ?)').run(stored.sha256, stored.file, stored.size);
+    const item = this.addItem({ kind: 'attachment', parentId, title: name });
+    const details = { file: known?.file ?? stored.file, size: stored.size, type, from };
+    return this.putItem({ id: item.id, details: JSON.stringify(details) });
+  }
+
+  attachment(id) {
+    const item = this.getItem(id);
+    if (item?.kind !== 'attachment') throw new Error('That attachment is missing.');
+    return { ...JSON.parse(item.details), id, name: item.title, parentId: item.parentId };
+  }
+
+  // What's attached to something and everything under it, leaving out what's in the Trash.
+  listAttachments(rootId) {
+    const rows = this.db
+      .prepare(`WITH RECURSIVE tree(id) AS (
+                  SELECT id FROM items WHERE id = ?
+                  UNION
+                  SELECT items.id FROM items JOIN tree ON items.parent_id = tree.id WHERE items.trashed_at IS NULL
+                )
+                SELECT items.id, items.title, items.details, parent.title AS owner, items.parent_id AS ownerId
+                FROM items JOIN tree ON items.id = tree.id JOIN items AS parent ON parent.id = items.parent_id
+                WHERE items.kind = 'attachment' ORDER BY parent.position, items.position`)
+      .all(rootId);
+    return rows.map(({ id, title, details, owner, ownerId }) => {
+      const { size, type, from } = JSON.parse(details);
+      return { id, name: title, size, type, from, owner, ownerId };
+    });
+  }
+
+  attachmentFiles() {
+    return this.db.prepare('SELECT file FROM attachment_files').all().map((row) => row.file);
+  }
+
+  // A stored file goes once nothing uses it, which can only happen after the Trash has let go of its last item.
+  tidyAttachments() {
+    const used = new Set(
+      this.db.prepare("SELECT json_extract(details, '$.file') AS file FROM items WHERE kind = 'attachment'").all().map((row) => row.file),
+    );
+    const keep = new Set();
+    for (const file of this.attachmentFiles()) {
+      if (used.has(file)) keep.add(file);
+      else this.db.prepare('DELETE FROM attachment_files WHERE file = ?').run(file);
+    }
+    return this.attachments.sweep(keep);
+  }
+
+  saveFolderImport({ id, root, state }) {
+    this.db
+      .prepare(`INSERT INTO folder_imports (id, root, state, status, started_at) VALUES (?, ?, ?, 'running', ?)
+                ON CONFLICT (id) DO UPDATE SET state = excluded.state, status = 'running', finished_at = NULL`)
+      .run(id, root, state, this.now().toISOString());
+  }
+
+  recordFolderImport(importId, { fileId, outcome, itemId = null, note = '' }) {
+    this.db
+      .prepare(`INSERT INTO folder_import_files (import_id, file_id, outcome, item_id, note) VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT (import_id, file_id) DO UPDATE SET outcome = excluded.outcome, item_id = excluded.item_id, note = excluded.note`)
+      .run(importId, fileId, outcome, itemId, note);
+  }
+
+  folderImportRows(importId) {
+    return this.db
+      .prepare('SELECT file_id AS fileId, outcome, item_id AS itemId, note FROM folder_import_files WHERE import_id = ?')
+      .all(importId);
+  }
+
+  finishFolderImport(id, status) {
+    this.db.prepare('UPDATE folder_imports SET status = ?, finished_at = ? WHERE id = ?').run(status, this.now().toISOString(), id);
+  }
+
+  unfinishedFolderImport() {
+    return this.db
+      .prepare(`SELECT id, root, state, started_at AS startedAt FROM folder_imports
+                WHERE status IN ('running', 'stopped') ORDER BY started_at DESC LIMIT 1`)
+      .get() ?? null;
   }
 
   // Removes an item and everything under it. Each one leaves a marker, so a device that was switched off can't bring

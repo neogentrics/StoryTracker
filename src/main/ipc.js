@@ -5,10 +5,43 @@ const os = require('node:os');
 const path = require('node:path');
 const { EXPORT_FORMATS } = require('../shared/details');
 const { checkExport, exportEverything, exportFile, safeName } = require('./export');
+const { FolderImport } = require('./folder');
 const { IMPORT_EXTENSIONS, Importer } = require('./import');
 
 const MAX_COVER = 50 * 1024 * 1024;
 const importer = new Importer();
+const folderImport = new FolderImport();
+let chosenFolder = null;
+
+// The window can only ask to scan the folder the author just picked, never a path of its own.
+async function chooseFolder(window) {
+  const { canceled, filePaths } = await dialog.showOpenDialog(window(), { title: 'Where are your files?', properties: ['openDirectory'] });
+  if (canceled) return null;
+  [chosenFolder] = filePaths;
+  return { name: path.basename(chosenFolder) };
+}
+
+async function saveFolderReport(window) {
+  const { canceled, filePath } = await dialog.showSaveDialog(window(), {
+    title: 'Save the report',
+    defaultPath: 'Find my files report.txt',
+    filters: [{ name: 'Text', extensions: ['txt'] }],
+  });
+  return canceled ? null : filePath;
+}
+
+async function addAttachments(workspace, window, parentId) {
+  const { canceled, filePaths } = await dialog.showOpenDialog(window(), { title: 'Add attachments', properties: ['openFile', 'multiSelections'] });
+  return canceled ? 0 : workspace().addAttachments({ parentId, files: filePaths });
+}
+
+async function saveAttachment(workspace, window, id) {
+  const { name } = workspace().open().attachment(id);
+  const { canceled, filePath } = await dialog.showSaveDialog(window(), { title: 'Save a copy', defaultPath: name });
+  if (canceled || !filePath) return null;
+  await workspace().saveAttachment(id, filePath);
+  return filePath;
+}
 
 async function chooseImport(window) {
   const { canceled, filePaths } = await dialog.showOpenDialog(window(), {
@@ -41,7 +74,7 @@ async function exportProject(workspace, window) {
     filters: [{ name: 'RT Story Tracker project', extensions: ['rtstory'] }],
   });
   if (canceled || !filePath) return null;
-  space.packProject(id, filePath);
+  await space.packProjectLater(id, filePath);
   return filePath;
 }
 
@@ -195,6 +228,27 @@ function registerIpc({ status, workspace, updater, settings, backups, window, ta
   handle('export:everything', () => everything(workspace, window));
   handle('export:preview', (input) => preview(workspace, input));
   handle('export:reveal', (file) => shell.showItemInFolder(String(file)));
+  const folderProgress = (data) => window()?.webContents.send('folder:progress', data);
+  handle('folder:choose', () => chooseFolder(window));
+  handle('folder:scan', () => {
+    if (!chosenFolder) throw new Error('Choose a folder first.');
+    return folderImport.scan(workspace(), chosenFolder, folderProgress);
+  });
+  handle('folder:edit', (change) => folderImport.edit(workspace(), change));
+  handle('folder:run', () => folderImport.run(workspace(), folderProgress));
+  handle('folder:stop', () => folderImport.stop());
+  handle('folder:pending', () => folderImport.pending(workspace()));
+  handle('folder:resume', () => folderImport.resume(workspace(), folderProgress));
+  handle('folder:discard', () => folderImport.discard(workspace()));
+  handle('folder:saveReport', async (report) => {
+    const file = await saveFolderReport(window);
+    if (file) fs.writeFileSync(file, folderImport.reportText(report));
+    return file;
+  });
+  handle('attachments:list', (id) => workspace().listAttachments(id));
+  handle('attachments:add', (parentId) => addAttachments(workspace, window, parentId));
+  handle('attachments:preview', (id) => workspace().previewAttachment(id));
+  handle('attachments:save', (id) => saveAttachment(workspace, window, id));
   handle('import:choose', () => chooseImport(window));
   handle('import:preview', (input) => importer.preview(input));
   handle('import:commit', (input) => importer.commit(workspace(), input));

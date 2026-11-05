@@ -96,6 +96,20 @@ This is the owner's idea: *"it would see the file structure you have"*, then org
 
 The test case is his own Stories folder, and the pass mark is that every file is accounted for.
 
+The plan is never stored as a tree. It's worked out again from the list of files and the author's edits every time
+(`src/main/folder/plan.js`), so an edit can't leave it half changed. A run writes down each file as it goes, in the
+project's own encrypted database, which is what lets it resume.
+
+### Attachments
+
+An attachment is an item, so it has an ID, goes to the Trash and will sync like anything else. Its file sits in the
+project's `attachments` folder under a random name, encrypted with AES-256-GCM using a key made from the project's key, so
+the password lock in 3.6 covers it. Only the database knows what a file is called. Two items with the same contents share
+one stored file, and a stored file goes when nothing uses it, after the Trash has let go.
+
+A `.rtstory` file holds attachments, and uses format 2 only when it has any. Automatic backups leave them out and keep them
+in an `attachments` folder beside the backups instead, so a gigabyte of pictures isn't written again every hour.
+
 ## Exporting
 
 - One chapter, one book, a series, or a whole project, to any format in the table.

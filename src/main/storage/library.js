@@ -6,7 +6,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { migrate, openDatabase } = require('./database');
 const { createKeys, hasAppSlot, openWithAppSlot, writeFileSafely } = require('./keys');
-const { PackageError, extractPackage, readPackageHeader, writePackage } = require('./package');
+const { PackageError, extractPackage, readPackageHeader, writePackage, writePackageLater } = require('./package');
+const { ATTACHMENTS_DIR, AttachmentStore, FILE_NAME } = require('./attachments');
 const { Project, TRASH_DAYS } = require('./project');
 
 const DATABASE_FILE = 'project.db';
@@ -50,7 +51,8 @@ class Library {
       db.close();
       throw error;
     }
-    return new Project(db, { id, file, deviceId: this.deviceId, now: this.now });
+    const attachments = new AttachmentStore(path.join(dir, ATTACHMENTS_DIR), projectKey);
+    return new Project(db, { id, file, deviceId: this.deviceId, attachments, now: this.now });
   }
 
   // Built under a temporary name, so a crash halfway through leaves nothing that looks like a project.
@@ -129,23 +131,59 @@ class Library {
     }
   }
 
+  packingList(id, project, temp, attachments) {
+    project.backupTo(temp);
+    const stored = attachments ? project.attachmentFiles() : [];
+    return {
+      projectId: id,
+      files: [
+        { name: KEY_FILE, source: path.join(this.projectDir(id), KEY_FILE) },
+        { name: DATABASE_FILE, source: temp },
+        ...stored
+          .filter((name) => fs.existsSync(project.attachments.pathOf(name)))
+          .map((name) => ({ name: `${ATTACHMENTS_DIR}/${name}`, source: project.attachments.pathOf(name) })),
+      ],
+    };
+  }
+
   // Packs an open project, or a closed one found by its ID. A straight copy, so the file is as encrypted as the project.
-  packProject(id, file, open = null) {
+  // Automatic backups leave attachments out and copy them beside the file instead, so a gigabyte of pictures isn't written
+  // again every hour.
+  packProject(id, file, open = null, { attachments = true } = {}) {
     const project = open ?? this.openProject(id);
     const temp = path.join(this.projectDir(id), `.pack-${crypto.randomUUID()}.db`);
     try {
-      project.backupTo(temp);
-      writePackage(file, {
-        projectId: id,
-        files: [
-          { name: KEY_FILE, source: path.join(this.projectDir(id), KEY_FILE) },
-          { name: DATABASE_FILE, source: temp },
-        ],
-      });
+      writePackage(file, this.packingList(id, project, temp, attachments));
     } finally {
       fs.rmSync(temp, { force: true });
       if (!open) project.close();
     }
+  }
+
+  // The same, without holding the window up. Packing a project with big attachments can take a while.
+  async packProjectLater(id, file, open) {
+    const temp = path.join(this.projectDir(id), `.pack-${crypto.randomUUID()}.db`);
+    try {
+      await writePackageLater(file, this.packingList(id, open, temp, true));
+    } finally {
+      fs.rmSync(temp, { force: true });
+    }
+  }
+
+  // Backups keep attachments in a folder beside them. They're only ever added to, so each is copied once.
+  async copyAttachments(id, folder) {
+    const from = path.join(this.projectDir(id), ATTACHMENTS_DIR);
+    if (!fs.existsSync(from)) return 0;
+    const to = path.join(folder, ATTACHMENTS_DIR);
+    await fs.promises.mkdir(to, { recursive: true });
+    let copied = 0;
+    for (const name of await fs.promises.readdir(from)) {
+      if (!FILE_NAME.test(name) || fs.existsSync(path.join(to, name))) continue;
+      await fs.promises.copyFile(path.join(from, name), path.join(to, `${name}.tmp`));
+      await fs.promises.rename(path.join(to, `${name}.tmp`), path.join(to, name));
+      copied += 1;
+    }
+    return copied;
   }
 
   // Unpacks into a temporary folder and proves the project opens before it goes anywhere near the library.
@@ -165,6 +203,7 @@ class Library {
     fs.mkdirSync(temp);
     try {
       extractPackage(file, temp);
+      this.bringAttachmentsBeside(file, temp);
       const key = openWithAppSlot(temp);
       if (!key) throw new PackageError('This project is locked.');
       const project = this.open(temp, id, key);
@@ -179,6 +218,17 @@ class Library {
     } catch (error) {
       fs.rmSync(temp, { recursive: true, force: true, maxRetries: 5 });
       throw error;
+    }
+  }
+
+  // A backup's attachments sit in a folder next to it.
+  bringAttachmentsBeside(file, dir) {
+    const beside = path.join(path.dirname(file), ATTACHMENTS_DIR);
+    if (!fs.existsSync(beside)) return;
+    fs.mkdirSync(path.join(dir, ATTACHMENTS_DIR), { recursive: true });
+    for (const name of fs.readdirSync(beside)) {
+      const target = path.join(dir, ATTACHMENTS_DIR, name);
+      if (FILE_NAME.test(name) && !fs.existsSync(target)) fs.copyFileSync(path.join(beside, name), target);
     }
   }
 

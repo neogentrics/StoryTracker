@@ -3,6 +3,40 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.5.0] - 2026-11-05
+
+Tell it where your files are, and it works out the rest or asks.
+
+### Added
+- **Find my files**, on the library screen and in the File menu. Point it at a folder and it sorts everything into series,
+  books, parts, chapters, earlier versions and attachments, using folder names, file names, version marks and exact copies.
+  Your originals are only ever read.
+- **The plan**: a tree of what it found, before anything comes in. Rename anything, drag chapters and books, or leave
+  out a file or a whole book.
+- **Ask me**: anything it can't tell becomes a question, such as how a folder with no pattern is organized, or which of
+  two files is newer. Anything you leave uses the choice shown.
+- **Earlier versions go into history**: `v1`, `v2`, `Final`, `Copy`, `(before 2026-11-02)` and old folders. The newest
+  file is the chapter and the rest are in its history, with their real dates. An older whole manuscript joins chapter by
+  chapter, and if part of it matches nothing, the file itself is kept too.
+- **Attachments**: pictures, audio, PDFs and anything else, kept with a book or the project, encrypted, and stored apart
+  from the writing so a big file never slows it down. The same contents are only stored once.
+- **Pictures in imported files**: pictures in Word, EPUB and OpenDocument files now stay with the book as attachments.
+- **Covers** are found in a folder and set on the book, and books in a series get their series name and number.
+- **The report** accounts for every file: what it became, what was left out and why. You can save it as a text file.
+- **Stop and resume**: a folder import can stop at any point, by choice or by a power cut, and pick up where it was
+  without repeating anything.
+
+### Changed
+- A `.rtstory` file now carries attachments. A project with none is written as before, so older versions can still open it.
+- Automatic backups keep attachments in a folder beside the backups, copied once, so big files aren't written again every
+  time. Restoring a backup finds them there.
+- Export everything now includes attachments.
+
+### Known limits
+- Pictures sit beside the writing as attachments. They don't appear on the page yet.
+- Zip files stay as attachments and aren't unpacked.
+- Two exact copies are treated as one file wherever they are, and the report lists each copy.
+
 ## [3.4.0] - 2026-11-04
 
 Your work can come in now, from wherever it's been living.

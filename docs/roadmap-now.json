@@ -24,7 +24,7 @@
   "questions": [
     {
       "q": "What happens to pictures in an imported file?",
-      "a": "They stay out for now, because chapters can’t hold pictures yet. The Import window says how many were left out, and your original file keeps them. Attachments in v3.5 bring them in."
+      "a": "From v3.5 they stay with the book as attachments, encrypted like the rest of the project. They sit beside the writing and don’t appear on the page yet."
     },
     {
       "q": "Why did StoryTracker move off WPF?",

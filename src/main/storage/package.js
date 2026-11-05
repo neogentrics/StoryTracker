@@ -8,9 +8,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const MARKER = Buffer.from('RTSTORY\n', 'latin1');
-const FORMAT = 1;
+// Format 2 can hold attachments. A project without any is still written as format 1, so older apps can open it.
+const FORMAT = 2;
 const CHUNK = 1024 * 1024;
-const MAX_HEADER = 1024 * 1024;
+const MAX_HEADER = 64 * 1024 * 1024;
+const ATTACHMENT_NAME = /^attachments\/[0-9a-f-]{36}\.rtatt$/;
 
 class PackageError extends Error {
   constructor(message) {
@@ -19,26 +21,33 @@ class PackageError extends Error {
   }
 }
 
-function hashOf(file) {
+function* hashSteps(file, result) {
   const hash = crypto.createHash('sha256');
   const handle = fs.openSync(file, 'r');
   const buffer = Buffer.alloc(CHUNK);
   try {
     for (let read = fs.readSync(handle, buffer); read > 0; read = fs.readSync(handle, buffer)) {
       hash.update(buffer.subarray(0, read));
+      yield;
     }
   } finally {
     fs.closeSync(handle);
   }
-  return hash.digest('hex');
+  result.sha256 = hash.digest('hex');
 }
 
-// Built under a temporary name, so a crash or a full disk can't leave half a backup under the real name.
-function writePackage(destination, { projectId, files }) {
-  const parts = files.map(({ name, source }) => ({ name, source, size: fs.statSync(source).size, sha256: hashOf(source) }));
+// Built under a temporary name, so a crash or a full disk can't leave half a backup under the real name. It's a generator
+// so the same steps can run straight through, or a little at a time with the window still answering.
+function* packSteps(destination, { projectId, files }) {
+  const parts = [];
+  for (const { name, source } of files) {
+    const part = { name, source, size: fs.statSync(source).size };
+    yield* hashSteps(source, part);
+    parts.push(part);
+  }
   const header = Buffer.from(
     JSON.stringify({
-      format: FORMAT,
+      format: parts.some((part) => ATTACHMENT_NAME.test(part.name)) ? FORMAT : 1,
       projectId,
       files: parts.map(({ name, size, sha256 }) => ({ name, size, sha256 })),
     }),
@@ -59,6 +68,7 @@ function writePackage(destination, { projectId, files }) {
       try {
         for (let read = fs.readSync(input, buffer); read > 0; read = fs.readSync(input, buffer)) {
           fs.writeSync(out, buffer, 0, read);
+          yield;
         }
       } finally {
         fs.closeSync(input);
@@ -75,6 +85,18 @@ function writePackage(destination, { projectId, files }) {
     }
     fs.rmSync(temp, { force: true });
     throw error;
+  }
+}
+
+function writePackage(destination, contents) {
+  for (const _step of packSteps(destination, contents));
+}
+
+async function writePackageLater(destination, contents) {
+  let steps = 0;
+  for (const _step of packSteps(destination, contents)) {
+    steps += 1;
+    if (steps % 32 === 0) await new Promise(setImmediate);
   }
 }
 
@@ -109,6 +131,7 @@ function readPackageHeader(file) {
 
 // Only plain names can come out of a file: one that tried to reach another folder would be a trap, not a project.
 function safeName(name) {
+  if (ATTACHMENT_NAME.test(name)) return name;
   if (typeof name !== 'string' || !name || name !== path.basename(name) || name === '.' || name === '..') {
     throw new PackageError('That project file is damaged.');
   }
@@ -123,6 +146,7 @@ function extractPackage(file, destination) {
     let position = bodyStart;
     for (const part of header.files) {
       const target = path.join(destination, safeName(part.name));
+      fs.mkdirSync(path.dirname(target), { recursive: true });
       const out = fs.openSync(target, 'w');
       const hash = crypto.createHash('sha256');
       try {
@@ -147,4 +171,4 @@ function extractPackage(file, destination) {
   }
 }
 
-module.exports = { PackageError, extractPackage, readPackageHeader, writePackage };
+module.exports = { PackageError, extractPackage, readPackageHeader, writePackage, writePackageLater };

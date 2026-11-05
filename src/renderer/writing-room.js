@@ -4,6 +4,8 @@ import { el, formatCount, words } from './dom.js';
 import { openDetails } from './details-dialog.js';
 import { openExport } from './export-dialog.js';
 import { openHistory } from './history.js';
+import { openAttachments } from './attachments-dialog.js';
+import { openFolderImport } from './folder-import.js';
 import { openImport } from './import-dialog.js';
 import { icon } from './icons.js';
 import { Page } from './page.js';
@@ -87,6 +89,7 @@ export class WritingRoom {
             iconButton('find-button', 'search', 'Find and replace', () => this.find()),
             iconButton('import-button', 'import', 'Import', () => this.showImport()),
             iconButton('export-button', 'export', 'Export', () => this.showExport()),
+            iconButton('attachments-button', 'attach', 'Attachments', () => this.showAttachments()),
             iconButton('history-button', 'history', 'Earlier versions of this chapter', () => this.showHistory()),
             iconButton('goals-button', 'goal', 'Goals', () => this.openGoals(this.activePage.chapterId)),
             iconButton('focus-button', 'focus', 'Focus mode', () => this.toggleFocus()),
@@ -343,6 +346,38 @@ export class WritingRoom {
         onDone: (result) => this.afterImport(result),
       });
     });
+  }
+
+  async findFiles(options) {
+    await this.attempt(async () => {
+      await this.flush();
+      await openFolderImport({
+        api: this.api,
+        ...options,
+        onError: (text) => this.showMessage(text),
+        onDone: (outline) => this.afterFolderImport(outline),
+      });
+    });
+  }
+
+  async afterFolderImport(outline) {
+    this.outline = outline;
+    this.chapterId = null;
+    this.bookId = null;
+    await this.page.clear();
+    this.renderLists();
+    const first = booksOf(outline).find((book) => book.children.length);
+    if (first) this.selectBook(first.id);
+  }
+
+  showAttachments() {
+    return this.attempt(() =>
+      openAttachments({
+        api: this.api,
+        id: this.bookId ?? this.outline.id,
+        title: this.bookId ? findNode(this.outline, this.bookId)?.title : this.outline.title,
+        onError: (text) => this.showMessage(text),
+      }));
   }
 
   async afterImport({ outline, first, chapters }) {

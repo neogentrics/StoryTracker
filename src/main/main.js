@@ -178,6 +178,10 @@ async function importFromHere() {
     const { importedWords } = await new Importer().inspect(path.join(scratch, `self-test.${format}`));
     if (importedWords < 5) return `${format} came back with ${importedWords} words`;
   }
+  const project = workspace.open();
+  const picture = await project.addAttachment(project.id, { name: 'self-test.pdf', source: path.join(scratch, 'self-test.pdf') });
+  const back = await project.attachments.read(project.attachment(picture.id).file);
+  if (!back.equals(fs.readFileSync(path.join(scratch, 'self-test.pdf')))) return 'an attachment came back different';
   return 'imported';
 }
 
@@ -204,7 +208,7 @@ async function selfTest() {
     report.checks.push({ name: 'opens the window', passed: state === 'ready', detail: state });
     report.checks.push({ name: 'writes and saves a chapter in the window', passed: writing === 'saved', detail: writing });
     report.checks.push({ name: 'exports a print PDF, an e-book and a Word file', passed: printed === 'exported', detail: printed });
-    report.checks.push({ name: 'reads those three files back in', passed: imported === 'imported', detail: imported });
+    report.checks.push({ name: 'reads those three files back in, and keeps an attachment', passed: imported === 'imported', detail: imported });
     report.ok = report.ok && state === 'ready' && writing === 'saved' && printed === 'exported' && imported === 'imported';
   } catch (error) {
     report = { ok: false, error: error.stack };
