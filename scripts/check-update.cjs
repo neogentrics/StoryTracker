@@ -97,14 +97,18 @@ async function waitForVersion(version) {
 
   await window.waitForSelector('#update-restart', { timeout: 180000 });
   console.log('The update downloaded, and the app offered to restart.');
-  await window.click('#update-restart');
+  await window.click('#update-restart').catch(() => {}); // The app may close before the click reports back.
   await waitForVersion(newVersion);
   console.log(`Installed version is now ${newVersion}.`);
   server.close();
 
   // The update reopens the app, and a second copy would only hand over to that one.
   await sleep(10000);
-  execSync(`taskkill /F /T /IM "${APP_EXE}"`, { stdio: 'ignore' });
+  try {
+    execSync(`taskkill /F /T /IM "${APP_EXE}"`, { stdio: 'ignore' });
+  } catch {
+    // It hadn't reopened, which is fine for this test.
+  }
   await sleep(2000);
 
   app = await launch();

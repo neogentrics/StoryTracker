@@ -305,7 +305,7 @@ input[type='text'] {
   background: var(--panel);
 }
 
-.column h2 {
+.column > h2 {
   margin: 0;
   padding: 0.7rem 0.8rem 0.4rem;
   overflow: hidden;

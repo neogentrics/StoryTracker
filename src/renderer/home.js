@@ -73,8 +73,9 @@ export function renderFailure(root, message) {
         'section',
         { class: 'home-card' },
         el('p', { class: 'brand' }, 'RT Story Tracker'),
-        el('h1', {}, 'The library didn’t open'),
+        el('h1', {}, 'That didn’t work'),
         el('p', { id: 'failure', class: 'lead' }, message),
+        el('button', { class: 'primary', onclick: () => window.location.reload() }, 'Try again'),
       ),
     ),
   );

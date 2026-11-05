@@ -32,9 +32,11 @@ jobs:
       - run: npm test
       - name: End-to-end test (real app)
         if: runner.os != 'Linux'
+        timeout-minutes: 8
         run: npm run test:e2e
       - name: End-to-end test (real app, virtual display)
         if: runner.os == 'Linux'
+        timeout-minutes: 8
         run: xvfb-run -a npm run test:e2e
 
   install:

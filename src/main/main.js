@@ -23,6 +23,7 @@ let workspace = null;
 let libraryError = null;
 let mainWindow = null;
 let flushCount = 0;
+let quitting = false;
 
 const updater = new Updater((status) => mainWindow?.webContents.send('update:status', status));
 
@@ -111,7 +112,9 @@ function createWindow({ show = true } = {}) {
     event.preventDefault();
     requestFlush(window).finally(() => {
       saved = true;
-      window.close();
+      // Stopping the close above also cancelled any quit, and on a Mac closing the window wouldn't start it again.
+      if (quitting) app.quit();
+      else window.close();
     });
   });
 
@@ -235,6 +238,10 @@ if (!app.requestSingleInstanceLock()) {
 
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin' && !selfTestFile) app.quit();
+  });
+
+  app.on('before-quit', () => {
+    quitting = true;
   });
 
   app.on('will-quit', () => workspace?.closeProject());

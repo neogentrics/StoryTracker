@@ -52,6 +52,10 @@ async function typeOnPage(window, text) {
   await window.keyboard.type('# A Heading');
   assert.equal(await window.textContent('.ProseMirror h1'), 'A Heading');
   await window.keyboard.press('Enter');
+  await window.keyboard.type('## Smaller');
+  const look = await window.$eval('.ProseMirror h2', (node) => getComputedStyle(node).textTransform);
+  assert.equal(look, 'none', 'a heading on the page has none of the side lists\' styling');
+  await window.keyboard.press('Enter');
   await window.keyboard.type('- a list item');
   assert.equal(await window.textContent('.ProseMirror ul li'), 'a list item');
   await window.keyboard.press('Enter');
