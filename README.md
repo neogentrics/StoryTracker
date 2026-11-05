@@ -9,7 +9,7 @@
 [![Platforms](https://img.shields.io/badge/windows%20%7C%20macOS%20%7C%20linux-b79cff?style=for-the-badge&labelColor=150e22)](#download)
 [![Offline](https://img.shields.io/badge/works-offline-2e8fe0?style=for-the-badge&labelColor=150e22)](#how-your-writing-is-kept)
 
-**[Download](#download)** &nbsp;·&nbsp; **[What it does](#what-it-does)** &nbsp;·&nbsp; **[Roadmap](ROADMAP.md)** &nbsp;·&nbsp; **[What's new](CHANGELOG.md)** &nbsp;·&nbsp; **[Project page](https://recontowers.com/projects/storytracker/)**
+**[Download](https://github.com/neogentrics/StoryTracker/releases/latest)** &nbsp;·&nbsp; **[What it does](#what-it-does)** &nbsp;·&nbsp; **[Roadmap](ROADMAP.md)** &nbsp;·&nbsp; **[What's new](CHANGELOG.md)** &nbsp;·&nbsp; **[Project page](https://recontowers.com/projects/storytracker/)**
 
 </div>
 
@@ -34,13 +34,9 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 
 ## Download
 
-> [!NOTE]
-> Version 3.0 hasn't had its first release yet. The newest download on the releases page is still the old Windows app,
-> 2.3.0, which needs a PostgreSQL server. You can run the new app from the source below.
-
 | Windows | macOS | Linux |
 |---|---|---|
-| `.exe` installer | `.dmg` for Apple silicon or Intel | `AppImage` or `.deb` |
+| [`.exe` installer](https://github.com/neogentrics/StoryTracker/releases/latest) | [`.dmg` for Apple silicon or Intel](https://github.com/neogentrics/StoryTracker/releases/latest) | [`AppImage` or `.deb`](https://github.com/neogentrics/StoryTracker/releases/latest) |
 
 The builds aren't code-signed yet, so Windows may show a SmartScreen warning the first time, and macOS will ask you to
 open the app from *System Settings → Privacy & Security*.
