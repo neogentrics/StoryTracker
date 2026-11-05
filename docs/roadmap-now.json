@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "3.4.0: bring in a real book",
-    "note": "Released. This version’s test: import a real Word manuscript and an AI-made Markdown file, and compare word counts with the originals.",
+    "title": "v3.5: find my files",
+    "note": "Building now. Tell it where your files are, and it works out the rest or asks.",
     "items": [
       {
-        "title": "A real manuscript",
-        "text": "Import one and read the word check in the Import window. A generated 108,880-word file matched exactly, but no real book has been tried."
+        "title": "Folder scan",
+        "text": "It reads names and sorts everything into series, books, chapters, versions and attachments. Your originals are never touched."
       },
       {
-        "title": "Pages and Scrivener",
-        "text": "Neither has been tried with a real file. A Mac and a real Scrivener project are what they need."
+        "title": "The plan and Ask me",
+        "text": "You see what it thinks as a tree, and anything it isn’t sure of becomes a question instead of a guess."
       },
       {
-        "title": "Tell me what it got wrong",
-        "text": "Chapters split in the wrong place, or clean-ups that flag your writing, are what to look for."
+        "title": "Attachments and the report",
+        "text": "Pictures, audio and PDFs stay with the book, and every file is accounted for at the end."
       }
     ]
   },
