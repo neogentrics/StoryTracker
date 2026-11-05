@@ -8,7 +8,7 @@ export function el(tag, props = {}, ...children) {
     else if (value === true) node.setAttribute(name, '');
     else if (value !== false && value !== null && value !== undefined) node.setAttribute(name, value);
   }
-  node.append(...children.flat().filter((child) => child !== null && child !== undefined));
+  node.append(...children.flat(Infinity).filter((child) => child !== null && child !== undefined));
   return node;
 }
 

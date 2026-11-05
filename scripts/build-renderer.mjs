@@ -13,7 +13,11 @@ cpSync(join(root, 'src/renderer/index.html'), join(out, 'index.html'));
 cpSync(join(root, 'build/icon.png'), join(out, 'icon.png'));
 
 await build({
-  entryPoints: { app: join(root, 'src/renderer/app.js'), style: join(root, 'src/renderer/style.css') },
+  entryPoints: {
+    app: join(root, 'src/renderer/app.js'),
+    style: join(root, 'src/renderer/style.css'),
+    fonts: join(root, 'src/renderer/fonts.css'), // For print files, which load these by themselves.
+  },
   outdir: out,
   bundle: true,
   format: 'iife', // file:// pages can't load ES modules, so this ships one classic script.

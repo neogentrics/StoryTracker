@@ -9,7 +9,7 @@ const TRASH_DAYS = 30;
 const VERSION_GAP_MS = 10 * 60 * 1000;
 const EVERY_VERSION_DAYS = 2;
 const DAY_MS = 86400000;
-const FIELDS = ['kind', 'parentId', 'position', 'title', 'body', 'goal', 'trashedAt'];
+const FIELDS = ['kind', 'parentId', 'position', 'title', 'body', 'goal', 'trashedAt', 'details'];
 const COLUMNS = {
   kind: 'kind',
   parentId: 'parent_id',
@@ -18,6 +18,7 @@ const COLUMNS = {
   body: 'body',
   goal: 'goal',
   trashedAt: 'trashed_at',
+  details: 'details',
 };
 const SMALLEST_GAP = 1e-6;
 
@@ -35,6 +36,7 @@ function toItem(row) {
     words: row.words,
     goal: row.goal,
     trashedAt: row.trashed_at,
+    details: row.details,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     deviceId: row.device_id,
@@ -178,6 +180,26 @@ class Project {
     return { title: this.title(), words: this.outline()?.words ?? 0, updatedAt };
   }
 
+  // Covers
+
+  setCover(itemId, { type, data, width, height }) {
+    this.db
+      .prepare(`INSERT INTO covers (item_id, type, data, width, height) VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT (item_id) DO UPDATE SET type = excluded.type, data = excluded.data,
+                  width = excluded.width, height = excluded.height`)
+      .run(itemId, type, data, width, height);
+  }
+
+  cover(itemId) {
+    const row = this.db.prepare('SELECT * FROM covers WHERE item_id = ?').get(itemId);
+    if (!row) return null;
+    return { type: row.type, data: row.data, width: row.width, height: row.height, extension: row.type === 'image/png' ? 'png' : 'jpg' };
+  }
+
+  removeCover(itemId) {
+    this.db.prepare('DELETE FROM covers WHERE item_id = ?').run(itemId);
+  }
+
   // Trash
 
   trashItem(id) {
@@ -269,6 +291,7 @@ class Project {
       for (const row of rows) {
         this.db.prepare('DELETE FROM items WHERE id = ?').run(row.id);
         this.db.prepare('DELETE FROM versions WHERE item_id = ?').run(row.id);
+        this.db.prepare('DELETE FROM covers WHERE item_id = ?').run(row.id);
         this.db
           .prepare('INSERT INTO removals (item_id, kind, removed_at, device_id) VALUES (?, ?, ?, ?)')
           .run(row.id, row.kind, at, this.deviceId);

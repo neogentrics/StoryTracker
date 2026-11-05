@@ -1,7 +1,7 @@
 {
   "now": {
-    "title": "v3.3: get it out",
-    "note": "Building now. This is how your work leaves the app, so it ships before import. After this, nothing can go in that can't come out.",
+    "title": "v3.3: built, and in testing",
+    "note": "It goes out when you give the word.",
     "items": [
       {
         "title": "Every format",
@@ -9,11 +9,11 @@
       },
       {
         "title": "Store-ready EPUB",
-        "text": "Cover, contents, metadata and book details, checked with the official EPUB validator."
+        "text": "Cover, contents and metadata, passing the official EPUB validator with no errors or warnings."
       },
       {
         "title": "Book layouts",
-        "text": "Trim sizes, mirrored margins, front and back matter, and print PDFs ready for KDP."
+        "text": "Trim sizes, mirrored margins, real page numbers in the contents, and your print rules built in."
       }
     ]
   },
@@ -51,12 +51,12 @@
       "a": "Markdown export arrives in v3.3, App Link sends a chapter to RT Markdown Reader in v3.7 (both apps have to be up to date), and Claude can work with the book directly in v3.13."
     },
     {
-      "q": "Will it make EPUBs that KDP accepts?",
-      "a": "Yes, in v3.3. It does the job of a tool like Kindle Create in our own way, with nothing else to install."
-    },
-    {
       "q": "Can it be tested on real stories?",
       "a": "Yes, once the basics work. Your stories and Notion become the test bed, and what you need for how you write goes on this roadmap."
+    },
+    {
+      "q": "Will it make EPUBs that KDP accepts?",
+      "a": "It makes EPUBs that pass EPUBCheck, the official validator, with no errors or warnings. The test that counts is uploading one to KDP’s previewer, which is yours to do."
     }
   ]
 }

@@ -1,6 +1,7 @@
 'use strict';
 // What the window can ask for. Everything from the window is checked here, because the storage trusts its callers.
 const path = require('node:path');
+const { cleanDetails, parseDetails } = require('../shared/details');
 const { findInDocument, replaceInDocument } = require('../shared/find');
 const { findNode } = require('../shared/outline');
 const { parseDocument, toDocument } = require('../shared/text');
@@ -72,6 +73,39 @@ class Workspace {
   removeSample(id) {
     if (this.project?.id === id) this.closeProject();
     this.library.removeSample(needId(id));
+  }
+
+  // A book's details. Author and publisher are kept on the project too, so the next book starts with them filled in.
+  getDetails(id) {
+    const item = this.need(id);
+    const defaults = parseDetails(this.project.getItem(this.project.id).details);
+    const cover = this.project.cover(id);
+    return {
+      title: item.title,
+      details: { ...defaults, ...parseDetails(item.details) },
+      cover: cover ? { width: cover.width, height: cover.height, url: `data:${cover.type};base64,${Buffer.from(cover.data).toString('base64')}` } : null,
+    };
+  }
+
+  saveDetails({ id, details }) {
+    const item = this.need(id);
+    if (item.kind !== 'book') throw new Error('Details belong to a book.');
+    const clean = cleanDetails(details);
+    this.project.putItem({ id, details: JSON.stringify(clean) });
+    const { author, publisher } = clean;
+    const project = this.project.getItem(this.project.id);
+    const defaults = { ...parseDetails(project.details), ...(author ? { author } : {}), ...(publisher ? { publisher } : {}) };
+    this.project.putItem({ id: this.project.id, details: JSON.stringify(defaults) });
+    return clean;
+  }
+
+  setCover(id, picture) {
+    if (this.need(id).kind !== 'book') throw new Error('A cover belongs to a book.');
+    this.project.setCover(id, picture);
+  }
+
+  removeCover(id) {
+    this.open().removeCover(needId(id));
   }
 
   listProjectTrash() {

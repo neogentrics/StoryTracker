@@ -1203,6 +1203,88 @@ mark,
   margin-top: 0.9rem;
 }
 
+/* Export and book details */
+
+.checks {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.1rem 0.8rem;
+  margin: 0.3rem 0 0.5rem;
+}
+
+.warning-list {
+  margin: 0.6rem 0 0;
+  padding: 0.45rem 0.75rem 0.45rem 1.6rem;
+  border-radius: 8px;
+  background: color-mix(in srgb, #e8a33a 18%, transparent);
+  font-size: 0.87rem;
+}
+
+.warning-list:empty {
+  display: none;
+}
+
+.export-result {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-top: 0.6rem;
+  font-size: 0.87rem;
+}
+
+.export-result:empty {
+  display: none;
+}
+
+.export-file {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.export-result button {
+  flex: none;
+  padding: 0.15rem 0.6rem;
+}
+
+.dialog-actions.spread {
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialog-actions button {
+  white-space: nowrap;
+}
+
+#export {
+  width: min(38rem, calc(100vw - 2rem));
+}
+
+.action-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.details-form textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.cover-preview {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.cover-preview img {
+  max-width: 6rem;
+  max-height: 9rem;
+  border-radius: 4px;
+  box-shadow: var(--soft-shadow);
+}
+
 /* Trash */
 
 .trash-list {
