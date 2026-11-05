@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "3.2.0: try to lose something",
-    "note": "Released. This version's test: delete a chapter and restore it, move a project with one file, and restore an old backup.",
+    "title": "v3.3: get it out",
+    "note": "Building now. This is how your work leaves the app, so it ships before import. After this, nothing can go in that can't come out.",
     "items": [
       {
-        "title": "Delete and restore",
-        "text": "Move a chapter to the Trash, bring it back, and try an earlier version."
+        "title": "Every format",
+        "text": "Word, PDF, Markdown, HTML, XML, RTF, plain text and OpenDocument, for a chapter, a book, a series or a project."
       },
       {
-        "title": "Set up backups",
-        "text": "Preferences, then Backups: pick a folder and a schedule. Nothing runs until you do."
+        "title": "Store-ready EPUB",
+        "text": "Cover, contents, metadata and book details, checked with the official EPUB validator."
       },
       {
-        "title": "Tell me about the look",
-        "text": "The window was rebuilt from RT Markdown Reader's. Say what still doesn't feel right."
+        "title": "Book layouts",
+        "text": "Trim sizes, mirrored margins, front and back matter, and print PDFs ready for KDP."
       }
     ]
   },
