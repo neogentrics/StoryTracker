@@ -28,7 +28,7 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v1.0–v2.3](#v10v23--the-first-app) | The first app | ✅ Released (Windows, needs a PostgreSQL server) |
 | [Step zero](#step-zero--settle-the-foundations) | Settle the foundations | ✅ Done |
 | [v3.0](#v30--write-a-book) | Write a book | ✅ Released ([3.0.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.0.0)) |
-| [v3.1](#v31--comfortable-writing) | Comfortable writing | 🚧 Built, being tested |
+| [v3.1](#v31--comfortable-writing) | Comfortable writing | 🚧 Released as 3.1.0, being tested by the owner |
 | [v3.2](#v32--never-lose-a-word) | Never lose a word | Planned |
 | [v3.3](#v33--get-it-out) | Get it out | Planned |
 | [v3.4](#v34--bring-it-in) | Bring it in | Planned |
