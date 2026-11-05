@@ -13,9 +13,11 @@ const KIND_OF = new Map(Object.entries(KINDS).flatMap(([kind, list]) => list.map
 const NOISE_FILE = /^(desktop\.ini|thumbs\.db|\.ds_store|\.localized|icon\r?)$|^~\$|^\._|\.(tmp|lnk|crdownload|part|partial)$/i;
 const NOISE_FOLDER = /^(\.git|\.svn|\.hg|node_modules|\$recycle\.bin|__macosx|\.trash|\.trashes|\.vs|\.vscode|\.idea)$/i;
 const SUPPORT_FOLDER = /^(chapters?|manuscripts?|drafts?|text|writing|scenes?|versions?|revisions?|old|older|archived?|archives|backups?|previous|edits?|edited|art|artwork|covers?|images?|pictures?|photos?|illustrations?|graphics|audio|audiobooks?|music|video|marketing|promo|notes?|research|formatting|print|paperback|hardcover|ebooks?|kindle|kdp|published|exports?|exported)$/i;
-const OLD_FOLDER = /^(versions?|revisions?|old|older|archived?|archives|backups?|previous)$/i;
+const OLD_FOLDER = /^(versions?|revisions?|archived?|archives|backups?)$|\b(old|older|previous|superseded)\b/i;
+const DRAFT_FOLDER = /\bdrafts?\b|\b(?:version|ver|rev|revision|v)[ .\-]*\d/i;
 const COVER_FOLDER = /^covers?$/i;
-const NOTES_FOLDER = /^(notes?|research|marketing|promo)$/i;
+const FINISHED_FOLDER = /\b(print|ebook|e-book|paperback|hardcover|kindle|kdp|formatted|published|full manuscript)\b/i;
+const NOTES_FOLDER = /^(notes?|marketing|promo|characters?|lore|worldbuilding|world)$|\b(research|dossiers?)\b/i;
 const SERIES_NAME = /\b(series|saga|trilogy|duology|cycle|chronicles)\b/i;
 const NOTES_NAME = /\b(notes?|outline|synopsis|blurb|bible|research|characters?|timeline|query|summary|ideas?|plot|worldbuilding|marketing|bio|description|keywords?)\b/i;
 
@@ -26,11 +28,18 @@ const CHAPTER = new RegExp(`^(?:chapter|chap|ch)[ .\\-]*(${COUNT})${REST}`, 'i')
 const BOOK = new RegExp(`^(?:book|bk|volume|vol)[ .\\-]*(${COUNT})${REST}`, 'i');
 const PART = new RegExp(`^part[ .\\-]*(${COUNT})${REST}`, 'i');
 const LEADING_NUMBER = /^(\d{1,3})(?:[ .\-–—]+(\S.*))?$/;
+// The Long Road Chapter 3, or The Long Road Book 2 - Chapter 3. What comes first is usually the book's own title.
+const INSIDE_CHAPTER = new RegExp(`(?:^|[ (\\-–—])chapter[ .\\-]*(${COUNT})${REST}`, 'i');
+const INSIDE_BOOK = /\bbook[ .\-]*(\d+)\b/i;
+const INSIDE_SPECIAL = /[ (\-–—](foreword|preface|prologue|interlude|epilogue|afterword)\b[ .:,\-–—]*(.*)$/i;
 const SPECIAL = /^(dedication|foreword|preface|introduction|prologue|interlude|epilogue|afterword|acknowledge?ments?|appendix)\b[ .:,\-–—]*(.*)$/i;
 // Where each comes in a book, with chapters between prologue and epilogue.
 const SPECIAL_PLACE = { dedication: -4, foreword: -3, preface: -2, introduction: -1.5, prologue: -1, interlude: 5000, epilogue: 10000, afterword: 10001, acknowledgements: 10002, acknowledgments: 10002, acknowledgement: 10002, acknowledgment: 10002, appendix: 10003 };
 
 const tidy = (text) => text.replace(/_+/g, ' ').replace(/\s+/g, ' ').replace(/^[\s\-–—.,:]+|[\s\-–—.,:]+$/g, '').trim();
+
+// 02_Books_in_Progress: the number is only there to sort the folder.
+const folderName = (name) => tidy(name).replace(/^\d{1,3}[ .\-–—]+(?=\D)/, '');
 
 function roman(text) {
   const values = { i: 1, v: 5, x: 10, l: 50, c: 100 };
@@ -75,11 +84,24 @@ function versionOf(stem) {
 
 // Where a file sits in a book, if its name says so.
 function chapterOf(name) {
+  const within = INSIDE_SPECIAL.exec(name);
+  if (within && !SPECIAL.test(name)) {
+    const word = within[1].toLowerCase();
+    return { place: SPECIAL_PLACE[word], key: word, title: tidy(`${word[0].toUpperCase()}${word.slice(1)} ${within[2]}`) };
+  }
   const special = SPECIAL.exec(name);
   if (special) {
     const word = special[1].toLowerCase();
     const extra = /^\d+\b/.exec(special[2])?.[0];
     return { place: SPECIAL_PLACE[word] + (extra ? Number(extra) / 100 : 0), key: `${word}${extra ?? ''}`, title: tidy(name) };
+  }
+  const inside = INSIDE_CHAPTER.exec(name);
+  if (inside && inside.index > 0) {
+    const number = numberFrom(inside[1]);
+    const book = Number(INSIDE_BOOK.exec(name.slice(0, inside.index))?.[1] ?? 0);
+    const tail = tidy(inside[2]).replace(/^\(|\)$/g, '').trim();
+    const label = `${book ? `Book ${book}, ` : ''}Chapter ${number}`;
+    return { place: book * 1000 + number, key: `book${book}chapter${number}`, title: tail ? `${label}: ${tail}` : label };
   }
   const chapter = CHAPTER.exec(name);
   if (chapter) {
@@ -95,20 +117,20 @@ function chapterOf(name) {
 }
 
 function bookOf(name) {
-  const found = BOOK.exec(tidy(name));
+  const found = BOOK.exec(folderName(name));
   if (!found) return null;
   const number = numberFrom(found[1]);
   return { number, title: tidy(found[2]) || `Book ${number}` };
 }
 
 function partOf(name) {
-  const found = PART.exec(tidy(name));
-  return found ? { number: numberFrom(found[1]), title: tidy(name) } : null;
+  const found = PART.exec(folderName(name));
+  return found ? { number: numberFrom(found[1]), title: folderName(name) } : null;
 }
 
 // Series_The_Long_Road becomes The Long Road.
 function seriesTitle(name) {
-  return tidy(name).replace(/^series\s+/i, '') || tidy(name);
+  return folderName(name).replace(/^series\s+/i, '') || folderName(name);
 }
 
 const compareNumbers = (a, b) => {
@@ -123,6 +145,7 @@ const compareNumbers = (a, b) => {
 function compareVersions(a, b) {
   const rank = (file) => (file.version.old || file.inOldFolder ? 0 : file.version.copy ? 1 : 2);
   return rank(b) - rank(a)
+    || compareNumbers(b.draft ?? [], a.draft ?? [])
     || Number(b.version.final) - Number(a.version.final)
     || compareNumbers(b.version.number ?? [], a.version.number ?? [])
     || (b.version.date ?? '').localeCompare(a.version.date ?? '')
@@ -132,11 +155,11 @@ function compareVersions(a, b) {
 
 // True when nothing but the date on the file separates the two, which is a guess worth asking about.
 function sameMarks(a, b) {
-  const marks = (file) => JSON.stringify([file.version.old || file.inOldFolder, file.version.copy, file.version.final, file.version.number, file.version.date]);
+  const marks = (file) => JSON.stringify([file.version.old || file.inOldFolder, file.draft ?? null, file.version.copy, file.version.final, file.version.number, file.version.date]);
   return marks(a) === marks(b);
 }
 
 module.exports = {
-  COVER_FOLDER, NOISE_FILE, NOISE_FOLDER, NOTES_FOLDER, NOTES_NAME, OLD_FOLDER, SERIES_NAME, SUPPORT_FOLDER,
-  bookOf, chapterOf, compareVersions, kindOf, partOf, sameMarks, seriesTitle, tidy, versionOf,
+  COVER_FOLDER, DRAFT_FOLDER, FINISHED_FOLDER, NOISE_FILE, NOISE_FOLDER, NOTES_FOLDER, NOTES_NAME, OLD_FOLDER, SERIES_NAME, SUPPORT_FOLDER,
+  bookOf, chapterOf, compareVersions, folderName, kindOf, partOf, sameMarks, seriesTitle, tidy, versionOf,
 };

@@ -20,6 +20,9 @@ function prepare(entry) {
   const extension = dot > 0 ? name.slice(dot + 1).toLowerCase() : '';
   const folders = parts.slice(0, -1);
   const version = signs.versionOf(stem);
+  // Draft v3/Chapter 1.docx: the folder is the version.
+  const draftFolder = folders.filter((folder) => signs.DRAFT_FOLDER.test(signs.tidy(folder))).at(-1);
+  const draft = draftFolder ? signs.versionOf(draftFolder).number ?? [0] : null;
   return {
     ...entry,
     id: idOf('f', entry.rel),
@@ -28,6 +31,7 @@ function prepare(entry) {
     extension,
     folders,
     version,
+    draft,
     kind: signs.kindOf(extension),
     inOldFolder: folders.some((folder) => signs.OLD_FOLDER.test(signs.tidy(folder))),
     role: null,
@@ -52,7 +56,15 @@ function folderTree(files) {
 const subfolders = (folder) => [...folder.folders.values()].sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 const filesUnder = (folder) => [...folder.files, ...subfolders(folder).flatMap(filesUnder)];
 const isWriting = (file) => !file.role && file.kind === 'writing' && !isNotes(file);
-const isSupport = (folder) => signs.SUPPORT_FOLDER.test(signs.tidy(folder.name)) || Boolean(signs.partOf(folder.name));
+const isSupport = (folder) => {
+  const name = signs.folderName(folder.name);
+  return signs.SUPPORT_FOLDER.test(name)
+    || signs.SUPPORT_FOLDER.test(signs.seriesTitle(folder.name))
+    || signs.DRAFT_FOLDER.test(name)
+    || signs.OLD_FOLDER.test(name)
+    || signs.NOTES_FOLDER.test(name)
+    || Boolean(signs.partOf(folder.name));
+};
 
 function isNotes(file) {
   return signs.NOTES_NAME.test(file.version.rest) || file.folders.some((folder) => signs.NOTES_FOLDER.test(signs.tidy(folder)));
@@ -76,7 +88,7 @@ function isBook(folder) {
   if (folder.isBook !== undefined) return folder.isBook;
   const decide = () => {
     if (signs.bookOf(folder.name)) return true;
-    if (isSupport(folder) || signs.SERIES_NAME.test(signs.tidy(folder.name)) || booksByFile(folder)) return false;
+    if (isSupport(folder) || signs.SERIES_NAME.test(signs.folderName(folder.name)) || booksByFile(folder)) return false;
     if (writingNear(folder).length === 0) return false;
     return !subfolders(folder).some((child) => !isSupport(child) && holdsBook(child));
   };
@@ -193,7 +205,7 @@ class Planner {
 
   chapter(group, book, holder, sign) {
     const [current, ...older] = this.ordered(group);
-    const node = this.node('chapter', current.rel, sign.title, holder, { place: sign.place, file: current.id, older: older.map((file) => file.id) });
+    const node = this.node('chapter', current.rel, sign.title, holder, { place: sign.place, file: current.id, older: older.map((file) => file.id), split: Boolean(sign.split) });
     this.place(current, 'chapter', node);
     older.forEach((file) => this.place(file, 'older', node, `An earlier version of ${current.name}.`));
     return node;
@@ -211,7 +223,8 @@ class Planner {
   unsure(files, book, holderOf) {
     if (files.length === 0) return;
     const forced = files.filter((file) => file.forced === 'chapter');
-    const open = files.filter((file) => !forced.includes(file));
+    const finished = (file) => WHOLE_NAME.test(file.version.rest) || file.folders.some((folder) => signs.FINISHED_FOLDER.test(signs.tidy(folder)));
+    const open = files.filter((file) => !forced.includes(file) && !finished(file));
     forced.forEach((file, at) => this.chapter([file], book, holderOf(file), { place: 9000 + at, title: signs.tidy(file.version.rest) }));
     if (open.length === 0) return;
     const value = this.ask({
@@ -258,7 +271,7 @@ class Planner {
     if (value === 'versions') this.whole(writing, book);
     if (value === 'chapters') {
       [...groups].sort((a, b) => byName(a[0], b[0])).forEach((group, at) => {
-        this.chapter(group, book, holderOf(group[0]), { place: at + 1, title: signs.tidy(group[0].version.rest) });
+        this.chapter(group, book, holderOf(group[0]), { place: at + 1, title: signs.tidy(group[0].version.rest), split: true });
       });
     }
   }
@@ -290,7 +303,7 @@ class Planner {
       ],
       value: 'attachment',
     });
-    if (value === 'book') this.book({ key: `loose:${folder.rel}`, title: signs.tidy(folder.name) || 'Imported book', files, parent: owner });
+    if (value === 'book') this.book({ key: `loose:${folder.rel}`, title: signs.folderName(folder.name) || 'Imported book', files, parent: owner });
     if (value === 'books') {
       for (const file of files) this.book({ key: `loose:${file.rel}`, title: signs.tidy(file.version.rest) || file.stem, files: [file], parent: owner });
     }
@@ -299,13 +312,13 @@ class Planner {
   walk(folder, owner, inSeries) {
     if (isBook(folder)) {
       const sign = signs.bookOf(folder.name);
-      this.book({ key: folder.rel, title: sign?.title ?? (signs.tidy(folder.name) || this.project.title), files: filesUnder(folder), parent: owner, number: sign?.number ?? null });
+      this.book({ key: folder.rel, title: sign?.title ?? (signs.folderName(folder.name) || this.project.title), files: filesUnder(folder), parent: owner, number: sign?.number ?? null });
       return;
     }
     const books = subfolders(folder).filter(isBook);
     const byFile = booksByFile(folder);
     const asSeries = !inSeries && folder.rel && !isSupport(folder)
-      && (signs.SERIES_NAME.test(signs.tidy(folder.name)) || books.length >= 2 || byFile);
+      && (signs.SERIES_NAME.test(signs.folderName(folder.name)) || books.length >= 2 || byFile);
     const here = asSeries ? this.node('series', folder.rel, signs.seriesTitle(folder.name), owner) : owner;
 
     if (byFile) {

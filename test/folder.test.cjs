@@ -78,6 +78,64 @@ test('names say what they can', () => {
   assert.equal(signs.seriesTitle('Series_The_Long_Road'), 'The Long Road');
 });
 
+test('a chapter number can come after the book\'s own title', () => {
+  assert.equal(signs.chapterOf('The Long Road Chapter 3').title, 'Chapter 3');
+  assert.equal(signs.chapterOf('The Long Road Chapter 3').place, 3);
+  assert.equal(signs.chapterOf('The Long Road Chapter 3 - The Ferry').title, 'Chapter 3: The Ferry');
+  assert.equal(signs.chapterOf('The Long Road Book 2 - Chapter 5').title, 'Book 2, Chapter 5');
+  assert.notEqual(signs.chapterOf('The Long Road Book 1 - Chapter 5').key, signs.chapterOf('The Long Road Book 2 - Chapter 5').key);
+  assert.equal(signs.chapterOf('The Long Road Prologue').title, 'Prologue');
+  assert.ok(signs.chapterOf('The Long Road Epilogue (before 2026-10-19)').place > 9000);
+  assert.equal(signs.chapterOf('Prologue Notes').title, 'Prologue Notes');
+  assert.equal(signs.chapterOf('Chapterhouse Dreams'), null);
+  assert.equal(signs.chapterOf('The Chapterhouse 3'), null);
+});
+
+test('folder habits: sort numbers, research, old versions and dossiers', () => {
+  const result = plan([
+    '02_Books_in_Progress/Series_The_Long_Road/Series_Research/geography.docx',
+    '02_Books_in_Progress/Series_The_Long_Road/Book_1_Ash/Chapter 1.docx',
+    '02_Books_in_Progress/Series_The_Long_Road/Book_1_Ash/Old Versions/Chapter 1 (before 2026-10-19).docx',
+    '02_Books_in_Progress/Series_The_Long_Road/Book_2_Salt/Chapter 1.docx',
+    '01_Book_Winter/Chapter 1.docx',
+    'Universe Dossiers/Characters/Marit.docx',
+    'Universe Dossiers/Characters/Oren.docx',
+  ]);
+  const series = result.tree.children.filter((node) => node.kind === 'series');
+  assert.deepEqual(series.map((node) => node.title), ['The Long Road'], 'a research folder isn\'t a series');
+  assert.deepEqual(titles(series[0]), ['Ash', 'Salt']);
+  assert.ok(titles(result.tree).includes('Book Winter'));
+  assert.equal(roleOf(result, '02_Books_in_Progress/Series_The_Long_Road/Book_1_Ash/Old Versions/Chapter 1 (before 2026-10-19).docx'), 'older');
+  assert.equal(roleOf(result, '02_Books_in_Progress/Series_The_Long_Road/Series_Research/geography.docx'), 'attachment');
+  assert.equal(roleOf(result, 'Universe Dossiers/Characters/Marit.docx'), 'attachment');
+  assert.deepEqual(result.asks, [], 'none of that needed asking');
+});
+
+test('a finished copy beside the chapters isn\'t worth asking about', () => {
+  const result = plan([
+    'Book 1/Chapter 1.docx',
+    'Book 1/The Road Manuscript - Print v1.0.docx',
+    'Book 1/Print Version/The Road v1.0.docx',
+  ]);
+  assert.deepEqual(result.asks, []);
+  assert.equal(roleOf(result, 'Book 1/The Road Manuscript - Print v1.0.docx'), 'attachment');
+  assert.equal(roleOf(result, 'Book 1/Print Version/The Road v1.0.docx'), 'attachment');
+});
+
+test('a folder named as a draft is the version of everything in it', () => {
+  const result = plan([
+    'Book 1/Manuscript/Draft v2/Chapters/Chapter 1.docx',
+    'Book 1/Manuscript/Draft v3 (Rewrite)/Chapters/Chapter 1.docx',
+    'Book 1/Manuscript/Draft v3 (Rewrite)/Chapters/Old Versions/Chapter 1.docx',
+    'Book 1/Manuscript/First Draft/Chapter 1.docx',
+  ]);
+  assert.equal(roleOf(result, 'Book 1/Manuscript/Draft v3 (Rewrite)/Chapters/Chapter 1.docx'), 'chapter');
+  assert.equal(roleOf(result, 'Book 1/Manuscript/Draft v2/Chapters/Chapter 1.docx'), 'older');
+  assert.equal(roleOf(result, 'Book 1/Manuscript/First Draft/Chapter 1.docx'), 'older');
+  assert.equal(result.tree.children.length, 1);
+  assert.deepEqual(result.asks, []);
+});
+
 test('version marks come off a name', () => {
   const check = (name, rest, expected) => {
     const version = signs.versionOf(name);
@@ -481,6 +539,19 @@ test('the whole thing: every file accounted for, originals unchanged', async () 
   assert.ok(failed === undefined || /couldn’t be read/.test(failed.note));
   assert.ok(report.groups.find((group) => group.outcome === 'skipped').files.some((file) => file.rel === 'Thumbs.db'));
   assert.equal(space.progress().today, 0, 'bringing files in isn\'t writing');
+});
+
+test('a file with no chapter name that holds a whole book is split', async () => {
+  const root = folderOf({
+    'Stuff/alpha.docx': await wordFile('# Chapter 1', 'First words.', '# Chapter 2', 'Second words.'),
+    'Stuff/beta.docx': await wordFile('Just a little.'),
+  });
+  const { space } = project();
+  const folder = new FolderImport();
+  await folder.scan(space, root, () => {});
+  const { outline } = await folder.run(space, () => {});
+  const book = outline.children.find((node) => node.title === 'Stuff');
+  assert.deepEqual(book.children.map((node) => node.title), ['Chapter 1', 'Chapter 2', 'beta']);
 });
 
 test('stopping keeps what\'s done, and a resume finishes without repeating anything', async () => {

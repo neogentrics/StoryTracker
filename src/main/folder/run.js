@@ -88,12 +88,13 @@ class FolderRun {
         await this.keep(file, bookItem, `It couldn’t be read as writing: ${error.message}`);
         return;
       }
-      const sections = sectionsOf(source, node.kind === 'whole' ? null : 'none', node.kind === 'whole' ? file.name : node.title);
+      const whole = node.kind === 'whole' || node.split;
+      const sections = sectionsOf(source, whole ? null : 'none', node.kind === 'whole' ? file.name : node.title);
       if (sections.length === 0 || sections.every((section) => section.type === 'part' || wordsIn(section.blocks) === 0)) {
         await this.keep(file, bookItem, 'There were no words in it.');
         return;
       }
-      if (node.kind === 'chapter') sections.forEach((section) => { section.title = node.title; });
+      if (node.kind === 'chapter' && sections.length === 1) sections[0].title = node.title;
       this.project.db.transaction(() => {
         const made = this.workspace.importSections({
           target: { kind: 'book', id: bookItem, partId: parentItem === bookItem ? null : parentItem },
@@ -117,11 +118,12 @@ class FolderRun {
       let matched = 0;
       try {
         const source = await readSource(full);
-        const sections = sectionsOf(source, node.kind === 'whole' ? null : 'none', node.title).filter((section) => section.type === 'chapter');
+        const whole = node.kind === 'whole' || node.split;
+        const sections = sectionsOf(source, whole ? null : 'none', node.title).filter((section) => section.type === 'chapter');
         const at = new Date(file.mtime || Date.now()).toISOString();
         this.project.db.transaction(() => {
           for (const section of sections) {
-            const chapter = node.kind === 'whole' ? chapters.find((item) => sameTitle(item.title) === sameTitle(section.title)) : chapters[0];
+            const chapter = chapters.length > 1 ? chapters.find((item) => sameTitle(item.title) === sameTitle(section.title)) : chapters[0];
             if (!chapter) continue;
             this.project.addOlderVersion(chapter.id, { title: section.title, body: JSON.stringify(documentOf(section.blocks)), at });
             matched += 1;
