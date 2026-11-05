@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "3.3.0: upload it to KDP",
-    "note": "Released. This version’s test: export a book to each format, open them, and upload the EPUB to KDP’s previewer and one other store.",
+    "title": "v3.4: bring it in",
+    "note": "Building now. One file at a time, with Markdown first, because people bring in files made with AI.",
     "items": [
       {
-        "title": "The KDP previewer",
-        "text": "Upload an EPUB and a print PDF. Every warning it shows gets looked at, and fixed if it can be."
+        "title": "Word and Markdown",
+        "text": "Your manuscripts come in with their headings and italics, split into chapters, with word counts compared."
       },
       {
-        "title": "Open each format",
-        "text": "Word and LibreOffice are checked. Calibre and Pages haven’t been tried."
+        "title": "AI clean-up",
+        "text": "Chat text, stray symbols and odd headings in AI-made files are shown one by one, and nothing changes unless you say so."
       },
       {
-        "title": "Your book details",
-        "text": "Fill them in once for a book, and author and publisher carry to the next one."
+        "title": "Everything else",
+        "text": "Plain text, RTF, HTML, EPUB, OpenDocument, PDF text, Scrivener, and Pages as best it can."
       }
     ]
   },
