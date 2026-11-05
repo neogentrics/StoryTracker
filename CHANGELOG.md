@@ -15,7 +15,7 @@ Make it a place to spend a whole day.
 - **Fifteen themes**: RT Markdown Reader's, the old app's and a new one, Slate. High Contrast stays flat, and the rest
   have panels that run from one colour to another.
 - **Glass**: frosted panels over colour, with any theme but High Contrast.
-- **Twenty fonts for the page**, with text size and page width, and a choice of font for the app itself. Five of the fonts
+- **Seventeen fonts for the page**, with text size and page width, and a choice of font for the app itself. Five of the fonts
   come with the app, so a book looks the same on every computer.
 - **Focus mode** (Ctrl+Shift+F): just the page. Esc brings everything back.
 - **Goals**: words a day for a project and words for a chapter, with the day's count at the top of the window.

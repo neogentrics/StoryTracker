@@ -27,7 +27,7 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 <td width="50%"><img src="docs/screenshots/formatting.png" alt="A chapter with headings, a numbered list and a centred scene break"><br><b>Format.</b> Headings, lists and alignment, with Markdown shortcuts if you like them.</td>
 </tr>
 <tr>
-<td><img src="docs/screenshots/theme-glass.png" alt="A chapter in the Dusk theme with Glass on"><br><b>Make it yours.</b> Fifteen themes, Glass with any of them, and twenty fonts.</td>
+<td><img src="docs/screenshots/theme-glass.png" alt="A chapter in the Dusk theme with Glass on"><br><b>Make it yours.</b> Fifteen themes, Glass with any of them, and seventeen fonts.</td>
 <td><img src="docs/screenshots/find.png" alt="Find and replace, with every match marked on the page"><br><b>Find and replace.</b> In a chapter, a book or the whole project, with an Undo.</td>
 </tr>
 <tr>
@@ -61,7 +61,7 @@ open the app from *System Settings → Privacy & Security*.
 | **Saves itself** | A couple of seconds after you pause, and every five seconds while you type. There's no Save button to forget |
 | **Spell check** | With your own dictionary, so invented names stop being marked wrong |
 | **Find and replace** | In a chapter, a book or the whole project. A replace across chapters has an Undo |
-| **Themes and fonts** | Fifteen themes, Glass with any of them, twenty fonts, and control of text size and page width |
+| **Themes and fonts** | Fifteen themes, Glass with any of them, seventeen fonts, and control of text size and page width |
 | **Focus mode** | Just the page, until you press Esc |
 | **Goals** | Words a day and words for a chapter |
 | **Comments** | Notes on a selection, kept out of the book and its word count |
