@@ -125,11 +125,12 @@ that can't come out.
 | 🙋 Word | M | A chapter, a book, or a series as `.docx`, which also covers Pages on a Mac. |
 | 🙋 PDF | M | With print preview, printing, and a contents page. |
 | 🙋 Markdown, HTML, XML | M | Plus plain text and RTF. |
-| EPUB & OpenDocument | M | |
+| 🙋 Store-ready EPUB | L | An EPUB that KDP and other stores' uploaders accept, with the cover, contents, metadata and book details they ask for, checked before it's saved. It does the job of a tool like Kindle Create in our own way, with nothing else to install. |
+| OpenDocument | S | |
 | Book layouts | L | Trim sizes, mirrored margins, front and back matter, for print PDFs and ebooks. To be shared with RT Markdown Reader's v4.0. |
 | Export everything | S | A whole project as a folder of Markdown, pictures and CSV. |
 
-**Test:** export a book to each format and open it in Word, Pages, Calibre and a browser.
+**Test:** export a book to each format and open it in Word, Pages, Calibre and a browser. Upload the EPUB to KDP's previewer and at least one other store, and neither reports a problem.
 
 ## v3.4 — Bring it in
 
