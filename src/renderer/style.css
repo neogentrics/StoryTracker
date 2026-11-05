@@ -1731,3 +1731,69 @@ mark,
 html[data-theme='contrast'] :is(button, input, select, textarea) {
   border-color: var(--panel-edge);
 }
+
+/* The lock */
+.lock-body {
+  display: grid;
+  gap: 12px;
+}
+
+.lock-error {
+  margin: 8px 0 0;
+  color: var(--danger, #b3261e);
+}
+
+.recovery-key {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-family: 'Courier Prime', Consolas, monospace;
+  font-size: 16px;
+  text-align: center;
+  user-select: text;
+  white-space: nowrap;
+}
+
+.recovery-key.small {
+  font-size: 14px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.authenticator-picture {
+  display: block;
+  margin: 8px auto;
+  image-rendering: pixelated;
+  background: #fff;
+}
+
+.way-list {
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.way-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.way-row small {
+  display: block;
+  color: var(--muted);
+}
+
+.way-actions {
+  display: flex;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+#security-progress {
+  width: 100%;
+}

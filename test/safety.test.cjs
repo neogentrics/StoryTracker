@@ -116,7 +116,7 @@ test('a project in the Trash can be restored, and goes for good after 30 days', 
   made.trashProject(id);
   assert.deepEqual(made.listProjects(), []);
   assert.equal(made.listProjectTrash()[0].title, 'A Book');
-  made.restoreProject(id);
+  made.restoreProject(made.listProjectTrash()[0].id);
   made.openProject(id);
   assert.equal(textOf(made, chapter), 'whole project');
 

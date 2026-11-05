@@ -41,6 +41,11 @@ class Workspace {
     this.library = library;
     this.project = null;
     this.lastReplace = null;
+    this.key = null;
+    this.locked = false;
+    this.passUntil = 0;
+    this.mustReset = false;
+    this.busy = 0;
   }
 
   listProjects() {
@@ -65,17 +70,27 @@ class Workspace {
     return { ...opened, outline: this.project.outline() };
   }
 
-  openProject(id) {
+  // The key stays here for as long as the project is open, because adding a way in needs it, and goes when it closes.
+  openProject(id, projectKey = null) {
     this.closeProject();
-    this.project = this.library.openProject(needId(id));
+    const key = Buffer.from(projectKey ?? this.library.appKey(needId(id)));
+    this.project = this.library.openProject(needId(id), key);
+    this.key = key;
+    this.locked = this.library.isLocked(id);
     this.lastReplace = null;
     this.project.tidy();
-    return { id, title: this.project.title(), outline: this.project.outline(), progress: this.progress() };
+    return { id, title: this.project.title(), outline: this.project.outline(), progress: this.progress(), locked: this.locked };
   }
 
   closeProject() {
     this.project?.close();
     this.project = null;
+    this.key?.fill(0);
+    this.key = null;
+    this.locked = false;
+    this.lastReplace = null;
+    this.passUntil = 0;
+    this.mustReset = false;
   }
 
   removeSample(id) {
@@ -305,9 +320,9 @@ class Workspace {
     return this.library.packProjectLater(id, file, this.open());
   }
 
-  importProject(file, { replace = false } = {}) {
+  importProject(file, { replace = false, projectKey = null } = {}) {
     if (replace) this.closeProject();
-    return this.library.importProject(file, { replace });
+    return this.library.importProject(file, { replace, projectKey });
   }
 
   loadChapter(id) {

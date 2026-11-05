@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "3.5.0: point it at your files",
-    "note": "Released. The test on the real Stories folder passed: every file accounted for, and none of them changed.",
+    "title": "v3.6: the password lock",
+    "note": "Built and tested. Not released: the design says an outside review comes first, and that decision is yours.",
     "items": [
       {
-        "title": "Look over the plan",
-        "text": "Run Find my files on your own folder and answer Ask me. Wrong guesses about books and chapters are what to look for."
+        "title": "A real lock",
+        "text": "A password on any project, with a recovery key you save. Without one of them the files are garbled, backups included."
       },
       {
-        "title": "Read a few chapters",
-        "text": "The test checked files, not story text. Only you can say whether a book’s chapters are right."
+        "title": "Ways back in",
+        "text": "Trust this computer, and add an authenticator app, so a forgotten password isn’t the end of a book."
       },
       {
-        "title": "Still open from earlier",
-        "text": "A real Word manuscript in Import, Pages on a Mac, and a real Scrivener project."
+        "title": "Lock when idle",
+        "text": "By hand, on closing, after a set time away, and when the computer locks or sleeps."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.5."
+    "text": "The outside review of the lock, the power-cut test, and the decisions below."
   },
   "questions": [
     {

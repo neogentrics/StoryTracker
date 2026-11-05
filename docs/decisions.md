@@ -152,6 +152,9 @@ authors ask.
 | Is *trusted computer* on or off by default? | **Off,** offered on the same screen. It's easier, but weaker. |
 | Should the app warn if there's only one way in? | **Yes,** once. |
 
+✅ **Built in 3.6 as recommended.** The warning turned out not to be needed: the password and the recovery key can only be
+replaced, never removed, so a locked project always has at least two.
+
 ### 20. How Notion ends (before v3.14)
 
 | Choice | In short |

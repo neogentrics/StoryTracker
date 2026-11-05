@@ -9,6 +9,18 @@ const path = require('node:path');
 const KEY_FILE = 'keys.json';
 const FORMAT = 1;
 const KEY_BYTES = 32;
+const SALT_BYTES = 16;
+
+// Slow on purpose: each guess at a password costs about a quarter of a second and 128 MB. The numbers are kept in each slot,
+// so they can rise later without locking anyone out.
+const SCRYPT = { name: 'scrypt', N: 2 ** 17, r: 8, p: 1 };
+const MAX_SCRYPT_N = 2 ** 20;
+const MAX_TRIES = 4;
+
+// Crockford's letters: no I, L, O or U, so a key copied down by hand can't be misread.
+const RECOVERY_LETTERS = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+const RECOVERY_BYTES = 20;
+const RECOVERY_LENGTH = 32;
 
 // The slot every project starts with, so a project with no password still opens on any computer, from any backup.
 // This key is in public source code, so it stops other programs reading the file and nothing more. Only a password
@@ -64,8 +76,100 @@ function createKeys(dir, projectId) {
   return projectKey;
 }
 
+const hasApp = (data) => data.slots.some((slot) => slot.type === 'app');
+
 function hasAppSlot(dir) {
-  return read(dir).slots.some((slot) => slot.type === 'app');
+  return hasApp(read(dir));
+}
+
+function appSlot(projectKey, projectId) {
+  return lock(projectKey, projectId, 'app', APP_SLOT_KEY);
+}
+
+function stretch(password, { N, r, p, salt }) {
+  return new Promise((resolve, reject) => {
+    const options = { N, r, p, maxmem: 256 * N * r };
+    crypto.scrypt(String(password).normalize('NFKC'), Buffer.from(salt, 'base64'), KEY_BYTES, options, (error, key) => (error ? reject(error) : resolve(key)));
+  });
+}
+
+async function passwordSlot(projectKey, projectId, password) {
+  const kdf = { ...SCRYPT, salt: crypto.randomBytes(SALT_BYTES).toString('base64') };
+  return { ...lock(projectKey, projectId, 'password', await stretch(password, kdf)), kdf };
+}
+
+// A file from somewhere else chooses these numbers, so they're checked before any memory is spent on them.
+const fairCost = ({ name, N, r, p, salt }) => name === 'scrypt' && Number.isInteger(N) && N > 1 && N <= MAX_SCRYPT_N && (N & (N - 1)) === 0 && r === 8 && p >= 1 && p <= 4 && typeof salt === 'string';
+
+async function openWithPassword(data, password) {
+  for (const slot of data.slots.filter((item) => item.type === 'password' && item.kdf && fairCost(item.kdf)).slice(0, MAX_TRIES)) {
+    try {
+      return unlock(slot, data.projectId, await stretch(password, slot.kdf));
+    } catch {
+      // Not this slot.
+    }
+  }
+  return null;
+}
+
+function makeRecoveryKey() {
+  const bytes = crypto.randomBytes(RECOVERY_BYTES);
+  let bits = 0;
+  let value = 0;
+  let text = '';
+  for (const byte of bytes) {
+    value = (value << 8) | byte;
+    bits += 8;
+    while (bits >= 5) {
+      bits -= 5;
+      text += RECOVERY_LETTERS[(value >> bits) & 31];
+    }
+    value &= (1 << bits) - 1;
+  }
+  return text.match(/.{4}/g).join('-');
+}
+
+// Forgiving about how it was typed, so a key written down by hand still works.
+function cleanRecoveryKey(text) {
+  const clean = String(text).toUpperCase().replace(/[\s-]/g, '').replace(/O/g, '0').replace(/[IL]/g, '1');
+  return clean.length === RECOVERY_LENGTH && [...clean].every((letter) => RECOVERY_LETTERS.includes(letter)) ? clean : null;
+}
+
+// The key is already as long and as random as a key can usefully be, so it needs no slow stretching.
+function recoveryWrappingKey(clean, salt) {
+  return Buffer.from(crypto.hkdfSync('sha256', Buffer.from(clean, 'latin1'), Buffer.from(salt, 'base64'), 'RT Story Tracker recovery key', KEY_BYTES));
+}
+
+function recoverySlot(projectKey, projectId, text) {
+  const clean = cleanRecoveryKey(text);
+  if (!clean) throw new Error('That recovery key is not complete.');
+  const kdf = { name: 'hkdf', salt: crypto.randomBytes(SALT_BYTES).toString('base64') };
+  return { ...lock(projectKey, projectId, 'recovery', recoveryWrappingKey(clean, kdf.salt)), kdf };
+}
+
+function openWithRecovery(data, text) {
+  const clean = cleanRecoveryKey(text);
+  if (!clean) return null;
+  for (const slot of data.slots.filter((item) => item.type === 'recovery' && item.kdf?.name === 'hkdf')) {
+    try {
+      return unlock(slot, data.projectId, recoveryWrappingKey(clean, slot.kdf.salt));
+    } catch {
+      // Not this slot.
+    }
+  }
+  return null;
+}
+
+// One write, so a power cut leaves either the old ways in or the new ones, never neither.
+function swapSlots(dir, types, slots) {
+  const data = read(dir);
+  const kept = data.slots.filter((slot) => !types.includes(slot.type));
+  if (kept.length + slots.length === 0) throw new Error('A project must keep at least one way in.');
+  write(dir, { ...data, slots: [...kept, ...slots] });
+}
+
+function setLabel(dir, label) {
+  write(dir, { ...read(dir), label });
 }
 
 function openWithSlot(dir, type, wrappingKey) {
@@ -82,6 +186,11 @@ function openWithSlot(dir, type, wrappingKey) {
 
 function openWithAppSlot(dir) {
   return openWithSlot(dir, 'app', APP_SLOT_KEY);
+}
+
+function appKeyFrom(data) {
+  const slot = data.slots.find((item) => item.type === 'app');
+  return slot ? unlock(slot, data.projectId, APP_SLOT_KEY) : null;
 }
 
 function addSlot(dir, projectKey, type, wrappingKey, details = {}) {
@@ -105,13 +214,26 @@ function listSlots(dir) {
 }
 
 module.exports = {
+  FORMAT,
   KEY_FILE,
   addSlot,
+  appKeyFrom,
+  appSlot,
   createKeys,
+  hasApp,
   hasAppSlot,
   listSlots,
+  makeRecoveryKey,
   openWithAppSlot,
+  openWithPassword,
+  openWithRecovery,
   openWithSlot,
+  passwordSlot,
+  read,
+  recoverySlot,
   removeSlot,
+  setLabel,
+  swapSlots,
+  write,
   writeFileSafely,
 };

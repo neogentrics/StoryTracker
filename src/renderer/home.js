@@ -2,19 +2,20 @@ import { el, words } from './dom.js';
 import { icon } from './icons.js';
 
 const STATE_NOTES = {
-  locked: 'Locked',
+  locked: 'Password needed',
   damaged: "This project didn't open.",
 };
 
-function projectRow(project, { onOpen, onRemoveSample, onTrashProject }) {
+function projectRow(project, { onOpen, onUnlock, onRemoveSample, onTrashProject }) {
   const ready = project.state === 'ready';
+  const locked = project.state === 'locked';
   return el(
     'li',
     { class: 'project-row' },
     el(
       'button',
-      { class: 'project-open', disabled: !ready, onclick: () => onOpen(project.id) },
-      icon('book'),
+      { class: 'project-open', disabled: !ready && !locked, onclick: () => (locked ? onUnlock(project) : onOpen(project.id)) },
+      icon(locked ? 'lock' : 'book'),
       el('span', { class: 'project-title' }, project.title ?? 'Project'),
       el('span', { class: 'project-note' }, ready ? words(project.words) : STATE_NOTES[project.state]),
     ),
@@ -28,7 +29,7 @@ function projectRow(project, { onOpen, onRemoveSample, onTrashProject }) {
   );
 }
 
-export function renderHome(root, { projects, onOpen, onCreate, onSample, onRemoveSample, onOpenFile, onFindFiles, onTrashProject, onShowTrash }) {
+export function renderHome(root, { projects, onOpen, onUnlock, onCreate, onSample, onRemoveSample, onOpenFile, onFindFiles, onTrashProject, onShowTrash }) {
   const first = projects.length === 0;
   const hasSample = projects.some((project) => project.sample);
   const title = el('input', {
@@ -63,7 +64,7 @@ export function renderHome(root, { projects, onOpen, onCreate, onSample, onRemov
         first ? el('p', { class: 'lead' }, 'Everything saves by itself, on this computer. There’s nothing to set up.') : null,
         first
           ? null
-          : el('ul', { class: 'project-list' }, projects.map((item) => projectRow(item, { onOpen, onRemoveSample, onTrashProject }))),
+          : el('ul', { class: 'project-list' }, projects.map((item) => projectRow(item, { onOpen, onUnlock, onRemoveSample, onTrashProject }))),
         form,
         el(
           'div',

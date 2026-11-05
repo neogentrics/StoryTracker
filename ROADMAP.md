@@ -33,7 +33,7 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.3](#v33--get-it-out) | Get it out | ✅ Released ([3.3.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.3.0)) |
 | [v3.4](#v34--bring-it-in) | Bring it in | ✅ Released ([3.4.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.4.0)) |
 | [v3.5](#v35--find-my-files) | Find my files | 🚧 Released as 3.5.0, being tested by the owner |
-| [v3.6](#v36--password-lock) | Password lock | Planned |
+| [v3.6](#v36--password-lock) | Password lock | 🚧 Built, in review |
 | [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | Planned |
 | [v3.8](#v38--records) | Records | Planned |
 | [v3.9](#v39--versions-of-a-record) | Versions of a record | Planned |
@@ -165,14 +165,15 @@ that can't come out.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋🛡️ Password | L | Lock any project. Everything in it is encrypted, including search and history. |
-| 🙋 Recovery key | M | Shown once, to save or print. |
-| 🙋 Trusted computer | M | Optional. This computer can open the project through your login. |
-| 🙋 Authenticator (2FA) | M | Works with any authenticator app. A code before opening on a trusted computer, and a way back in if you forget the password there. |
-| Lock when idle | S | Or on close, or by hand. |
+| ✅ 🙋🛡️ Password | L | Lock any project. Everything in it is encrypted, including search and history. Putting a lock on moves the project to a new key, so copies made earlier can't open it. |
+| ✅ 🙋 Recovery key | M | Shown once, to save or print. |
+| ✅ 🙋 Trusted computer | M | Optional. This computer can open the project through your login. |
+| ✅ 🙋 Authenticator (2FA) | M | Works with any authenticator app. A code before opening on a trusted computer, and a way back in if you forget the password there. |
+| ✅ Lock when idle | S | Or on close, or by hand, and when the computer locks or sleeps. |
 
 **Test:** search a copied locked file for known words and find none. Recover using each way in. Get an outside review
-before release.
+before release. The first two pass, and are automated. An independent review by a separate AI session found eight
+problems around the encryption and none in it, and all are fixed. A review by a person is still the owner's call.
 
 ## v3.7 — RT Markdown Reader, on this computer
 

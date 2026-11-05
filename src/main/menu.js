@@ -44,6 +44,9 @@ function buildMenu({ send, checkForUpdates, about }) {
         { label: 'Earlier Versions of This Chapter…', click: () => send('history') },
         { label: 'Trash', click: () => send('trash') },
         { type: 'separator' },
+        { label: 'Password and Lock…', click: () => send('security') },
+        { label: 'Lock Project', accelerator: 'CmdOrCtrl+L', click: () => send('lock') },
+        { type: 'separator' },
         { label: 'Library', accelerator: 'CmdOrCtrl+Shift+L', click: () => send('library') },
         ...(isMac
           ? []

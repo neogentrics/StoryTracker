@@ -1,5 +1,6 @@
 import { el, formatCount } from './dom.js';
 import { icon } from './icons.js';
+import { ensurePass } from './security-dialog.js';
 
 export function sizeOf(bytes) {
   if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
@@ -29,7 +30,9 @@ export async function openAttachments({ api, id, title, onError }) {
       { class: 'attachment-row' },
       thumb,
       el('div', { class: 'attachment-name' }, el('span', { title: item.from || item.name }, item.name), el('small', {}, `${sizeOf(item.size)} · ${item.owner}`)),
-      el('button', { 'aria-label': `Save a copy of ${item.name}`, onclick: () => attempt(() => api.saveAttachment(item.id)) }, 'Save a copy'),
+      el('button', { 'aria-label': `Save a copy of ${item.name}`, onclick: () => attempt(async () => {
+        if (await ensurePass(api, 'A saved copy isn’t protected: anyone can open it.')) await api.saveAttachment(item.id);
+      }) }, 'Save a copy'),
       el('button', {
         class: 'quiet icon-only',
         title: 'Move to Trash',

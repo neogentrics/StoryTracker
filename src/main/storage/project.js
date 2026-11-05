@@ -326,6 +326,18 @@ class Project {
     });
   }
 
+  // A file moved to a new key gets a new name. Backups keep each file under its name, so one name must never mean two keys.
+  renameAttachmentFiles(moved) {
+    const row = this.db.prepare('UPDATE attachment_files SET file = ? WHERE file = ?');
+    const items = this.db.prepare("UPDATE items SET details = json_set(details, '$.file', ?) WHERE kind = 'attachment' AND json_extract(details, '$.file') = ?");
+    this.db.transaction(() => {
+      for (const [from, to] of moved) {
+        row.run(to, from);
+        items.run(to, from);
+      }
+    })();
+  }
+
   attachmentFiles() {
     return this.db.prepare('SELECT file FROM attachment_files').all().map((row) => row.file);
   }

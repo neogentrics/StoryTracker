@@ -26,6 +26,7 @@ app's [licence](LICENSE) limits your rights under them.
 | [entities](https://github.com/fb55/entities) | Used by parse5 and markdown-it | BSD 2-Clause, below |
 | [fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser), with fast-xml-builder, strnum, anynum, is-unsafe, xml-naming, path-expression-matcher and @nodable/entities | Reading OpenDocument, EPUB and Scrivener files | MIT, below |
 | [PDF.js](https://mozilla.github.io/pdf.js/) (pdfjs-dist) | Reading text from PDFs | Apache 2.0, below |
+| [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) | The picture an authenticator app scans | MIT, below |
 | Inter, Literata, Lora, EB Garamond, Atkinson Hyperlegible and Courier Prime, through [Fontsource](https://fontsource.org/) | Fonts for the page and the app | SIL Open Font License 1.1, below |
 
 ## better-sqlite3-multiple-ciphers
@@ -56,6 +57,7 @@ Copyright (c) 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger, Ant√
 Copyright (c) 2014 Vitaly Puzrin, Alex Kocharin
 Copyright (c) 2013-2019 Ivan Nikulin
 Copyright (c) 2017 Amit Kumar Gupta
+Copyright (c) 2009 Kazuhiko Arase
 Copyright (c) 2021-2026 Natural Intelligence
 Copyright 2019 - present Christopher J. Brody and other contributors
 Copyright (c) 2016 Dolan  

@@ -142,9 +142,11 @@ const DEFAULT_SETTINGS = {
   backupFolder: '',
   backupEvery: 'off',
   backupKeep: 10,
+  lockAfter: 15,
 };
 
 const LIMITS = { textSize: [14, 28], pageWidth: [32, 64], backupKeep: [1, 100] };
+const LOCK_AFTER = { 0: { label: 'Never' }, 5: { label: 'After 5 minutes' }, 15: { label: 'After 15 minutes' }, 30: { label: 'After 30 minutes' }, 60: { label: 'After an hour' } };
 const BACKUP_EVERY = { off: { label: 'Off' }, hour: { label: 'Every hour' }, day: { label: 'Every day' }, week: { label: 'Every week' } };
 
 // Anything unknown falls back to the default, so a damaged settings file can't stop the app opening.
@@ -167,7 +169,8 @@ function cleanSettings(input) {
     backupFolder: typeof source.backupFolder === 'string' ? source.backupFolder : '',
     backupEvery: known(source.backupEvery, BACKUP_EVERY, 'backupEvery'),
     backupKeep: Math.round(within('backupKeep')),
+    lockAfter: Object.hasOwn(LOCK_AFTER, source.lockAfter) ? Number(source.lockAfter) : DEFAULT_SETTINGS.lockAfter,
   };
 }
 
-module.exports = { BACKUP_EVERY, DEFAULT_SETTINGS, LIMITS, PAGE_FONTS, THEMES, UI_FONTS, cleanSettings };
+module.exports = { BACKUP_EVERY, DEFAULT_SETTINGS, LIMITS, LOCK_AFTER, PAGE_FONTS, THEMES, UI_FONTS, cleanSettings };

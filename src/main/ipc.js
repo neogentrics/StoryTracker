@@ -10,6 +10,7 @@ const { IMPORT_EXTENSIONS, Importer } = require('./import');
 
 const MAX_COVER = 50 * 1024 * 1024;
 const importer = new Importer();
+const previews = new Set();
 const folderImport = new FolderImport();
 let chosenFolder = null;
 
@@ -53,6 +54,19 @@ async function chooseImport(window) {
   return importer.inspect(filePaths[0]);
 }
 
+// While this runs the project can't be locked from under it.
+function busyWhile(workspace, work) {
+  return async (...args) => {
+    const space = workspace();
+    space.busy += 1;
+    try {
+      return await work(...args);
+    } finally {
+      space.busy -= 1;
+    }
+  };
+}
+
 // Errors come back as plain results, so the window can show the app's own words and not Electron's wrapper around them.
 function handle(channel, work) {
   ipcMain.handle(channel, async (_event, ...args) => {
@@ -70,7 +84,7 @@ async function exportProject(workspace, window) {
   const { id } = space.open();
   const { canceled, filePath } = await dialog.showSaveDialog(window(), {
     title: 'Save a copy of this project',
-    defaultPath: `${space.open().title().replace(/[<>:"/\\|?*]/g, ' ').trim() || 'Project'}.rtstory`,
+    defaultPath: `${(space.locked ? space.library.describe(id).title : space.open().title()).replace(/[<>:"/\\|?*]/g, ' ').trim() || 'Project'}.rtstory`,
     filters: [{ name: 'RT Story Tracker project', extensions: ['rtstory'] }],
   });
   if (canceled || !filePath) return null;
@@ -87,12 +101,14 @@ async function pickProjectFile(window) {
   return canceled ? null : filePaths[0];
 }
 
-async function importProject(workspace, window, given) {
+// Comes back as a project's ID, or for a locked file, what the lock screen needs.
+async function importProject(workspace, window, given, projectKey = null) {
   const file = given ?? (await pickProjectFile(window));
   if (!file) return null;
   try {
-    return workspace().importProject(file);
+    return workspace().importProject(file, { projectKey });
   } catch (error) {
+    if (error.code === 'LOCKED') return { locked: true, file, label: error.label };
     if (error.code !== 'EXISTS') throw error;
     const { response } = await dialog.showMessageBox(window(), {
       type: 'question',
@@ -101,7 +117,7 @@ async function importProject(workspace, window, given) {
       message: `You already have “${error.title}”.`,
       detail: 'Replacing it opens this file instead. The project you have now goes to the Trash for 30 days, so you can get it back.',
     });
-    return response === 0 ? workspace().importProject(file, { replace: true }) : null;
+    return response === 0 ? workspace().importProject(file, { replace: true, projectKey }) : null;
   }
 }
 
@@ -160,18 +176,92 @@ async function preview(workspace, input) {
     webPreferences: { plugins: true, sandbox: true, contextIsolation: true, nodeIntegration: false },
   });
   viewer.setMenuBarVisibility(false);
-  viewer.on('closed', () => fs.rmSync(file, { force: true }));
+  previews.add(viewer);
+  viewer.on('closed', () => {
+    previews.delete(viewer);
+    fs.rmSync(file, { force: true });
+  });
   await viewer.loadFile(file);
 }
 
-function registerIpc({ status, workspace, updater, settings, backups, window, takeFile }) {
+// A preview is a readable copy of the writing, so it goes when the project does.
+function closePreviews() {
+  for (const viewer of previews) viewer.close();
+}
+
+// Left behind if the app stopped while printing or previewing. Only this app's own names, and only plain copies.
+function sweepTemporaryFiles() {
+  for (const name of fs.readdirSync(os.tmpdir())) {
+    if (/^rtst-(preview|print)-\d+-\d+\.(pdf|html)$/.test(name)) fs.rmSync(path.join(os.tmpdir(), name), { force: true });
+  }
+}
+
+async function saveRecovery(window, text, label) {
+  const { canceled, filePath } = await dialog.showSaveDialog(window(), {
+    title: 'Save your recovery key',
+    defaultPath: 'RT Story Tracker recovery key.txt',
+    filters: [{ name: 'Text', extensions: ['txt'] }],
+  });
+  if (canceled || !filePath) return null;
+  const lines = ['RT Story Tracker recovery key', ...(label ? [`Project: ${label}`] : []), '', text, '', 'Keep this somewhere safe. It opens the project without the password.', ''];
+  fs.writeFileSync(filePath, lines.join('\n'));
+  return filePath;
+}
+
+// Its own small window, so the system's print dialog shows only the key.
+async function printRecovery(text) {
+  const page = new BrowserWindow({ show: false, webPreferences: { sandbox: true, contextIsolation: true, nodeIntegration: false } });
+  const html = `<!doctype html><meta charset="utf-8"><title>Recovery key</title><body style="font-family:sans-serif"><h2>RT Story Tracker recovery key</h2><p style="font:20px monospace">${text}</p><p>Keep this somewhere safe. It opens the project without the password.</p>`;
+  await page.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+  await new Promise((resolve) => { page.webContents.print({}, () => resolve()); });
+  page.close();
+}
+
+function registerSecurity({ security, workspace, window }) {
+  handle('security:status', () => security().status());
+  handle('security:lockInfo', (id) => security().lockInfo(String(id)));
+  handle('security:unlock', (input) => security().unlock(input));
+  handle('security:confirm', (secret) => security().confirm(secret));
+  handle('security:makeRecovery', () => security().makeRecovery());
+  handle('security:saveRecovery', ({ text, label }) => saveRecovery(window, String(text), String(label ?? '')));
+  handle('security:printRecovery', (text) => printRecovery(String(text).replace(/[^0-9A-Z-]/g, '')));
+  handle('security:setPassword', busyWhile(workspace, (input) => security().setPassword(input)));
+  handle('security:dropEarlier', () => security().dropEarlier());
+  handle('security:removeLock', busyWhile(workspace, () => security().removeLock()));
+  handle('security:changePassword', busyWhile(workspace, (password) => security().changePassword(password)));
+  handle('security:replaceRecovery', () => security().replaceRecovery());
+  handle('security:rename', (label) => security().rename(label));
+  handle('security:trust', () => security().trust());
+  handle('security:untrust', () => security().untrust());
+  handle('security:setQuick', (quick) => security().setQuick(quick));
+  handle('security:beginAuthenticator', () => security().beginAuthenticator());
+  handle('security:confirmAuthenticator', (code) => security().confirmAuthenticator(code));
+  handle('security:removeAuthenticator', () => security().removeAuthenticator());
+  handle('security:lockNow', () => {
+    const locked = security().lockNow();
+    if (locked) closePreviews();
+    return locked;
+  });
+}
+
+function registerIpc({ status, workspace, updater, settings, backups, security, window, takeFile }) {
+  const busy = (work) => busyWhile(workspace, work);
+  const unlocked = (work) => (...args) => {
+    security().needExportPass();
+    return work(...args);
+  };
+  registerSecurity({ security, workspace, window });
+  sweepTemporaryFiles();
   handle('app:status', status);
   handle('library:list', () => workspace().listProjects());
   handle('library:removeSample', (id) => workspace().removeSample(id));
   handle('project:create', (title) => workspace().createProject(title));
   handle('project:createSample', () => workspace().createSample());
   handle('project:open', (id) => workspace().openProject(id));
-  handle('project:close', () => workspace().closeProject());
+  handle('project:close', () => {
+    closePreviews();
+    security().close();
+  });
   handle('item:add', (input) => workspace().addItem(input));
   handle('item:rename', (input) => workspace().rename(input));
   handle('item:move', (input) => workspace().move(input));
@@ -184,8 +274,13 @@ function registerIpc({ status, workspace, updater, settings, backups, window, ta
   handle('version:list', (id) => workspace().listVersions(id));
   handle('version:get', (input) => workspace().getVersion(input));
   handle('version:restore', (input) => workspace().restoreVersion(input));
-  handle('project:export', () => exportProject(workspace, window));
+  handle('project:export', busy(() => exportProject(workspace, window)));
   handle('project:import', (file) => importProject(workspace, window, file));
+  handle('project:importLocked', async (input) => {
+    const key = await security().keyFromFile(input);
+    const id = await importProject(workspace, window, input.file, key);
+    return id ? workspace().openProject(id, key) : null;
+  });
   handle('app:takeFile', () => takeFile());
   handle('backup:chooseFolder', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog(window(), {
@@ -224,9 +319,9 @@ function registerIpc({ status, workspace, updater, settings, backups, window, ta
   handle('cover:choose', (id) => chooseCover(workspace, window, id));
   handle('cover:remove', (id) => workspace().removeCover(id));
   handle('export:check', (input) => checkExport(workspace().open(), input));
-  handle('export:run', (input) => runExport(workspace, window, input));
-  handle('export:everything', () => everything(workspace, window));
-  handle('export:preview', (input) => preview(workspace, input));
+  handle('export:run', busy(unlocked((input) => runExport(workspace, window, input))));
+  handle('export:everything', busy(unlocked(() => everything(workspace, window))));
+  handle('export:preview', busy(unlocked((input) => preview(workspace, input))));
   handle('export:reveal', (file) => shell.showItemInFolder(String(file)));
   const folderProgress = (data) => window()?.webContents.send('folder:progress', data);
   handle('folder:choose', () => chooseFolder(window));
@@ -235,10 +330,10 @@ function registerIpc({ status, workspace, updater, settings, backups, window, ta
     return folderImport.scan(workspace(), chosenFolder, folderProgress);
   });
   handle('folder:edit', (change) => folderImport.edit(workspace(), change));
-  handle('folder:run', () => folderImport.run(workspace(), folderProgress));
+  handle('folder:run', busy(() => folderImport.run(workspace(), folderProgress)));
   handle('folder:stop', () => folderImport.stop());
   handle('folder:pending', () => folderImport.pending(workspace()));
-  handle('folder:resume', () => folderImport.resume(workspace(), folderProgress));
+  handle('folder:resume', busy(() => folderImport.resume(workspace(), folderProgress)));
   handle('folder:discard', () => folderImport.discard(workspace()));
   handle('folder:saveReport', async (report) => {
     const file = await saveFolderReport(window);
@@ -246,12 +341,12 @@ function registerIpc({ status, workspace, updater, settings, backups, window, ta
     return file;
   });
   handle('attachments:list', (id) => workspace().listAttachments(id));
-  handle('attachments:add', (parentId) => addAttachments(workspace, window, parentId));
+  handle('attachments:add', busy((parentId) => addAttachments(workspace, window, parentId)));
   handle('attachments:preview', (id) => workspace().previewAttachment(id));
-  handle('attachments:save', (id) => saveAttachment(workspace, window, id));
+  handle('attachments:save', busy(unlocked((id) => saveAttachment(workspace, window, id))));
   handle('import:choose', () => chooseImport(window));
   handle('import:preview', (input) => importer.preview(input));
-  handle('import:commit', (input) => importer.commit(workspace(), input));
+  handle('import:commit', busy((input) => importer.commit(workspace(), input)));
   handle('update:install', () => updater.installNow());
 }
 
