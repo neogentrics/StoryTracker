@@ -39,6 +39,10 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 <td><img src="docs/screenshots/trash.png" alt="The Trash, with a chapter waiting to be restored"><br><b>Trash.</b> Deleted things wait 30 days.</td>
 </tr>
 <tr>
+<td><img src="docs/screenshots/export.png" alt="The Export window, with print layout choices"><br><b>Export.</b> Word, print PDF, store-ready EPUB and more.</td>
+<td><img src="docs/screenshots/details.png" alt="The book details form"><br><b>Book details.</b> Everything a store asks for, kept with the book.</td>
+</tr>
+<tr>
 <td><img src="docs/screenshots/focus.png" alt="Focus mode, with just the page"><br><b>Focus mode.</b> Just the page.</td>
 <td><img src="docs/screenshots/library.png" alt="The library, listing three projects with their word counts"><br><b>Your library.</b> Every project in one place, with nothing to set up.</td>
 </tr>
@@ -70,6 +74,9 @@ open the app from *System Settings → Privacy & Security*.
 | **Goals** | Words a day and words for a chapter |
 | **Comments** | Notes on a selection, kept out of the book and its word count |
 | **Split view** | Two chapters side by side |
+| **Export** | A chapter, book, series or whole project as Word, PDF, EPUB, Markdown, HTML, OpenDocument, RTF, plain text or XML |
+| **Store-ready EPUB** | Cover, contents, metadata and series details, passing the official EPUB validator |
+| **Print layouts** | Six trim sizes, mirrored margins, a contents page with real page numbers, running headers and print preview |
 | **Earlier versions** | Every chapter keeps copies as you write. Compare any two and restore with a click |
 | **Trash** | Deleted things wait 30 days, with an Undo straight away |
 | **Automatic backups** | Every hour, day or week, to a folder you choose |
@@ -79,8 +86,8 @@ open the app from *System Settings → Privacy & Security*.
 | **Works offline** | No account, no server, and your writing never leaves your computer |
 | **Updates itself** | On Windows and the Linux AppImage. Mac and the `.deb` tell you when a new version is out |
 
-Coming next: export (3.3), import (3.4) and the password lock (3.6), then characters, timelines and lore. See the
-[roadmap](ROADMAP.md).
+Coming next: import (3.4), finding your files (3.5) and the password lock (3.6), then characters, timelines and lore. See
+the [roadmap](ROADMAP.md).
 
 ## How your writing is kept
 

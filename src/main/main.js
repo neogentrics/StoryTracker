@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const { Backups } = require('./backups');
+const { exportFile } = require('./export');
 const { registerIpc } = require('./ipc');
 const { buildMenu } = require('./menu');
 const { runSelfTest, writeInWindow } = require('./self-test');
@@ -114,6 +115,9 @@ function createWindow({ show = true } = {}) {
     return { action: 'deny' };
   });
   window.webContents.on('will-navigate', (event) => event.preventDefault());
+  window.on('closed', () => {
+    if (window === mainWindow) BrowserWindow.getAllWindows().forEach((other) => other.close());
+  });
   window.webContents.on('context-menu', (_event, params) => spellingMenu(window, params));
   // The saved work is safe in the database, so a crashed window just starts again.
   window.webContents.on('render-process-gone', (_event, details) => {
@@ -156,6 +160,17 @@ async function windowState(window) {
   return 'timed out';
 }
 
+// Print files load fonts from inside the installed app, so this is only proven by doing it from there.
+async function exportFromHere() {
+  const project = workspace.open();
+  for (const format of ['pdf', 'epub', 'docx']) {
+    const file = path.join(scratch, `self-test.${format}`);
+    const { size } = await exportFile(project, { scope: 'project', format, file });
+    if (size < 1000) return `${format} came out empty`;
+  }
+  return 'exported';
+}
+
 // The window goes first and is closed before the storage work, because that work holds up this process, and a window
 // still loading behind it can stall for good.
 async function selfTest() {
@@ -169,12 +184,15 @@ async function selfTest() {
       timeout(60000, 'timed out'),
     ]);
     console.log(`Self-test: writing is ${writing}`);
+    const printed = await Promise.race([exportFromHere().catch((error) => error.message), timeout(120000, 'timed out')]);
+    console.log(`Self-test: print export is ${printed}`);
     workspace.closeProject();
     mainWindow.destroy();
     report = runSelfTest(path.join(scratch, 'work'), { withMeasure });
     report.checks.push({ name: 'opens the window', passed: state === 'ready', detail: state });
     report.checks.push({ name: 'writes and saves a chapter in the window', passed: writing === 'saved', detail: writing });
-    report.ok = report.ok && state === 'ready' && writing === 'saved';
+    report.checks.push({ name: 'exports a print PDF, an e-book and a Word file', passed: printed === 'exported', detail: printed });
+    report.ok = report.ok && state === 'ready' && writing === 'saved' && printed === 'exported';
   } catch (error) {
     report = { ok: false, error: error.stack };
   }

@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "3.2.0: try to lose something",
-    "note": "Released. This version's test: delete a chapter and restore it, move a project with one file, and restore an old backup.",
+    "title": "3.3.0: upload it to KDP",
+    "note": "Released. This version’s test: export a book to each format, open them, and upload the EPUB to KDP’s previewer and one other store.",
     "items": [
       {
-        "title": "Delete and restore",
-        "text": "Move a chapter to the Trash, bring it back, and try an earlier version."
+        "title": "The KDP previewer",
+        "text": "Upload an EPUB and a print PDF. Every warning it shows gets looked at, and fixed if it can be."
       },
       {
-        "title": "Set up backups",
-        "text": "Preferences, then Backups: pick a folder and a schedule. Nothing runs until you do."
+        "title": "Open each format",
+        "text": "Word and LibreOffice are checked. Calibre and Pages haven’t been tried."
       },
       {
-        "title": "Tell me about the look",
-        "text": "The window was rebuilt from RT Markdown Reader's. Say what still doesn't feel right."
+        "title": "Your book details",
+        "text": "Fill them in once for a book, and author and publisher carry to the next one."
       }
     ]
   },
@@ -51,12 +51,12 @@
       "a": "Markdown export arrives in v3.3, App Link sends a chapter to RT Markdown Reader in v3.7 (both apps have to be up to date), and Claude can work with the book directly in v3.13."
     },
     {
-      "q": "Will it make EPUBs that KDP accepts?",
-      "a": "Yes, in v3.3. It does the job of a tool like Kindle Create in our own way, with nothing else to install."
-    },
-    {
       "q": "Can it be tested on real stories?",
       "a": "Yes, once the basics work. Your stories and Notion become the test bed, and what you need for how you write goes on this roadmap."
+    },
+    {
+      "q": "Will it make EPUBs that KDP accepts?",
+      "a": "It makes EPUBs that pass EPUBCheck, the official validator, with no errors or warnings. The test that counts is uploading one to KDP’s previewer, which is yours to do."
     }
   ]
 }

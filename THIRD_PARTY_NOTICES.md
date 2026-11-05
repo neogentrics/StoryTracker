@@ -13,6 +13,9 @@ app's [licence](LICENSE) limits your rights under them.
 | [ProseMirror](https://prosemirror.net/), with orderedmap, rope-sequence and w3c-keyname | The editor | MIT, below |
 | [linkifyjs](https://linkify.js.org/) | Part of the editor kit | MIT, below |
 | [electron-updater](https://www.electron.build/auto-update) and builder-util-runtime | Updating the app | MIT, below |
+| [docx](https://github.com/dolanmiu/docx) | Word export | MIT, below |
+| [pdf-lib](https://pdf-lib.js.org/) | Finishing print PDFs | MIT, below |
+| [fflate](https://github.com/101arrowz/fflate) | Packing EPUB, Word and OpenDocument files | MIT, below |
 | [jsdiff](https://github.com/kpdecker/jsdiff) | Comparing versions of a chapter | BSD 3-Clause, below |
 | Inter, Literata, Lora, EB Garamond, Atkinson Hyperlegible and Courier Prime, through [Fontsource](https://fontsource.org/) | Fonts for the page and the app | SIL Open Font License 1.1, below |
 
@@ -36,10 +39,13 @@ WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEM
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-## Tiptap, ProseMirror, linkifyjs and electron-updater
+## Tiptap, ProseMirror, linkifyjs, electron-updater, docx, pdf-lib and fflate
 
 The MIT License (MIT)
 
+Copyright (c) 2016 Dolan  
+Copyright (c) 2019 Andrew Dillon  
+Copyright (c) 2026 Arjun Barrett  
 Copyright (C) 2015-2017 by Marijn Haverbeke <marijn@haverbeke.berlin> and others  
 Copyright (C) 2016 by Marijn Haverbeke <marijn@haverbeke.berlin>  
 Copyright (C) 2016 by Marijn Haverbeke <marijn@haverbeke.berlin> and others  

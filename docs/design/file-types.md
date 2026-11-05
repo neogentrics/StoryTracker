@@ -107,6 +107,14 @@ The test case is his own Stories folder, and the pass mark is that every file is
 - **Export everything:** a full copy of a project as a folder of Markdown, pictures and CSV. It's the way out if an
   author leaves. It's always there, and it asks for the password on a locked project.
 
+## The XML layout
+
+Exported with version 1 of our own layout. A file is one `rtstory` element holding `book` elements. A `book` has `detail`
+elements (`name` attribute), then `part` and `chapter` elements (`id` and `title` attributes, with chapters inside a part
+where the book has parts). A chapter holds `p` and `heading` (`level`, 1 to 3) with an optional `align`, plus `list` (`type`
+is `bulleted` or `numbered`) of `item`, `quote` and `break`. Inline text can hold `br`, and `span` with a `style` of any of
+`bold`, `italic`, `underline` and `strike`, separated by spaces.
+
 ## Moving and backing up: `.rtstory`
 
 The app's own format, as a single file: `.rtstory` (a working name, tied to [decision 15](../decisions.md)). It holds a

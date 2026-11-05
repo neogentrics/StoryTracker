@@ -179,6 +179,23 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   await shot(window, 'preferences');
   await window.click('#pref-close');
 
+  await window.click('.export-button');
+  await window.waitForSelector('#export[open]');
+  await window.selectOption('#export-format', 'pdf');
+  await pause(400);
+  await shot(window, 'export');
+  await window.click('#export-close');
+
+  await window.locator('#book-list .row', { hasText: 'The Ledger' }).hover();
+  await window.click('[aria-label="Details of The Ledger"]');
+  await window.waitForSelector('#details[open]');
+  await window.fill('#detail-author', 'Marit Vale');
+  await window.fill('#detail-publisher', 'Harbour Press');
+  await window.fill('#detail-subtitle', 'Book One of the Salt Road');
+  await pause(300);
+  await shot(window, 'details');
+  await window.click('#details-save');
+
   await window.click('.history-button');
   await window.waitForSelector('.history-view ins');
   await pause(300);

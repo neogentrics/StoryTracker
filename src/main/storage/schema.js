@@ -87,6 +87,22 @@ const STEPS = [
       `);
     },
   },
+  {
+    // A book's details are what stores ask for. Covers are pictures, so they sit apart from the writing.
+    version: 5,
+    up(db) {
+      db.exec(`
+        ALTER TABLE items ADD COLUMN details TEXT NOT NULL DEFAULT '';
+        CREATE TABLE covers (
+          item_id TEXT PRIMARY KEY,
+          type TEXT NOT NULL,
+          data BLOB NOT NULL,
+          width INTEGER NOT NULL,
+          height INTEGER NOT NULL
+        );
+      `);
+    },
+  },
 ];
 
 module.exports = { STEPS };

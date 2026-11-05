@@ -1,6 +1,8 @@
 // The three columns: books, then the chapters of the chosen book, then the page.
 import { canHold, findNode, indexTree, resolveDrop, resolveStep } from '../shared/outline.js';
 import { el, formatCount, words } from './dom.js';
+import { openDetails } from './details-dialog.js';
+import { openExport } from './export-dialog.js';
 import { openHistory } from './history.js';
 import { icon } from './icons.js';
 import { Page } from './page.js';
@@ -82,6 +84,7 @@ export class WritingRoom {
             { class: 'bar-side bar-right' },
             el('span', { class: 'bar-words' }, this.todayWords, this.projectWords),
             iconButton('find-button', 'search', 'Find and replace', () => this.find()),
+            iconButton('export-button', 'export', 'Export', () => this.showExport()),
             iconButton('history-button', 'history', 'Earlier versions of this chapter', () => this.showHistory()),
             iconButton('goals-button', 'goal', 'Goals', () => this.openGoals(this.activePage.chapterId)),
             iconButton('focus-button', 'focus', 'Focus mode', () => this.toggleFocus()),
@@ -306,6 +309,33 @@ export class WritingRoom {
       }));
   }
 
+  exportScopes() {
+    const scopes = [];
+    const chapter = this.activePage.chapterId && findNode(this.outline, this.activePage.chapterId);
+    if (chapter) scopes.push({ scope: 'chapter', id: chapter.id, label: `This chapter: ${chapter.title}` });
+    const book = this.bookId && findNode(this.outline, this.bookId);
+    if (book) scopes.push({ scope: 'book', id: book.id, label: `This book: ${book.title}` });
+    const holder = book && indexTree(this.outline).get(book.id)?.parent;
+    if (holder?.kind === 'series') scopes.push({ scope: 'series', id: holder.id, label: `This series: ${holder.title}` });
+    scopes.push({ scope: 'project', id: this.outline.id, label: `The whole project: ${this.outline.title}` });
+    return scopes;
+  }
+
+  async showExport(options = {}) {
+    await this.attempt(async () => {
+      await this.flush();
+      openExport({ api: this.api, scopes: this.exportScopes(), onError: (text) => this.showMessage(text), ...options });
+    });
+  }
+
+  showDetails(id = this.bookId) {
+    if (!id) {
+      this.showMessage('Choose a book first.');
+      return null;
+    }
+    return this.attempt(() => openDetails({ api: this.api, bookId: id, onError: (text) => this.showMessage(text) }));
+  }
+
   showTrash() {
     return this.attempt(() =>
       openTrash({
@@ -404,6 +434,13 @@ export class WritingRoom {
           { class: 'row-action', title: 'Rename', 'aria-label': `Rename ${node.title}`, onclick: () => this.startRename(node.id, title) },
           icon('pencil'),
         ),
+        node.kind === 'book'
+          ? el(
+              'button',
+              { class: 'row-action', title: 'Book details', 'aria-label': `Details of ${node.title}`, onclick: () => this.showDetails(node.id) },
+              icon('info'),
+            )
+          : null,
         node.kind === 'chapter'
           ? el(
               'button',

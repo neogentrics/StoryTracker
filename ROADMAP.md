@@ -29,8 +29,8 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [Step zero](#step-zero--settle-the-foundations) | Settle the foundations | ✅ Done |
 | [v3.0](#v30--write-a-book) | Write a book | ✅ Released ([3.0.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.0.0)) |
 | [v3.1](#v31--comfortable-writing) | Comfortable writing | ✅ Released ([3.1.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.1.0)) |
-| [v3.2](#v32--never-lose-a-word) | Never lose a word | 🚧 Released as 3.2.0, being tested by the owner |
-| [v3.3](#v33--get-it-out) | Get it out | Planned |
+| [v3.2](#v32--never-lose-a-word) | Never lose a word | ✅ Released ([3.2.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.2.0)) |
+| [v3.3](#v33--get-it-out) | Get it out | 🚧 Released as 3.3.0, being tested by the owner |
 | [v3.4](#v34--bring-it-in) | Bring it in | Planned |
 | [v3.5](#v35--find-my-files) | Find my files | Planned |
 | [v3.6](#v36--password-lock) | Password lock | Planned |
@@ -120,13 +120,13 @@ that can't come out.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Word | M | A chapter, a book, or a series as `.docx`, which also covers Pages on a Mac. |
-| 🙋 PDF | M | With print preview, printing, and a contents page. |
-| 🙋 Markdown, HTML, XML | M | Plus plain text and RTF. |
-| 🙋 Store-ready EPUB | L | An EPUB that KDP and other stores' uploaders accept, with the cover, contents, metadata and book details they ask for, checked before it's saved. It does the job of a tool like Kindle Create in our own way, with nothing else to install. |
-| OpenDocument | S | |
-| Book layouts | L | Trim sizes, mirrored margins, front and back matter, for print PDFs and ebooks. To be shared with RT Markdown Reader's v4.0. |
-| Export everything | S | A whole project as a folder of Markdown, pictures and CSV. |
+| ✅ 🙋 Word | M | A chapter, a book, or a series as `.docx`, which also covers Pages on a Mac. |
+| ✅ 🙋 PDF | M | With print preview, printing, and a contents page. |
+| ✅ 🙋 Markdown, HTML, XML | M | Plus plain text and RTF. |
+| ✅ 🙋 Store-ready EPUB | L | An EPUB that KDP and other stores' uploaders accept, with the cover, contents, metadata and book details they ask for, checked before it's saved. It does the job of a tool like Kindle Create in our own way, with nothing else to install. |
+| ✅ OpenDocument | S | |
+| ✅ Book layouts | L | Trim sizes, mirrored margins, front and back matter, for print PDFs and ebooks. To be shared with RT Markdown Reader's v4.0. |
+| ✅ Export everything | S | A whole project as a folder of Markdown, pictures and CSV. |
 
 **Test:** export a book to each format and open it in Word, Pages, Calibre and a browser. Upload the EPUB to KDP's previewer and at least one other store, and neither reports a problem.
 

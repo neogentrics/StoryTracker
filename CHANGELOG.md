@@ -3,6 +3,26 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.3.0] - 2026-11-04
+
+Your work can leave the app now, in any format you need.
+
+### Added
+- **Export** (Ctrl+E) a chapter, a book, a series or the whole project as Word, PDF, EPUB, Markdown, HTML, OpenDocument,
+  RTF, plain text or XML. Comments and anything in the Trash never go with it.
+- **Store-ready EPUB**: a cover, contents, metadata, series details and accessibility notes, passing the official EPUB
+  validator. The app tells you what a store is likely to ask for before you export.
+- **Book details**: author, publisher, ISBNs, description, keywords, series, copyright page, dedication, acknowledgements,
+  about the author and more, plus a cover picture.
+- **Book layouts** for print PDFs and Word: six trim sizes, mirrored margins with the binding margin set from the page
+  count, a contents page with real page numbers, running headers, page numbers and drop caps. Chapters can start on a
+  right-hand page.
+- **For print**: the last page is blank and the page count is even, unless you turn that off. For a re-upload, you can
+  keep a fixed page count so the cover's spine still fits. Print files have no links, because KDP's previewer warns
+  about them.
+- **Preview and print** (Ctrl+P).
+- **Export everything**: a whole project as a folder of Markdown, covers and CSV.
+
 ## [3.2.0] - 2026-11-04
 
 Never lose a word, and a friendlier look.
