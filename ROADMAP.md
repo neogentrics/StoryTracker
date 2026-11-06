@@ -173,7 +173,8 @@ that can't come out.
 
 **Test:** search a copied locked file for known words and find none. Recover using each way in. Get an outside review
 before release. The first two pass, and are automated. An independent review by a separate AI session found eight
-problems around the encryption and none in it, and all are fixed. A review by a person is still the owner's call.
+problems around the encryption and none in it, and all are fixed. On 2026-11-05 the owner decided that review is enough
+for release.
 
 ## v3.7 — RT Markdown Reader, on this computer
 

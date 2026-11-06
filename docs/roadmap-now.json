@@ -1,7 +1,7 @@
 {
   "now": {
     "title": "v3.6: the password lock",
-    "note": "Built and tested. Not released: the design says an outside review comes first, and that decision is yours.",
+    "note": "Built and tested on all three systems. An independent AI review found its problems and they’re fixed. Waiting for your word to release.",
     "items": [
       {
         "title": "A real lock",
@@ -19,7 +19,7 @@
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The outside review of the lock, the power-cut test, and the decisions below."
+    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.6."
   },
   "questions": [
     {

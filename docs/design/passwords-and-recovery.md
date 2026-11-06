@@ -153,7 +153,9 @@ These aren't bugs. They're what a lock like this can't do, and the author should
 - Forgetting the password with each way in removed in turn
 - A power cut while a slot is being changed: the old way in must still work
 - Searching a copied locked file for known words: none should be found
-- An outside review of this design and the code. Don't release encryption nobody else has looked at.
+- An outside review of this design and the code. Don't release encryption nobody else has looked at. For 3.6 that was an
+  independent review by a separate AI session, which the owner decided was enough. No person outside the project has
+  reviewed it.
 
 The first four are automated in `test/security.test.cjs` and `test/e2e/lock.e2e.cjs`. The password itself is stretched with
 scrypt at N=2^17, r=8, p=1, which costs about a quarter of a second and 128 MB for each guess. The recovery key is 160 random
