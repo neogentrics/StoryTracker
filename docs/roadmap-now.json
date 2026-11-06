@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "v3.6: the password lock",
-    "note": "Built and tested on all three systems. An independent AI review found its problems and they’re fixed. Waiting for your word to release.",
+    "title": "3.6.0: the password lock",
+    "note": "Released. Tested on Windows, Mac and Linux, with an independent AI review. No person outside the project has reviewed it.",
     "items": [
       {
-        "title": "A real lock",
-        "text": "A password on any project, with a recovery key you save. Without one of them the files are garbled, backups included."
+        "title": "Lock something small first",
+        "text": "Try it on a copy or a test project. Save the recovery key, lock it, then get back in each way you set up."
       },
       {
-        "title": "Ways back in",
-        "text": "Trust this computer, and add an authenticator app, so a forgotten password isn’t the end of a book."
+        "title": "Before your real books",
+        "text": "With every way in lost, nobody can open a project. Keep the recovery key away from the computer, and an unlocked copy until you trust it."
       },
       {
-        "title": "Lock when idle",
-        "text": "By hand, on closing, after a set time away, and when the computer locks or sleeps."
+        "title": "Still open from earlier",
+        "text": "Find my files on your own folder, a real Word manuscript, Pages on a Mac, and a real Scrivener project."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.6."
+    "text": "A power cut during a lock is simulated, not tested for real, and the decisions below. None of them hold up 3.6."
   },
   "questions": [
     {
