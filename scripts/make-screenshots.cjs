@@ -5,6 +5,7 @@ const { _electron: electron } = require('playwright-core');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
+const { AppLink } = require('../src/main/app-link');
 const { Library } = require('../src/main/storage/library');
 const { Workspace } = require('../src/main/workspace');
 
@@ -293,6 +294,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   // The lock, on a project of its own, so nothing above is affected.
+  process.env.NMR_LINK_DIR = path.join(profile, 'shared');
   await window.evaluate(() => window.storyTracker.saveSettings({ theme: 'system', glass: false }));
   await app.close();
   app = await launch(profile);
@@ -302,6 +304,37 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   await window.fill('#new-title', 'A Book in Progress');
   await window.click('#start-project');
   await window.waitForSelector('.ProseMirror');
+
+  // A document from RT Markdown Reader, played here by App Link's own code.
+  let links = {};
+  const reader = new AppLink({
+    folder: process.env.NMR_LINK_DIR,
+    dataDir: path.join(profile, 'reader'),
+    version: '3.9.0',
+    id: 'rt-markdown-reader',
+    name: 'RT Markdown Reader',
+    load: () => ({ ...links }),
+    save: (saved) => { links = saved; },
+    ask: async () => true,
+    open: async () => {},
+  });
+  await reader.start();
+  await window.evaluate(() => window.storyTracker.setLink(true));
+  await app.evaluate(({ dialog }) => { dialog.showMessageBox = async () => ({ response: 0 }); });
+  await reader.pairWith('storytracker');
+  await window.click('.prefs-button');
+  await window.waitForSelector('#linked-apps .word-row');
+  await window.locator('#linked-apps').scrollIntoViewIfNeeded();
+  await pause(300);
+  await shot(window, 'linked-apps');
+  await window.click('#pref-close');
+  await reader.send('storytracker', { name: 'Chapter 12.md', text: '# Chapter 12\n\nThe tide came in before anyone had finished packing, and it did not ask.\n' });
+  await window.waitForSelector('#inbox[open]');
+  await pause(300);
+  await shot(window, 'inbox');
+  await window.click('#inbox-drop');
+  await reader.stop();
+
   await window.click('.security-button');
   await window.fill('#new-password', 'seven silver spoons');
   await window.fill('#new-password-again', 'seven silver spoons');

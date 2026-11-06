@@ -33,8 +33,8 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.3](#v33--get-it-out) | Get it out | ✅ Released ([3.3.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.3.0)) |
 | [v3.4](#v34--bring-it-in) | Bring it in | ✅ Released ([3.4.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.4.0)) |
 | [v3.5](#v35--find-my-files) | Find my files | ✅ Released ([3.5.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.5.0)) |
-| [v3.6](#v36--password-lock) | Password lock | 🚧 Released as 3.6.0, being tested by the owner |
-| [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | Planned |
+| [v3.6](#v36--password-lock) | Password lock | ✅ Released ([3.6.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.6.0)) |
+| [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | 🚧 Built, in review |
 | [v3.8](#v38--records) | Records | Planned |
 | [v3.9](#v39--versions-of-a-record) | Versions of a record | Planned |
 | [v3.10](#v310--timeline-and-places) | Timeline and places | Planned |
@@ -182,12 +182,13 @@ for release.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Send to StoryTracker | M | A document from RT Markdown Reader lands in a small window: which project, and as what. Works with no pairing. |
-| 🙋 Open in RT Markdown Reader | S | A chapter, record or book opens there as a copy. |
-| 🙋🛡️ Link once | M | The apps find each other and you approve once. Off until you turn it on. |
-| Pictures come too | S | Needs App Link's `attachments`. |
+| ✅ 🙋 Send to StoryTracker | M | A document from RT Markdown Reader lands in a small window: which project, and as what. With no pairing, Open With works here; a menu item for it is on RT Markdown Reader's side. |
+| ✅ 🙋 Open in RT Markdown Reader | S | A chapter or book opens there as a copy. Records join when they exist. |
+| ✅ 🙋🛡️ Link once | M | The apps find each other and you approve once. Off until you turn it on. |
+| ✅ Pictures come too | S | Coming in, through App Link's `attachments`. Going out waits until RT Markdown Reader reads them. |
 
-**Test:** send a document each way, with and without a link, and with a locked project.
+**Test:** send a document each way, with and without a link, and with a locked project. **Passed** on 2026-11-05, in the
+app's own tests and against RT Markdown Reader 3.10 from source.
 
 ## v3.8 — Records
 

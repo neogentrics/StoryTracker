@@ -52,6 +52,13 @@ async function readSource(file) {
   return resolve(await readPrepared(file), []);
 }
 
+// Writing that came as text, from another app and not from a file.
+function sourceFromText(text, { plain = false, title }) {
+  if (plain) return { ...textToBlocks(text), title };
+  const { body, title: named, details } = splitFrontMatter(text);
+  return { ...markdownToBlocks(body), title: named ?? title, details };
+}
+
 function sectionsOf(source, mode, title) {
   if (source.sections) return source.sections;
   return sectionsFor({ ...source, title }, mode ?? splitOptions(source.blocks)[0].mode);
@@ -120,4 +127,4 @@ class Importer {
   }
 }
 
-module.exports = { IMPORT_EXTENSIONS, Importer, imageSize, readSource, sectionsOf };
+module.exports = { IMPORT_EXTENSIONS, Importer, imageSize, readSource, sectionsOf, sourceFromText };

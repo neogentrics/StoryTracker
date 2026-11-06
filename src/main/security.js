@@ -19,8 +19,8 @@ function checkPassword(password) {
 }
 
 class Security {
-  constructor({ workspace, trusted, backups, onProgress = () => {}, now = () => Date.now() }) {
-    Object.assign(this, { workspace, trusted, backups, onProgress, now });
+  constructor({ workspace, trusted, backups, onProgress = () => {}, onLocked = () => {}, now = () => Date.now() }) {
+    Object.assign(this, { workspace, trusted, backups, onProgress, onLocked, now });
     this.pendingRecovery = null;
     this.pendingSecret = null;
     this.earlier = null;
@@ -163,6 +163,7 @@ class Security {
       slots: [await passwordSlot(key, id, password), recoverySlot(key, id, recovery)],
     }));
     this.givePass();
+    this.onLocked();
     const made = this.backups?.backupNew(id);
     this.earlier = { id, folders: this.backups?.earlierFolders(id) ?? [] };
     return { opened, earlierBackups: this.earlier.folders.reduce((sum, folder) => sum + this.backups.countIn(folder), 0), newBackup: Boolean(made?.saved) };

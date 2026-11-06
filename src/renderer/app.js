@@ -33,6 +33,14 @@ async function enterRoom(opened) {
   room = new WritingRoom(root, opened, { api, onLibrary: leaveRoom, onPreferences: () => openPreferences(api), onSecurity: showSecurity, remember });
   await room.start();
   ready();
+  await room.showInbox();
+}
+
+// A document from another app. With a project open it's offered now. If not, the library says so, and it's offered as soon
+// as a project opens, which for a locked one is after its password.
+async function documentsChanged() {
+  if (room) await room.showInbox();
+  else if (document.querySelector('.project-list, .start-form') && !document.querySelector('#lock-screen')) await showHome();
 }
 
 function showSecurity() {
@@ -76,7 +84,11 @@ function watchForIdle() {
 
 async function opened(result) {
   await enterRoom(result);
-  if (result.mustReset) await askNewPassword(api);
+  if (result.mustReset) {
+    document.getElementById('inbox')?.remove();
+    await askNewPassword(api);
+    await room.showInbox();
+  }
 }
 
 // stay is for a project that has just been locked: opening it again straight away would undo that.
@@ -114,9 +126,10 @@ function showFileLock({ file, label }) {
 }
 
 async function showHome() {
-  const projects = await api.listProjects();
+  const [projects, waiting] = await Promise.all([api.listProjects(), api.inboxList()]);
   renderHome(root, {
     projects,
+    waiting,
     onOpen: (id) => run(async () => enterRoom(await api.openProject(id))),
     onUnlock: (project) => run(() => showLock(project)),
     onCreate: (title) => run(async () => enterRoom(await api.createProject(title))),
@@ -266,6 +279,9 @@ function onMenu(command) {
   if (command === 'details') room?.showDetails();
   if (command === 'open-file') openProjectFile();
   if (command === 'security') showSecurity();
+  if (command === 'reader-chapter') room?.openInReader('chapter');
+  if (command === 'reader-book') room?.openInReader('book');
+  if (command === 'inbox') room?.showInbox();
   if (command === 'lock') {
     if (lockedOpen) lockProject();
     else showSecurity();
@@ -278,6 +294,7 @@ async function start() {
   api.onUpdate(showUpdate);
   api.onMenu(onMenu);
   api.onOpenFile((file) => openProjectFile(file));
+  api.onInbox(() => documentsChanged());
   watchForIdle();
   await run(async () => {
     applyLook(await api.settings());

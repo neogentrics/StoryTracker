@@ -51,6 +51,10 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 <td><img src="docs/screenshots/ways-in.png" alt="The ways into a locked project: password, recovery key, this computer and an authenticator"><br><b>Ways back in.</b> A recovery key, a trusted computer and an authenticator.</td>
 </tr>
 <tr>
+<td><img src="docs/screenshots/inbox.png" alt="A document sent from RT Markdown Reader, asking which book it goes in"><br><b>Sent from RT Markdown Reader.</b> Nothing is filed until you say where.</td>
+<td><img src="docs/screenshots/linked-apps.png" alt="Linked apps in Preferences, with RT Markdown Reader linked"><br><b>Linked apps.</b> Off until you turn it on, and you approve once.</td>
+</tr>
+<tr>
 <td><img src="docs/screenshots/import.png" alt="The Import window, listing chat text to clean up and the chapters a file will become"><br><b>Import.</b> Word, Markdown and more, split into chapters and checked word for word.</td>
 <td><img src="docs/screenshots/preferences.png" alt="Preferences, with themes, fonts and page settings"><br><b>Preferences.</b> Themes, fonts and the page, all in one place.</td>
 </tr>
@@ -99,11 +103,12 @@ open the app from *System Settings → Privacy & Security*.
 | **The `.rtstory` file** | A whole project in one encrypted file, to move or back up. Double-click to open |
 | **Picks up where you left off** | Reopens the project and chapter you were in |
 | **Private by default** | Every project is encrypted on your own computer |
+| **RT Markdown Reader** | Send a document here, or open a chapter or a book there. Link the two apps once, or don't: it works either way. A locked project is never sent |
 | **Password lock** | Lock any project, and without your password or recovery key its files are a garbled mess, backups included. Trust a computer, add an authenticator, and lock by hand or when you step away |
 | **Works offline** | No account, no server, and your writing never leaves your computer |
 | **Updates itself** | On Windows and the Linux AppImage. Mac and the `.deb` tell you when a new version is out |
 
-Coming next: working with RT Markdown Reader (3.7), then characters, timelines and lore. See
+Coming next: characters, timelines and lore. See
 the [roadmap](ROADMAP.md).
 
 ## How your writing is kept

@@ -1,19 +1,19 @@
 {
   "now": {
-    "title": "3.6.0: the password lock",
-    "note": "Released. Tested on Windows, Mac and Linux, with an independent AI review. No person outside the project has reviewed it.",
+    "title": "v3.7: RT Markdown Reader, on this computer",
+    "note": "Built, and tested against the real RT Markdown Reader. Waiting for CI and your word to release.",
     "items": [
       {
-        "title": "Lock something small first",
-        "text": "Try it on a copy or a test project. Save the recovery key, lock it, then get back in each way you set up."
+        "title": "Send to StoryTracker",
+        "text": "A document from RT Markdown Reader lands in a small window: where it goes, and as what. Nothing is filed by itself."
       },
       {
-        "title": "Before your real books",
-        "text": "With every way in lost, nobody can open a project. Keep the recovery key away from the computer, and an unlocked copy until you trust it."
+        "title": "Open in RT Markdown Reader",
+        "text": "A chapter or a book opens there as a copy."
       },
       {
-        "title": "Still open from earlier",
-        "text": "Find my files on your own folder, a real Word manuscript, Pages on a Mac, and a real Scrivener project."
+        "title": "Link once",
+        "text": "The two apps find each other and you approve once. Off until you turn it on. A locked project is never sent."
       }
     ]
   },

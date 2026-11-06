@@ -8,6 +8,7 @@ import { openAttachments } from './attachments-dialog.js';
 import { openFolderImport } from './folder-import.js';
 import { openImport } from './import-dialog.js';
 import { icon } from './icons.js';
+import { openInbox } from './inbox-dialog.js';
 import { Page } from './page.js';
 import { ensurePass } from './security-dialog.js';
 import { openTrash } from './trash.js';
@@ -36,6 +37,7 @@ function booksOf(node) {
 export class WritingRoom {
   constructor(root, opened, { api, onLibrary, onPreferences, onSecurity, remember }) {
     this.api = api;
+    this.onLibrary = onLibrary;
     this.remember = remember;
     this.projectId = opened.id;
     this.outline = opened.outline;
@@ -383,14 +385,52 @@ export class WritingRoom {
       }));
   }
 
-  async afterImport({ outline, first, chapters }) {
+  // Another app sent something. A book chosen here is only a suggestion, which the author can change.
+  showInbox() {
+    return this.attempt(async () => {
+      if (document.querySelector('#inbox[open]')) return;
+      if (document.querySelector('dialog[open]')) {
+        if ((await this.api.inboxList()).length) this.showInfo('A document was sent here. It’s waiting under File, Documents Sent Here.');
+        return;
+      }
+      await this.flush();
+      await openInbox({
+        api: this.api,
+        books: booksOf(this.outline),
+        bookId: this.bookId,
+        onError: (text) => this.showMessage(text),
+        onDifferentProject: () => this.onLibrary(),
+        onNext: () => this.showInbox(),
+        onAdded: async (result) => {
+          await this.afterImport(result, 'Added');
+          await this.showInbox();
+        },
+      });
+    });
+  }
+
+  // A copy goes over, so nothing there comes back. A password-locked project refuses, and says why.
+  openInReader(scope) {
+    return this.attempt(async () => {
+      await this.flush();
+      const id = scope === 'book' ? this.bookId : this.activePage.chapterId;
+      if (!id) {
+        this.showMessage(`Open a ${scope} first.`);
+        return;
+      }
+      await this.api.openInReader({ scope, id });
+      this.showInfo('Opened a copy in RT Markdown Reader. Changes there don’t come back here.');
+    });
+  }
+
+  async afterImport({ outline, first, chapters }, verb = 'Imported') {
     this.outline = outline;
     this.chapterId = null;
     this.bookId = null;
     await this.page.clear();
     this.renderLists();
     if (first) await this.openChapter(first);
-    this.showInfo(`Imported ${chapters === 1 ? '1 chapter' : `${chapters} chapters`}.`);
+    this.showInfo(`${verb} ${chapters === 1 ? '1 chapter' : `${chapters} chapters`}.`);
   }
 
   showDetails(id = this.bookId) {

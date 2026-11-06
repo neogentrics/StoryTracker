@@ -3,6 +3,25 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.7.0] - 2026-11-05
+
+RT Story Tracker and RT Markdown Reader work together on this computer.
+
+### Added
+- **Linked apps**, in Preferences. The apps find each other and you approve once. It's off until you turn it on, and a
+  linked app can send you documents, not read anything here.
+- **Documents sent here.** A document from RT Markdown Reader lands in a small window: which book, and as what. Nothing is
+  filed by itself, and until you add it the document is only in memory. If no project is open it waits, and a locked
+  project offers it after its password.
+- **Open in RT Markdown Reader**, in the File menu, for a chapter or a book. It opens there as a copy. With a link it goes
+  straight across. With no link it starts RT Markdown Reader, the same way as Open With.
+- **Pictures come too.** Pictures sent with a document stay with the book as attachments.
+- **Open With.** A Markdown or text file opened with RT Story Tracker waits to be added, the same as one that was sent.
+
+### Security
+- A password-locked project is never sent to another app, by either road. A plain copy made for RT Markdown Reader is
+  removed as soon as a project is locked.
+
 ## [3.6.0] - 2026-11-05
 
 Lock a project, so that without getting into the app it's a garbled mess.

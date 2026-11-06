@@ -83,6 +83,34 @@ export async function openPreferences(api) {
     }
   };
 
+  const linkedApps = el('ul', { id: 'linked-apps', class: 'word-list' });
+  const linkNote = el('p', { id: 'link-note', class: 'quiet-note', role: 'status' });
+  const linkOn = el('input', { id: 'pref-link', type: 'checkbox', onchange: () => changeLink(() => api.setLink(linkOn.checked)) });
+  const showLinks = (status) => {
+    linkOn.checked = status.on;
+    linkNote.textContent = status.error ?? (status.on && !status.safe ? 'This computer has no safe place to keep a link, so links last until the app closes.' : '');
+    const row = (item) => el(
+      'li',
+      { class: 'word-row' },
+      el('span', {}, item.running ? item.name : `${item.name} (not running)`),
+      item.linked
+        ? el('button', { class: 'quiet', 'aria-label': `Remove the link to ${item.name}`, onclick: () => changeLink(() => api.unlinkApp(item.id)) }, 'Remove')
+        : el('button', { 'aria-label': `Link ${item.name}`, onclick: () => {
+          linkNote.textContent = `Answer in ${item.name}.`;
+          changeLink(() => api.pairApp(item.id));
+        } }, 'Link'),
+    );
+    const empty = status.on ? [el('li', { class: 'quiet-note' }, 'No other Recon Towers app is running with App Link on.')] : [];
+    linkedApps.replaceChildren(...(status.apps.length ? status.apps.map(row) : empty));
+  };
+  const changeLink = async (work) => {
+    try {
+      showLinks(await work());
+    } catch (error) {
+      linkNote.textContent = error.message;
+    }
+  };
+
   const themes = { system: { label: 'Same as this computer' }, ...THEMES };
   const dialog = el(
     'dialog',
@@ -152,11 +180,21 @@ export async function openPreferences(api) {
       field('Lock a project that has a password', select('pref-lock-after', LOCK_AFTER, String(settings.lockAfter), (value) => change('lockAfter', Number(value)))),
       el('p', { class: 'quiet-note' }, 'Counts time away from this app. A project with a password also locks when you close it, and when this computer locks or sleeps.'),
     ),
+    el(
+      'section',
+      {},
+      el('h3', {}, 'Linked apps'),
+      el('label', { class: 'check' }, linkOn, 'Let Recon Towers apps on this computer find this one'),
+      el('p', { class: 'quiet-note' }, 'A linked app can send you documents, and you choose where each one goes. It can’t read anything here. A locked project is never sent.'),
+      linkedApps,
+      linkNote,
+    ),
     el('div', { class: 'dialog-actions' }, el('button', { id: 'pref-close', class: 'primary', onclick: () => dialog.close() }, 'Done')),
   );
   dialog.addEventListener('close', () => dialog.remove());
   document.body.append(dialog);
   await showWords();
   await showBackups();
+  showLinks(await api.linkStatus());
   dialog.showModal();
 }

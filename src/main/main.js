@@ -6,7 +6,9 @@ const path = require('node:path');
 const { Backups } = require('./backups');
 const { exportFile } = require('./export');
 const { Importer } = require('./import');
+const { Inbox, isWritingFile } = require('./inbox');
 const { registerIpc } = require('./ipc');
+const { Linking } = require('./linking');
 const { buildMenu } = require('./menu');
 const { Security } = require('./security');
 const { runSelfTest, writeInWindow } = require('./self-test');
@@ -29,6 +31,7 @@ let workspace = null;
 let settings = null;
 let backups = null;
 let security = null;
+let linking = null;
 let pendingFile = process.argv.slice(1).find((arg) => arg.toLowerCase().endsWith('.rtstory')) ?? null;
 let libraryError = null;
 let mainWindow = null;
@@ -45,6 +48,43 @@ const systemVault = {
   open: (data) => safeStorage.decryptString(data),
 };
 
+// A document arriving is the one thing that may bring this window forward by itself.
+const inbox = new Inbox({
+  onChange: ({ arrived }) => {
+    if (!mainWindow) return;
+    if (arrived) {
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.show();
+      mainWindow.focus();
+    }
+    mainWindow.webContents.send('inbox:changed');
+  },
+});
+
+async function askToLink({ name }) {
+  const box = {
+    type: 'question',
+    message: `Link ${name} with RT Story Tracker?`,
+    detail: `${name} will be able to send documents here, and you choose where each one goes. It can’t read or change anything on its own.\n\nOnly say yes if you’ve just asked it to link.`,
+    buttons: ['Link', 'Don’t Link'],
+    defaultId: 1,
+    cancelId: 1,
+    noLink: true,
+  };
+  if (mainWindow) mainWindow.focus();
+  const { response } = await (mainWindow ? dialog.showMessageBox(mainWindow, box) : dialog.showMessageBox(box));
+  return response === 0;
+}
+
+// A Markdown or text file this app was started with, or handed: someone chose Open With, or another app did it for them.
+function takeWritingFile(file) {
+  try {
+    inbox.take({ from: 'Another app', path: file });
+  } catch (error) {
+    dialog.showMessageBox(mainWindow, { type: 'info', message: error.message });
+  }
+}
+
 function openLibrary() {
   try {
     const root = path.join(app.getPath('userData'), 'library');
@@ -56,6 +96,18 @@ function openLibrary() {
       backups,
       trusted: new TrustedComputer(root, systemVault),
       onProgress: (progress) => mainWindow?.webContents.send('security:progress', progress),
+      onLocked: () => linking?.clearSent(),
+    });
+    linking = new Linking({
+      workspace,
+      settings,
+      inbox,
+      root,
+      vault: systemVault,
+      home: app.getPath('home'),
+      dataDir: app.getPath('userData'),
+      version: app.getVersion(),
+      ask: askToLink,
     });
     session.defaultSession.setSpellCheckerEnabled(settings.values.spellcheck);
   } catch (error) {
@@ -290,7 +342,8 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   // A double-clicked .rtstory file: Windows and Linux pass it to a second copy of the app, and Mac sends this event.
   const openFile = (file) => {
-    if (mainWindow?.webContents.isLoading() === false) mainWindow.webContents.send('app:openFile', file);
+    if (isWritingFile(file)) takeWritingFile(file);
+    else if (mainWindow?.webContents.isLoading() === false) mainWindow.webContents.send('app:openFile', file);
     else pendingFile = file;
   };
   app.on('open-file', (event, file) => {
@@ -299,7 +352,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   app.on('second-instance', (_event, argv) => {
-    const file = argv.slice(1).find((arg) => arg.toLowerCase().endsWith('.rtstory'));
+    const file = argv.slice(1).find((arg) => arg.toLowerCase().endsWith('.rtstory') || isWritingFile(arg));
     if (file) openFile(file);
     if (!mainWindow) return;
     if (mainWindow.isMinimized()) mainWindow.restore();
@@ -321,6 +374,8 @@ if (!app.requestSingleInstanceLock()) {
       updater,
       backups: () => backups,
       security: () => security,
+      linking: () => linking,
+      inbox: () => inbox,
       window: () => mainWindow,
       takeFile: () => {
         const file = pendingFile;
@@ -343,6 +398,9 @@ if (!app.requestSingleInstanceLock()) {
     } else {
       updater.start();
       backups?.start();
+      linking?.apply().catch(() => {});
+      const given = process.argv.slice(1).find(isWritingFile);
+      if (given) takeWritingFile(given);
     }
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) mainWindow = createWindow();
@@ -357,5 +415,8 @@ if (!app.requestSingleInstanceLock()) {
     quitting = true;
   });
 
-  app.on('will-quit', () => security?.close());
+  app.on('will-quit', () => {
+    security?.close();
+    linking?.close();
+  });
 }
