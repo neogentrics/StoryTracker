@@ -13,8 +13,13 @@ const FILE_ENDING = '.rtstory';
 
 const stamp = (date) => date.toISOString().replace(/[:.]/g, '-');
 
-function folderName({ id, title }) {
-  const clean = String(title ?? 'Project').replace(/[<>:"/\\|?*\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+const LOCKED_NAME = 'Locked project';
+const shownName = ({ title, state }) => (state === 'locked' ? LOCKED_NAME : title ?? 'Project');
+
+// A locked project's title stays inside it, so its backups can't be named after it.
+function folderName(project) {
+  const { id } = project;
+  const clean = String(shownName(project)).replace(/[<>:"/\\|?*\u0000-\u001f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
   return `${clean || 'Project'} ${id.slice(0, 8)}`;
 }
 
@@ -81,8 +86,9 @@ class Backups {
     const { backupFolder, backupKeep } = this.settings.values;
     let saved = 0;
     this.lastError = null;
-    for (const project of this.workspace.library.listProjects()) {
-      if (project.state !== 'ready' || !wanted(project)) continue;
+    for (const listed of this.workspace.library.listProjects()) {
+      const project = this.reachable(listed);
+      if (!project || !wanted(project)) continue;
       try {
         const dir = path.join(backupFolder, folderName(project));
         fs.mkdirSync(dir, { recursive: true });
@@ -92,18 +98,45 @@ class Backups {
         this.state.projects[project.id] = { at: this.now().toISOString(), updatedAt: project.updatedAt };
         saved += 1;
       } catch (error) {
-        this.lastError = `${project.title}: ${error.message}`;
+        this.lastError = `${shownName(project)}: ${error.message}`;
       }
     }
     if (saved) this.write();
     return { saved, error: this.lastError };
   }
 
+  // A locked project can only be backed up while it's open, which is also the only time it can change.
+  reachable(project) {
+    if (project.state === 'ready') return project;
+    const open = this.workspace.project;
+    return project.state === 'locked' && open?.id === project.id ? { ...open.summary(), id: project.id, state: 'locked' } : null;
+  }
+
+  // Every folder of this project's from before it was locked, whatever it was called at the time.
+  earlierFolders(id) {
+    const { backupFolder } = this.settings.values;
+    if (!backupFolder || !fs.existsSync(backupFolder)) return [];
+    return fs
+      .readdirSync(backupFolder, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory() && entry.name.endsWith(` ${id.slice(0, 8)}`) && !entry.name.startsWith(LOCKED_NAME))
+      .map((entry) => path.join(backupFolder, entry.name));
+  }
+
+  countIn(folder) {
+    return fs.existsSync(folder) ? fs.readdirSync(folder).filter((name) => name.endsWith(FILE_ENDING)).length : 0;
+  }
+
+  // A newly locked project goes straight to a new backup, so the older unlocked ones aren't the only copies.
+  backupNew(id) {
+    delete this.state.projects[id];
+    return this.settings.values.backupFolder ? this.run((project) => project.id === id) : { saved: 0 };
+  }
+
   // Can take a while the first time, so it carries on behind the app.
   copyAttachments(project, dir) {
     this.copying = this.copying
       .then(() => this.workspace.library.copyAttachments(project.id, dir))
-      .catch((error) => { this.lastError = `${project.title}: ${error.message}`; });
+      .catch((error) => { this.lastError = `${shownName(project)}: ${error.message}`; });
   }
 
   keepNewest(dir, keep) {

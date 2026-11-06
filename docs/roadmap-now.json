@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "3.5.0: point it at your files",
-    "note": "Released. The test on the real Stories folder passed: every file accounted for, and none of them changed.",
+    "title": "3.6.0: the password lock",
+    "note": "Released. Tested on Windows, Mac and Linux, with an independent AI review. No person outside the project has reviewed it.",
     "items": [
       {
-        "title": "Look over the plan",
-        "text": "Run Find my files on your own folder and answer Ask me. Wrong guesses about books and chapters are what to look for."
+        "title": "Lock something small first",
+        "text": "Try it on a copy or a test project. Save the recovery key, lock it, then get back in each way you set up."
       },
       {
-        "title": "Read a few chapters",
-        "text": "The test checked files, not story text. Only you can say whether a book’s chapters are right."
+        "title": "Before your real books",
+        "text": "With every way in lost, nobody can open a project. Keep the recovery key away from the computer, and an unlocked copy until you trust it."
       },
       {
         "title": "Still open from earlier",
-        "text": "A real Word manuscript in Import, Pages on a Mac, and a real Scrivener project."
+        "text": "Find my files on your own folder, a real Word manuscript, Pages on a Mac, and a real Scrivener project."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "The power-cut test is still open, and the decisions below. None of them hold up 3.5."
+    "text": "A power cut during a lock is simulated, not tested for real, and the decisions below. None of them hold up 3.6."
   },
   "questions": [
     {

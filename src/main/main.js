@@ -1,5 +1,5 @@
 'use strict';
-const { app, BrowserWindow, dialog, ipcMain, Menu, session, shell } = require('electron');
+const { app, BrowserWindow, dialog, ipcMain, Menu, powerMonitor, safeStorage, session, shell } = require('electron');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -8,9 +8,11 @@ const { exportFile } = require('./export');
 const { Importer } = require('./import');
 const { registerIpc } = require('./ipc');
 const { buildMenu } = require('./menu');
+const { Security } = require('./security');
 const { runSelfTest, writeInWindow } = require('./self-test');
 const { Settings } = require('./settings');
 const { Library } = require('./storage/library');
+const { TrustedComputer } = require('./storage/trusted');
 const { Updater } = require('./updater');
 const { Workspace } = require('./workspace');
 
@@ -26,6 +28,7 @@ else if (process.env.RTST_USER_DATA) app.setPath('userData', process.env.RTST_US
 let workspace = null;
 let settings = null;
 let backups = null;
+let security = null;
 let pendingFile = process.argv.slice(1).find((arg) => arg.toLowerCase().endsWith('.rtstory')) ?? null;
 let libraryError = null;
 let mainWindow = null;
@@ -34,12 +37,26 @@ let quitting = false;
 
 const updater = new Updater((status) => mainWindow?.webContents.send('update:status', status));
 
+// The system's own encrypted storage. On Linux with no keyring Electron falls back to a fixed password, which is no
+// protection at all, so that counts as having none.
+const systemVault = {
+  available: () => safeStorage.isEncryptionAvailable() && (process.platform !== 'linux' || safeStorage.getSelectedStorageBackend() !== 'basic_text'),
+  seal: (text) => safeStorage.encryptString(text),
+  open: (data) => safeStorage.decryptString(data),
+};
+
 function openLibrary() {
   try {
     const root = path.join(app.getPath('userData'), 'library');
     workspace = new Workspace(new Library(root));
     settings = new Settings(root);
     backups = new Backups(workspace, settings);
+    security = new Security({
+      workspace,
+      backups,
+      trusted: new TrustedComputer(root, systemVault),
+      onProgress: (progress) => mainWindow?.webContents.send('security:progress', progress),
+    });
     session.defaultSession.setSpellCheckerEnabled(settings.values.spellcheck);
   } catch (error) {
     libraryError = error.message;
@@ -185,6 +202,23 @@ async function importFromHere() {
   return 'imported';
 }
 
+// The password stretching and the new key are native code inside the installed app, so this proves them there.
+async function lockFromHere() {
+  const { id } = workspace.open();
+  const password = 'correct horse battery staple';
+  security.makeRecovery();
+  await security.setPassword({ password });
+  workspace.closeProject();
+  if (workspace.library.describe(id).state !== 'locked') return 'it wasn’t locked';
+  const refused = await security.unlock({ id, how: 'password', secret: 'the wrong password' }).then(() => false, () => true);
+  if (!refused) return 'a wrong password opened it';
+  await security.unlock({ id, how: 'password', secret: password });
+  const project = workspace.open();
+  const [attachment] = project.listAttachments(id);
+  const back = await project.attachments.read(project.attachment(attachment.id).file);
+  return back.equals(fs.readFileSync(path.join(scratch, 'self-test.pdf'))) ? 'locked' : 'an attachment came back different';
+}
+
 // The window goes first and is closed before the storage work, because that work holds up this process, and a window
 // still loading behind it can stall for good.
 async function selfTest() {
@@ -202,6 +236,8 @@ async function selfTest() {
     console.log(`Self-test: print export is ${printed}`);
     const imported = await Promise.race([importFromHere().catch((error) => error.message), timeout(60000, 'timed out')]);
     console.log(`Self-test: import is ${imported}`);
+    const locked = await Promise.race([lockFromHere().catch((error) => error.message), timeout(60000, 'timed out')]);
+    console.log(`Self-test: lock is ${locked}`);
     workspace.closeProject();
     mainWindow.destroy();
     report = runSelfTest(path.join(scratch, 'work'), { withMeasure });
@@ -209,7 +245,8 @@ async function selfTest() {
     report.checks.push({ name: 'writes and saves a chapter in the window', passed: writing === 'saved', detail: writing });
     report.checks.push({ name: 'exports a print PDF, an e-book and a Word file', passed: printed === 'exported', detail: printed });
     report.checks.push({ name: 'reads those three files back in, and keeps an attachment', passed: imported === 'imported', detail: imported });
-    report.ok = report.ok && state === 'ready' && writing === 'saved' && printed === 'exported' && imported === 'imported';
+    report.checks.push({ name: 'locks a project with a password and opens it again', passed: locked === 'locked', detail: locked });
+    report.ok = report.ok && state === 'ready' && writing === 'saved' && printed === 'exported' && imported === 'imported' && locked === 'locked';
   } catch (error) {
     report = { ok: false, error: error.stack };
   }
@@ -283,6 +320,7 @@ if (!app.requestSingleInstanceLock()) {
       },
       updater,
       backups: () => backups,
+      security: () => security,
       window: () => mainWindow,
       takeFile: () => {
         const file = pendingFile;
@@ -298,6 +336,8 @@ if (!app.requestSingleInstanceLock()) {
       }),
     );
     mainWindow = createWindow({ show: !selfTestFile });
+    // A locked project shouldn't stay open behind a locked screen or a sleeping laptop.
+    for (const event of ['lock-screen', 'suspend']) powerMonitor.on(event, () => mainWindow?.webContents.send('menu:command', 'auto-lock'));
     if (selfTestFile) {
       selfTest();
     } else {
@@ -317,5 +357,5 @@ if (!app.requestSingleInstanceLock()) {
     quitting = true;
   });
 
-  app.on('will-quit', () => workspace?.closeProject());
+  app.on('will-quit', () => security?.close());
 }

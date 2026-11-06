@@ -25,7 +25,7 @@ class AttachmentStore {
     return path.join(this.dir, file);
   }
 
-  // Takes a path or a Buffer. Written under a temporary name, so a crash can't leave half a file under the real one.
+  // Takes a path, a Buffer or a stream. Written under a temporary name, so a crash can't leave half a file under the real one.
   async store(input) {
     fs.mkdirSync(this.dir, { recursive: true });
     const file = `${crypto.randomUUID()}.rtatt`;
@@ -36,7 +36,7 @@ class AttachmentStore {
     cipher.setAAD(Buffer.from(file));
     const hash = crypto.createHash('sha256');
     let size = 0;
-    const source = Buffer.isBuffer(input) ? Readable.from([input]) : fs.createReadStream(input);
+    const source = Buffer.isBuffer(input) ? Readable.from([input]) : typeof input === 'string' ? fs.createReadStream(input) : input;
     const seal = async function* seal(chunks) {
       yield MARKER;
       yield iv;
@@ -78,6 +78,13 @@ class AttachmentStore {
     decipher.setAuthTag(tag);
     const end = size - TAG_BYTES - 1;
     return { decipher, source: end >= start ? fs.createReadStream(full, { start, end }) : Readable.from([]) };
+  }
+
+  // The file's contents as a stream, for moving it to another key. It fails at the end if the file has been damaged.
+  reader(file) {
+    const { decipher, source } = this.decipherFor(file);
+    source.on('error', (error) => decipher.destroy(error));
+    return source.pipe(decipher);
   }
 
   async read(file) {

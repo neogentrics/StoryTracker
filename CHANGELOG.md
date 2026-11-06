@@ -3,6 +3,34 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.6.0] - 2026-11-05
+
+Lock a project, so that without getting into the app it's a garbled mess.
+
+### Added
+- **A password** on any project, from Password and Lock in the File menu or the lock button. Everything is encrypted under
+  it: the writing, the history, the search, the attachments and the title.
+- **A recovery key**, shown once, to copy, save or print. It works on any computer. You can make a new one at any time.
+- **Trust this computer**, optional. If you forget your password you can get back in through your login here. It never
+  travels with the project.
+- **An authenticator**, on a trusted computer: any authenticator app, a code before this computer's way in opens, and a
+  wait after too many wrong codes.
+- **Locking** by hand (Ctrl+L), on closing, after a set time away, and when the computer locks or sleeps. The time away is
+  in Preferences.
+- **A lock screen** with *Forgot your password?*, which lists the ways this project has, and leads to setting a new password.
+- **Locked project files.** A `.rtstory` file of a locked project opens with its password or recovery key, on any computer.
+- **A name for a locked project**, of your choosing, so the library can tell them apart without showing the title.
+
+### Changed
+- Exporting from a locked project, and saving a copy of an attachment, asks for the password first, because what comes out
+  isn't protected.
+- A locked project backs up while it's open and as it closes, to a folder that doesn't carry its title. After locking, the
+  app makes a new backup and offers to delete older ones, which it can't protect.
+
+### Security
+- Putting a lock on, or taking it off, moves the whole project to a new key, so a copy made earlier can't open it. A big
+  project takes a minute or two, and needs room for a second copy while it works.
+
 ## [3.5.0] - 2026-11-05
 
 Tell it where your files are, and it works out the rest or asks.

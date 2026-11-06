@@ -162,7 +162,7 @@ test('a project with no app slot shows as locked and needs its key', (t) => {
   const projectKey = openWithAppSlot(dir);
   addSlot(dir, projectKey, 'password', crypto.randomBytes(32));
   removeSlot(dir, listSlots(dir).find((slot) => slot.type === 'app').id);
-  assert.deepEqual(library.listProjects(), [{ id, state: 'locked', title: null }]);
+  assert.deepEqual(library.listProjects(), [{ id, state: 'locked', title: 'Locked project' }]);
   assert.throws(() => library.openProject(id), /locked/);
   const opened = library.openProject(id, projectKey);
   t.after(() => opened.close());

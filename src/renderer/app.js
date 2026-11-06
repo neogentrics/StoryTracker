@@ -2,6 +2,8 @@ import { el } from './dom.js';
 import { applyLook } from './look.js';
 import { openPreferences } from './prefs.js';
 import { renderFailure, renderHome } from './home.js';
+import { renderLock } from './lock-screen.js';
+import { askNewPassword, openSecurity } from './security-dialog.js';
 import { openTrash } from './trash.js';
 import { WritingRoom } from './writing-room.js';
 
@@ -14,7 +16,11 @@ const remember = {
   set: (key, value) => localStorage.setItem(key, value),
 };
 
+const IDLE_CHECK_MS = 15000;
+
 let room = null;
+let lockedOpen = false;
+let lastActive = Date.now();
 
 function ready() {
   document.body.dataset.state = 'ready';
@@ -22,8 +28,88 @@ function ready() {
 
 async function enterRoom(opened) {
   remember.set(LAST_PROJECT, opened.id);
-  room = new WritingRoom(root, opened, { api, onLibrary: leaveRoom, onPreferences: () => openPreferences(api), remember });
+  lockedOpen = Boolean(opened.locked);
+  lastActive = Date.now();
+  room = new WritingRoom(root, opened, { api, onLibrary: leaveRoom, onPreferences: () => openPreferences(api), onSecurity: showSecurity, remember });
   await room.start();
+  ready();
+}
+
+function showSecurity() {
+  if (!room) return null;
+  return openSecurity({
+    api,
+    beforeChange: () => room?.flush(),
+    onChanged: (opened) => { lockedOpen = Boolean(opened.locked); },
+    onLock: () => lockProject(),
+    onError: (text) => room?.showMessage(text),
+  }).catch((error) => room?.showMessage(error.message));
+}
+
+// Whatever was open goes with the project. Unsaved words are saved first, and if they can't be, it stays open.
+async function lockProject() {
+  if (!room || !lockedOpen) return;
+  const { projectId } = room;
+  try {
+    await room.flush();
+  } catch (error) {
+    room.showMessage(`Stayed open, because your latest changes aren’t saved yet: ${error.message}`);
+    return;
+  }
+  if (!(await api.lockNow())) return;
+  document.querySelectorAll('dialog').forEach((dialog) => dialog.remove());
+  room.leave();
+  room = null;
+  lockedOpen = false;
+  await showLock({ id: projectId, stay: true });
+}
+
+function watchForIdle() {
+  const active = () => { lastActive = Date.now(); };
+  for (const event of ['keydown', 'pointerdown', 'pointermove', 'wheel']) document.addEventListener(event, active, { passive: true, capture: true });
+  setInterval(async () => {
+    if (!room || !lockedOpen) return;
+    const { lockAfter } = await api.settings();
+    if (lockAfter && Date.now() - lastActive >= lockAfter * 60000) await lockProject();
+  }, IDLE_CHECK_MS);
+}
+
+async function opened(result) {
+  await enterRoom(result);
+  if (result.mustReset) await askNewPassword(api);
+}
+
+// stay is for a project that has just been locked: opening it again straight away would undo that.
+async function showLock({ id, title, stay = false }) {
+  const info = await api.lockInfo(id);
+  if (!stay && info.computer.quick && !info.computer.code) {
+    try {
+      await opened(await api.unlock({ id, how: 'computer' }));
+      return;
+    } catch {
+      // This computer's way in didn't work, so the screen below offers the others.
+    }
+  }
+  renderLock(root, {
+    title: title ?? (info.label || 'Locked project'),
+    computer: info.computer,
+    open: async (request) => opened(await api.unlock({ id, ...request })),
+    onBack: () => run(showHome),
+  });
+  ready();
+}
+
+function showFileLock({ file, label }) {
+  renderLock(root, {
+    title: label || 'Locked project',
+    computer: { on: false, code: false, quick: false },
+    open: async (request) => {
+      const result = await api.importLocked({ file, ...request });
+      if (result) await opened(result);
+      else await showHome();
+    },
+    onBack: () => run(showHome),
+  });
   ready();
 }
 
@@ -32,6 +118,7 @@ async function showHome() {
   renderHome(root, {
     projects,
     onOpen: (id) => run(async () => enterRoom(await api.openProject(id))),
+    onUnlock: (project) => run(() => showLock(project)),
     onCreate: (title) => run(async () => enterRoom(await api.createProject(title))),
     onSample: () => run(async () => enterRoom(await api.createSample())),
     onOpenFile: () => openProjectFile(),
@@ -90,6 +177,13 @@ async function openProjectFile(file) {
     await room?.flush();
     const id = await api.importProject(file);
     if (!id) return;
+    if (id.locked) {
+      room?.leave();
+      room = null;
+      await api.closeProject();
+      showFileLock(id);
+      return;
+    }
     room?.leave();
     room = null;
     await enterRoom(await api.openProject(id));
@@ -171,6 +265,12 @@ function onMenu(command) {
   if (command === 'print') room?.showExport({ format: 'pdf', preview: true });
   if (command === 'details') room?.showDetails();
   if (command === 'open-file') openProjectFile();
+  if (command === 'security') showSecurity();
+  if (command === 'lock') {
+    if (lockedOpen) lockProject();
+    else showSecurity();
+  }
+  if (command === 'auto-lock') lockProject();
 }
 
 async function start() {
@@ -178,6 +278,7 @@ async function start() {
   api.onUpdate(showUpdate);
   api.onMenu(onMenu);
   api.onOpenFile((file) => openProjectFile(file));
+  watchForIdle();
   await run(async () => {
     applyLook(await api.settings());
     const status = await api.status();
@@ -191,8 +292,13 @@ async function start() {
     const last = remember.get(LAST_PROJECT);
     if (last) {
       const projects = await api.listProjects();
-      if (projects.some((project) => project.id === last && project.state === 'ready')) {
+      const project = projects.find((item) => item.id === last);
+      if (project?.state === 'ready') {
         await enterRoom(await api.openProject(last));
+        return;
+      }
+      if (project?.state === 'locked') {
+        await showLock(project);
         return;
       }
     }

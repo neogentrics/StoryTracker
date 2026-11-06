@@ -291,6 +291,40 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
     await pause(400);
     await shot(window, `theme-${name}`);
   }
+
+  // The lock, on a project of its own, so nothing above is affected.
+  await window.evaluate(() => window.storyTracker.saveSettings({ theme: 'system', glass: false }));
+  await app.close();
+  app = await launch(profile);
+  window = await open(app);
+  await window.click('#open-library');
+  await window.waitForSelector('#new-title');
+  await window.fill('#new-title', 'A Book in Progress');
+  await window.click('#start-project');
+  await window.waitForSelector('.ProseMirror');
+  await window.click('.security-button');
+  await window.fill('#new-password', 'seven silver spoons');
+  await window.fill('#new-password-again', 'seven silver spoons');
+  await window.fill('#locked-label', 'Book one');
+  await pause(300);
+  await shot(window, 'password');
+  await window.click('#security-next');
+  await window.waitForSelector('#recovery-key');
+  await window.check('#recovery-saved');
+  await pause(300);
+  await shot(window, 'recovery-key');
+  await window.click('#recovery-continue');
+  await window.waitForSelector('#security-done');
+  if (await window.locator('#offer-trust').count()) await window.click('#offer-trust');
+  await window.click('#security-done');
+  await window.click('.security-button');
+  await window.waitForSelector('#ways');
+  await pause(300);
+  await shot(window, 'ways-in');
+  await window.click('#security-lock-now');
+  await window.waitForSelector('#lock-screen');
+  await pause(300);
+  await shot(window, 'lock');
   await app.close();
 
   for (const dir of [profile, firstRun]) fs.rmSync(dir, { recursive: true, force: true, maxRetries: 5 });

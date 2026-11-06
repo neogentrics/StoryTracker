@@ -117,6 +117,7 @@ function readHeader(handle) {
   }
   if (header.format > FORMAT) throw new PackageError('That project file was made by a newer version of the app.');
   if (!Array.isArray(header.files) || typeof header.projectId !== 'string') throw new PackageError('That project file is damaged.');
+  if (new Set(header.files.map((part) => part.name)).size !== header.files.length) throw new PackageError('That project file is damaged.');
   return { header, bodyStart: start.length + length };
 }
 
@@ -124,6 +125,28 @@ function readPackageHeader(file) {
   const handle = fs.openSync(file, 'r');
   try {
     return readHeader(handle).header;
+  } finally {
+    fs.closeSync(handle);
+  }
+}
+
+// One small part of the file, without unpacking the rest. Its checksum still has to match.
+function readPackagePart(file, name) {
+  const handle = fs.openSync(file, 'r');
+  try {
+    const { header, bodyStart } = readHeader(handle);
+    let position = bodyStart;
+    for (const part of header.files) {
+      if (part.name === name) {
+        if (part.size > MAX_HEADER) throw new PackageError('That project file is damaged.');
+        const data = Buffer.alloc(part.size);
+        if (fs.readSync(handle, data, 0, part.size, position) !== part.size) throw new PackageError('That project file is cut short.');
+        if (crypto.createHash('sha256').update(data).digest('hex') !== part.sha256) throw new PackageError('That project file is damaged.');
+        return data;
+      }
+      position += part.size;
+    }
+    return null;
   } finally {
     fs.closeSync(handle);
   }
@@ -171,4 +194,4 @@ function extractPackage(file, destination) {
   }
 }
 
-module.exports = { PackageError, extractPackage, readPackageHeader, writePackage, writePackageLater };
+module.exports = { PackageError, extractPackage, readPackageHeader, readPackagePart, writePackage, writePackageLater };

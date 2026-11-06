@@ -9,6 +9,7 @@ import { openFolderImport } from './folder-import.js';
 import { openImport } from './import-dialog.js';
 import { icon } from './icons.js';
 import { Page } from './page.js';
+import { ensurePass } from './security-dialog.js';
 import { openTrash } from './trash.js';
 
 const DRAG_TYPE = 'application/x-rtst-item';
@@ -33,7 +34,7 @@ function booksOf(node) {
 }
 
 export class WritingRoom {
-  constructor(root, opened, { api, onLibrary, onPreferences, remember }) {
+  constructor(root, opened, { api, onLibrary, onPreferences, onSecurity, remember }) {
     this.api = api;
     this.remember = remember;
     this.projectId = opened.id;
@@ -94,6 +95,7 @@ export class WritingRoom {
             iconButton('goals-button', 'goal', 'Goals', () => this.openGoals(this.activePage.chapterId)),
             iconButton('focus-button', 'focus', 'Focus mode', () => this.toggleFocus()),
             iconButton('trash-button', 'trash', 'Trash', () => this.showTrash()),
+            iconButton('security-button', 'lock', 'Password and lock', () => onSecurity()),
             iconButton('prefs-button', 'settings', 'Preferences', () => onPreferences()),
           ),
         ),
@@ -329,6 +331,7 @@ export class WritingRoom {
   async showExport(options = {}) {
     await this.attempt(async () => {
       await this.flush();
+      if (!(await ensurePass(this.api, 'Exported files aren’t protected: anyone can read them.'))) return;
       openExport({ api: this.api, scopes: this.exportScopes(), onError: (text) => this.showMessage(text), ...options });
     });
   }

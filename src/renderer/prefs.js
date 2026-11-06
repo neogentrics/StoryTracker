@@ -1,4 +1,4 @@
-import { BACKUP_EVERY, LIMITS, PAGE_FONTS, THEMES, UI_FONTS } from '../shared/themes.js';
+import { BACKUP_EVERY, LIMITS, LOCK_AFTER, PAGE_FONTS, THEMES, UI_FONTS } from '../shared/themes.js';
 import { el } from './dom.js';
 import { applyLook } from './look.js';
 
@@ -144,6 +144,13 @@ export async function openPreferences(api) {
         onchange: (event) => change('backupKeep', Number(event.target.value)),
       })),
       el('div', { class: 'word-form' }, el('button', { id: 'backup-now', onclick: backupNow }, 'Back up now'), backupNote),
+    ),
+    el(
+      'section',
+      {},
+      el('h3', {}, 'Lock'),
+      field('Lock a project that has a password', select('pref-lock-after', LOCK_AFTER, String(settings.lockAfter), (value) => change('lockAfter', Number(value)))),
+      el('p', { class: 'quiet-note' }, 'Counts time away from this app. A project with a password also locks when you close it, and when this computer locks or sleeps.'),
     ),
     el('div', { class: 'dialog-actions' }, el('button', { id: 'pref-close', class: 'primary', onclick: () => dialog.close() }, 'Done')),
   );

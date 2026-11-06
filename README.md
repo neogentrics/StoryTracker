@@ -47,6 +47,10 @@ scratch. Versions 1.0 to 2.3 were a Windows-only app called StoryTracker that ne
 <td><img src="docs/screenshots/attachments.png" alt="The attachments of a book, with a preview of each picture"><br><b>Attachments.</b> Pictures, audio and PDFs kept with the book, encrypted.</td>
 </tr>
 <tr>
+<td><img src="docs/screenshots/lock.png" alt="The lock screen of a project, asking for its password"><br><b>The lock.</b> Without your password or recovery key, it's a garbled mess.</td>
+<td><img src="docs/screenshots/ways-in.png" alt="The ways into a locked project: password, recovery key, this computer and an authenticator"><br><b>Ways back in.</b> A recovery key, a trusted computer and an authenticator.</td>
+</tr>
+<tr>
 <td><img src="docs/screenshots/import.png" alt="The Import window, listing chat text to clean up and the chapters a file will become"><br><b>Import.</b> Word, Markdown and more, split into chapters and checked word for word.</td>
 <td><img src="docs/screenshots/preferences.png" alt="Preferences, with themes, fonts and page settings"><br><b>Preferences.</b> Themes, fonts and the page, all in one place.</td>
 </tr>
@@ -95,17 +99,20 @@ open the app from *System Settings → Privacy & Security*.
 | **The `.rtstory` file** | A whole project in one encrypted file, to move or back up. Double-click to open |
 | **Picks up where you left off** | Reopens the project and chapter you were in |
 | **Private by default** | Every project is encrypted on your own computer |
+| **Password lock** | Lock any project, and without your password or recovery key its files are a garbled mess, backups included. Trust a computer, add an authenticator, and lock by hand or when you step away |
 | **Works offline** | No account, no server, and your writing never leaves your computer |
 | **Updates itself** | On Windows and the Linux AppImage. Mac and the `.deb` tell you when a new version is out |
 
-Coming next: the password lock (3.6) and working with RT Markdown Reader (3.7), then characters, timelines and lore. See
+Coming next: working with RT Markdown Reader (3.7), then characters, timelines and lore. See
 the [roadmap](ROADMAP.md).
 
 ## How your writing is kept
 
 Every project is an encrypted database in the app's own folder, with its own random key. A project with no password can be
-opened by any copy of this app, so that's privacy from a casual look, not secrecy. The password lock in 3.6 is what makes it
-real. Deleted things wait 30 days in the Trash, every chapter keeps its earlier versions, and backups go to a folder you
+opened by any copy of this app, so that's privacy from a casual look, not secrecy. A password is what makes it real:
+the project moves to a new key that only your password or recovery key can open. There's no account and no spare key, so if
+you lose every way in, nobody can open it. The [design](docs/design/passwords-and-recovery.md) says what a lock can't do as
+well as what it can. Deleted things wait 30 days in the Trash, every chapter keeps its earlier versions, and backups go to a folder you
 choose.
 
 Tests kill the app outright while it's saving, on all three systems, and every reported save survives. The numbers are in

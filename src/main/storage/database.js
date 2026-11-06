@@ -45,6 +45,17 @@ function copyDatabase(db, file, destination) {
   fs.copyFileSync(file, destination);
 }
 
+// Rewrites every page under a new key. It's done on a copy, so the project itself is never half one key and half the other.
+function rekeyDatabase(file, oldKey, newKey) {
+  const db = openDatabase(file, oldKey);
+  try {
+    db.pragma('journal_mode = DELETE');
+    db.pragma(`rekey = "x'${newKey.toString('hex')}'"`);
+  } finally {
+    db.close();
+  }
+}
+
 function migrate(db, file, { steps = STEPS, now = () => new Date() } = {}) {
   const current = db.pragma('user_version', { simple: true });
   const latest = steps.at(-1).version;
@@ -75,4 +86,4 @@ function databaseInfo(db) {
   return { sqlite, cipher: Object.keys(db.pragma('cipher')[0] ?? {})[0] ?? 'unknown' };
 }
 
-module.exports = { APPLICATION_ID, WrongKeyError, copyDatabase, databaseInfo, migrate, openDatabase };
+module.exports = { APPLICATION_ID, WrongKeyError, copyDatabase, databaseInfo, migrate, openDatabase, rekeyDatabase };
