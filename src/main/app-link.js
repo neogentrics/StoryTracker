@@ -9,7 +9,7 @@ const net = require('node:net');
 const path = require('node:path');
 
 const PROTOCOL = 1;
-const APP_ID = 'storytracker';
+const APP_ID = 'rt-story-tracker';
 const APP_NAME = 'RT Story Tracker';
 const ACCEPTS = ['markdown', 'text'];
 const MAX_LINE = 8 * 1024 * 1024;

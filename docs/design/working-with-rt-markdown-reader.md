@@ -59,7 +59,8 @@ Electron, RT Markdown Reader's `app-link.js` can be reused as it is; with .NET, 
 - `open_document` sends text or a path, and the app opens it unsaved. Nothing is saved because of a request.
 - `unlink` ends it. App Link stays off until the person turns it on.
 
-StoryTracker's app id is `storytracker`. It implements all four methods. If the app's display name changes, the id stays.
+StoryTracker's app id is `rt-story-tracker`, the same as its repo. It was `storytracker` until 3.7.1, and links made before
+that have to be made again. It implements all four methods.
 
 **Trust on one computer:** any program running as the same person could claim any name, as the rules say. The approval
 prompt and the key are what protect the link. That's a fair limit: a program already running as you can read your files

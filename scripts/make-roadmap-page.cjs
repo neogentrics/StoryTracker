@@ -9,7 +9,7 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8').replace(/\
 const roadmap = read('ROADMAP.md');
 const decisions = read('docs/decisions.md');
 const page = JSON.parse(read('docs/roadmap-now.json'));
-const REPO = 'https://github.com/neogentrics/StoryTracker';
+const REPO = 'https://github.com/neogentrics/rt-story-tracker';
 const SIZES = { S: ['s', 'Small'], M: ['m', 'Medium'], L: ['l', 'Large'] };
 
 const escape = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

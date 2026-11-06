@@ -1,7 +1,7 @@
 {
   "name": "rt-story-tracker",
   "productName": "RT Story Tracker",
-  "version": "3.7.0",
+  "version": "3.7.1",
   "description": "A place to write a book and keep everything around it, for Windows, macOS and Linux.",
   "author": "Recon Towers Dev Department <author@neogentrics.com>",
   "license": "SEE LICENSE IN LICENSE",
@@ -136,7 +136,7 @@
       {
         "provider": "github",
         "owner": "neogentrics",
-        "repo": "StoryTracker",
+        "repo": "rt-story-tracker",
         "releaseType": "release"
       }
     ],
@@ -149,10 +149,10 @@
       }
     ]
   },
-  "homepage": "https://github.com/neogentrics/StoryTracker",
-  "bugs": "https://github.com/neogentrics/StoryTracker/issues",
+  "homepage": "https://github.com/neogentrics/rt-story-tracker",
+  "bugs": "https://github.com/neogentrics/rt-story-tracker/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/neogentrics/StoryTracker.git"
+    "url": "https://github.com/neogentrics/rt-story-tracker.git"
   }
 }

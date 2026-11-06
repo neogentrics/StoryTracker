@@ -6,7 +6,7 @@
 const { app, net } = require('electron');
 
 const OWNER = 'neogentrics';
-const REPO = 'StoryTracker';
+const REPO = 'rt-story-tracker';
 const RELEASES_URL = `https://github.com/${OWNER}/${REPO}/releases/latest`;
 const FIRST_CHECK_MS = 8000;
 const CHECK_EVERY_MS = 6 * 60 * 60 * 1000;

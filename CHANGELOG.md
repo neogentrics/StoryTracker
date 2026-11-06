@@ -3,6 +3,13 @@
 All notable changes to RT Story Tracker (StoryTracker until 3.0) are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [3.7.1] - 2026-11-06
+
+### Changed
+- The project on GitHub is now `neogentrics/rt-story-tracker`, and the app's id for linking with other Recon Towers apps
+  is `rt-story-tracker`, to match the app's name. If you linked the app with RT Markdown Reader in 3.7.0, link them again
+  in Preferences. Nothing else changes, and your projects and settings stay as they are.
+
 ## [3.7.0] - 2026-11-05
 
 RT Story Tracker and RT Markdown Reader work together on this computer.
@@ -203,4 +210,4 @@ A new app, built from scratch for Windows, Mac and Linux. Nothing to set up and 
 ## [2.3.0] - 2025-07-23
 
 The last version of the old Windows app. Chapters in a rich text editor, on a PostgreSQL server you set up yourself. The
-notes for it and older versions are on the [releases page](https://github.com/neogentrics/StoryTracker/releases).
+notes for it and older versions are on the [releases page](https://github.com/neogentrics/rt-story-tracker/releases).

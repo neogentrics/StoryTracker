@@ -84,14 +84,14 @@ function project(space) {
 test('App Link stays off until it’s turned on, and leaves nothing behind when turned off', async (t) => {
   const space = setUp(t, { on: false });
   await space.linking.apply();
-  assert.equal(fs.existsSync(path.join(space.folder, 'storytracker.json')), false);
+  assert.equal(fs.existsSync(path.join(space.folder, 'rt-story-tracker.json')), false);
   await space.linking.setOn(true);
-  const info = JSON.parse(fs.readFileSync(path.join(space.folder, 'storytracker.json'), 'utf8'));
-  assert.deepEqual([info.protocol, info.id, info.name, info.version], [1, 'storytracker', 'RT Story Tracker', '3.7.0']);
+  const info = JSON.parse(fs.readFileSync(path.join(space.folder, 'rt-story-tracker.json'), 'utf8'));
+  assert.deepEqual([info.protocol, info.id, info.name, info.version], [1, 'rt-story-tracker', 'RT Story Tracker', '3.7.0']);
   assert.equal(validEndpoint(info.endpoint), true);
-  assert.deepEqual(await call(info.endpoint, 'hello', {}), { protocol: 1, app: 'storytracker', name: 'RT Story Tracker', version: '3.7.0', accepts: ['markdown', 'text'] });
+  assert.deepEqual(await call(info.endpoint, 'hello', {}), { protocol: 1, app: 'rt-story-tracker', name: 'RT Story Tracker', version: '3.7.0', accepts: ['markdown', 'text'] });
   await space.linking.setOn(false);
-  assert.equal(fs.existsSync(path.join(space.folder, 'storytracker.json')), false);
+  assert.equal(fs.existsSync(path.join(space.folder, 'rt-story-tracker.json')), false);
   assert.equal(space.settings.values.appLink, false);
 });
 
@@ -100,10 +100,10 @@ test('a document sent over a link waits in the inbox, and nothing is filed by it
   await space.linking.apply();
   const { book } = project(space);
   const { app } = await space.peer();
-  await app.pairWith('storytracker');
+  await app.pairWith('rt-story-tracker');
   assert.equal((await space.linking.status()).apps[0].linked, true);
 
-  await app.send('storytracker', { name: 'Chapter 12.md', text: '# Chapter 12\n\nThe tide came in.\n' });
+  await app.send('rt-story-tracker', { name: 'Chapter 12.md', text: '# Chapter 12\n\nThe tide came in.\n' });
   const [item] = space.inbox.list();
   assert.deepEqual([item.from, item.name, item.words], ['RT Markdown Reader', 'Chapter 12.md', 6]);
   assert.deepEqual(space.changes, [{ arrived: true }]);
@@ -121,26 +121,33 @@ test('a link takes the person’s yes, and a wrong key gets nowhere', async (t) 
   const space = setUp(t, { ask: async () => false });
   await space.linking.apply();
   const { app } = await space.peer();
-  await assert.rejects(app.pairWith('storytracker'), (error) => error.code === 'declined');
-  await assert.rejects(app.pairWith('storytracker'), (error) => error.code === 'declined', 'it can’t keep asking');
-  const { endpoint } = JSON.parse(fs.readFileSync(path.join(space.folder, 'storytracker.json'), 'utf8'));
+  await assert.rejects(app.pairWith('rt-story-tracker'), (error) => error.code === 'declined');
+  await assert.rejects(app.pairWith('rt-story-tracker'), (error) => error.code === 'declined', 'it can’t keep asking');
+  const { endpoint } = JSON.parse(fs.readFileSync(path.join(space.folder, 'rt-story-tracker.json'), 'utf8'));
   await assert.rejects(call(endpoint, 'open_document', { app: 'rt-markdown-reader', key: 'guess', text: 'hi' }), (error) => error.code === 'not_linked');
   await assert.rejects(call(endpoint, 'open_document', { app: '__proto__', key: 'guess', text: 'hi' }), (error) => error.code === 'not_linked');
   await assert.rejects(call(endpoint, 'nonsense', {}), (error) => error.code === 'unknown_method');
   assert.deepEqual(space.inbox.list(), []);
 });
 
+test('links from before the new App Link id are dropped, so they can be made again', (t) => {
+  const space = setUp(t);
+  fs.writeFileSync(path.join(space.root, 'links.bin'), 'old');
+  new Linking({ workspace: space.workspace, settings: space.settings, vault: fakeVault(), inbox: space.inbox, root: space.root, tempDir: space.tempDir, home: space.dir, dataDir: space.dir, version: '3.7.1' });
+  assert.equal(fs.existsSync(path.join(space.root, 'links.bin')), false);
+});
+
 test('a key is sealed, and with nowhere safe it lasts until the app closes', async (t) => {
   const space = setUp(t);
   await space.linking.apply();
   const { app } = await space.peer();
-  await app.pairWith('storytracker');
+  await app.pairWith('rt-story-tracker');
   const { key } = space.linking.load()['rt-markdown-reader'];
-  assert.equal(fs.readFileSync(path.join(space.root, 'links.bin')).includes(key), false);
+  assert.equal(fs.readFileSync(path.join(space.root, 'app-links.bin')).includes(key), false);
 
   const bare = setUp(t, { vault: fakeVault(false) });
   bare.linking.save({ somebody: { name: 'Some App', key } });
-  assert.equal(fs.existsSync(path.join(bare.root, 'links.bin')), false);
+  assert.equal(fs.existsSync(path.join(bare.root, 'app-links.bin')), false);
   assert.equal(bare.linking.load().somebody.key, key);
 });
 
@@ -148,7 +155,7 @@ test('removing a link ends it on both sides', async (t) => {
   const space = setUp(t);
   await space.linking.apply();
   const { app } = await space.peer();
-  await app.pairWith('storytracker');
+  await app.pairWith('rt-story-tracker');
   await space.linking.unlink('rt-markdown-reader');
   assert.deepEqual(space.linking.load(), {});
   assert.deepEqual(app.load(), {});
@@ -243,8 +250,8 @@ test('a document waits for a locked project, in memory, and goes in after the pa
 
   await space.linking.apply();
   const { app } = await space.peer();
-  await app.pairWith('storytracker');
-  await app.send('storytracker', { name: 'Late.md', text: 'Waiting words.' });
+  await app.pairWith('rt-story-tracker');
+  await app.send('rt-story-tracker', { name: 'Late.md', text: 'Waiting words.' });
   const onDisk = fs.readdirSync(space.root, { recursive: true }).filter((name) => {
     const full = path.join(space.root, String(name));
     return fs.statSync(full).isFile() && fs.readFileSync(full).includes('Waiting words');
@@ -366,12 +373,12 @@ test('an endpoint can’t be a network address', () => {
 test('a line that’s too long is cut off, and garbage ends the connection', async (t) => {
   const space = setUp(t);
   await space.linking.apply();
-  const { endpoint } = JSON.parse(fs.readFileSync(path.join(space.folder, 'storytracker.json'), 'utf8'));
+  const { endpoint } = JSON.parse(fs.readFileSync(path.join(space.folder, 'rt-story-tracker.json'), 'utf8'));
   await new Promise((resolve) => {
     const sock = net.connect(endpoint);
     sock.on('connect', () => sock.write('not json\n'));
     sock.on('error', resolve);
     sock.on('close', resolve);
   });
-  assert.equal((await call(endpoint, 'hello', {})).app, 'storytracker');
+  assert.equal((await call(endpoint, 'hello', {})).app, 'rt-story-tracker');
 });

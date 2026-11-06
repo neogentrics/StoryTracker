@@ -190,8 +190,8 @@ The repo has no licence. RT Markdown Reader is proprietary, with public source.
 
 ✅ **Chosen 6 November 2026: The suite first.**
 
-Comparing this roadmap with RT Markdown Reader added four releases. The suite became v3.9, because Author Desk, RT Press and
-RT Audio Studio are being planned to it. Records and what follows moved up by one, to v3.10 to v3.8. Pictures and tables,
+Comparing this roadmap with RT Markdown Reader added four releases. The suite became v3.8, because Author Desk, RT Press and
+RT Audio Studio are being planned to it. Records and what follows moved up by one, to v3.9 to v3.17. Pictures and tables,
 read aloud and dictation, and finding your way around are v3.18 to v3.20.
 
 ### 25. Which app keeps which export
