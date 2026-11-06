@@ -23,6 +23,10 @@
   },
   "questions": [
     {
+      "q": "Can the apps detect each other when they’re installed?",
+      "a": "Not yet: today they find each other only while running. v3.17 adds an installed list and an Apps panel in every app, to the suite’s shared rules. Decision 24 is whether it comes next."
+    },
+    {
       "q": "What happens to pictures in an imported file?",
       "a": "From v3.5 they stay with the book as attachments, encrypted like the rest of the project. They sit beside the writing and don’t appear on the page yet."
     },
@@ -36,7 +40,7 @@
     },
     {
       "q": "Will it read text aloud?",
-      "a": "It's under Later, using RT Markdown Reader's offline voices. From v3.7 you can also send a chapter to RT Markdown Reader and have it read there."
+      "a": "Yes, in v3.19, using RT Markdown Reader's offline voices, with the dictionary's pronunciations. You can already send a chapter to RT Markdown Reader and have it read there."
     },
     {
       "q": "Will the dictionary know how to say words?",
@@ -48,7 +52,7 @@
     },
     {
       "q": "Were these features taken from RT Markdown Reader?",
-      "a": "Partly. Most came from what you said you need, and the plan reuses its export, themes, AI services, connector and sync. Nobody has gone through its feature list one by one yet."
+      "a": "Partly. Most came from what you said you need. In November the two roadmaps were compared feature by feature, and what this app was missing was added: v3.17 to v3.20, and wider v3.11 and v3.13."
     },
     {
       "q": "How do I hand an AI a chapter as Markdown?",

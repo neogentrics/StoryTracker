@@ -40,10 +40,14 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.10](#v310--timeline-and-places) | Timeline and places | Planned |
 | [v3.11](#v311--lore-ideas-research-dictionaries) | Lore, ideas, research, dictionaries | Planned |
 | [v3.12](#v312--where-every-book-stands) | Where every book stands | Planned |
-| [v3.13](#v313--claude-integration) | Claude integration | Planned |
+| [v3.13](#v313--claude-and-ai) | Claude and AI | Planned |
 | [v3.14](#v314--leaving-notion) | Leaving Notion | Planned |
 | [v3.15](#v315--two-computers) | Two computers | Planned |
 | [v3.16](#v316--files-kept-in-step) | Files kept in step | Planned |
+| [v3.17](#v317--the-recon-towers-suite) | The Recon Towers suite | Planned |
+| [v3.18](#v318--pictures-and-tables-on-the-page) | Pictures and tables on the page | Planned |
+| [v3.19](#v319--hear-it-and-say-it) | Hear it and say it | Planned |
+| [v3.20](#v320--find-your-way-around) | Find your way around | Planned |
 | [v4.0](#v40--the-companion) | The companion | Planned |
 | [Later](#later--only-if-needed) | Only if needed | Ideas |
 | [Ongoing](#ongoing--polish--distribution) | Polish & distribution | Ongoing |
@@ -244,7 +248,10 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 | 🙋 Story ideas | S | Jot it, tag it, and turn it into a book when it's ready. |
 | 🙋 Dictionaries | M | Glossary and invented words, with meanings and a pronunciation guide, including words from other languages. Feeds spell check and read aloud, and RT Markdown Reader's voices through App Link, so a name is taught once. |
 | 🙋 Research | M | Sources, notes, pictures and PDFs, attached to what they're for. |
+| Citations | M | Bring in sources from BibTeX or Zotero, cite them, and build the list at the end. For research and non-fiction. |
 | One search | M | Across chapters, records, lore and research. |
+| 🙋 Smart search | M | Search by meaning as well as by word, on your own computer, beside One search. Using RT Markdown Reader's way of doing it. |
+| Check links | S | Finds mentions and links that lead nowhere, across chapters, records and lore, as RT Markdown Reader's link checker does. |
 
 **Test:** load the Universe Bible, Races and Research Library, and find a fact by search alone.
 
@@ -254,25 +261,30 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Book catalog | M | Status, series, formats, publish date and store links. |
+| 🙋 Book catalog | M | Writing status and series live here. Published editions, formats, dates and store links are RT Author Desk's, shown here once it exists. Until then they're typed in here. See [decision 18](docs/decisions.md). |
 | 🙋 What's left | M | One view of every book: words, chapters done, what's next. It updates itself. |
 | 🙋 To-dos | S | Per book or project, and in the text. |
 | Reading order | S | Publication order and timeline order, side by side. |
+| Where this was sent | S | A list per book of what went where, and when. Needs App Link to say where a document landed. |
 
 **Test:** Works in Progress can be retired, because this view says the same thing on its own.
 
-## v3.13 — Claude integration
+## v3.13 — Claude and AI
 
-🙋 Must be in the app, with settings for how far it goes. Follows RT Markdown Reader's connector.
+🙋 Must be in the app, with settings for how far it goes. Follows RT Markdown Reader's connector and AI services. AI is an
+add-on: it's off until you turn it on, and the app is complete without it.
 
 | Feature | Size | Details |
 |---|:-:|---|
 | 🙋🛡️ Connect Claude | L | Claude Desktop and Claude Code can reach your projects, through a connector you add in one click. Locked projects stay out. |
 | 🙋🛡️ Your choice of access | M | Per project: **Off** (the default), **Read only**, **Suggest** (you accept or reject each change), or **Read and write** (Claude edits directly). |
 | A record of changes | S | Every change Claude makes is in version history, labelled and undoable. |
-| AI assist (optional) | M | Your own AI service, as in RT Markdown Reader. Off until you turn it on. |
+| 🙋 AI assist (optional) | M | Proofread, rewrite, shorten, translate or summarise a selection. You see the change and accept it. |
+| 🙋 Your choice of AI | M | Claude, ChatGPT, Gemini, Mistral, OpenRouter, or a local model through Ollama or LM Studio, with a different model for each task if you like. Your own account and key, as in RT Markdown Reader. |
+| 🙋 Claude Code | S | Use a Claude Code sign-in instead of a key, and Open in Claude Code from a project. |
 
-**Test:** a Claude session finds a dossier, suggests an edit, and it appears as a change to accept, then at each other level.
+**Test:** a Claude session finds a dossier, suggests an edit, and it appears as a change to accept, then at each other
+level. Proofread a selection with a local model, with the computer offline.
 
 ## v3.14 — Leaving Notion
 
@@ -312,6 +324,64 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 
 **Test:** edit in each app, then in both at once. Comments in StoryTracker survive an edit from the file.
 
+## v3.17 — The Recon Towers suite
+
+🙋 The apps know each other when they're installed, not only when they're running. Built to
+[the suite's rules](https://github.com/neogentrics/rt-markdown-reader/blob/main/docs/app-suite.md), not a second set. Which
+release this should really be is [decision 24](docs/decisions.md).
+
+| Feature | Size | Details |
+|---|:-:|---|
+| 🙋 Installed list | S | Each app leaves a small file saying it's installed and how to start it, and removes it when it's uninstalled. Replaces the guessing in Open in RT Markdown Reader. |
+| 🙋 Apps panel | M | The same panel in every app: which Recon Towers apps are on this computer, which are running, and which are linked. It offers to link one or open one. Finding an app never links it. |
+| 🙋 What it's doing | S | A linked app can ask for a short status, such as what's open. A locked project says nothing about itself, and no writing is ever in the answer. |
+| 🙋 Asking for facts | M | A linked app can ask for what this one owns: word counts, draft status, dictionary pronunciations. This app can ask RT Author Desk for a book's published facts. |
+| 🙋 Publish through RT Markdown Reader | S | Sending to WordPress, Ghost, Discord and wikis stays in RT Markdown Reader. This app hands it the chapter over App Link, and doesn't build its own. Never a locked project. |
+| Automations | M | Webhooks and n8n can start an export or a backup, or add a note to a project. Off until you turn it on, and locked projects stay out. |
+
+**Test:** install each app on a clean computer, in either order, and each finds the other. Uninstall one and it goes from
+the list. Status from a locked project says nothing.
+
+## v3.18 — Pictures and tables on the page
+
+🙋 What RT Markdown Reader's pages can hold. Until now, pictures sit beside the writing as attachments.
+
+| Feature | Size | Details |
+|---|:-:|---|
+| 🙋 Pictures in chapters | M | Place a picture on the page, from an attachment or a file, and it goes through to Word, PDF and EPUB. Encrypted like the rest. |
+| 🙋 Tables | M | A table editor for the page, with export to every format. |
+| 🙋 Clean paste | S | Paste from a web page or Word as clean text, with only the formatting this app uses. |
+| Bookmarks | S | Mark a place and jump back to it. Private notes are already comments, which stay out of the book. |
+
+**Test:** a chapter with a picture and a table comes out right in Word, PDF and EPUB, and survives the KDP previewer.
+
+## v3.19 — Hear it and say it
+
+🙋 Moved up from Later. Uses RT Markdown Reader's offline voices and speech to text, with nothing to install and nothing
+leaving the computer.
+
+| Feature | Size | Details |
+|---|:-:|---|
+| 🙋 Read aloud | M | Hear a chapter in a natural voice, with each sentence highlighted as it's read, and a choice of speakers or headphones. |
+| 🙋 Names said right | S | Read aloud uses the dictionary's pronunciations, so an invented name is taught once. |
+| 🙋 Dictation | M | Speak and it types, with the offline Whisper model and a choice of microphone. |
+
+**Test:** with the computer offline, read a chapter aloud with an invented name said right, and dictate a page.
+
+## v3.20 — Find your way around
+
+🙋 What a big project needs once it has hundreds of chapters and records.
+
+| Feature | Size | Details |
+|---|:-:|---|
+| 🙋 Quick Open | S | Type a few letters to jump to any chapter or record. |
+| 🙋 Command palette | S | Every command, by name, from the keyboard. |
+| 🙋 Your own shortcuts | M | Change any keyboard shortcut. |
+| 🙋 Customize Theme | M | Change a theme's colours, and share them with RT Markdown Reader. |
+| 🙋 Colour-safe | S | Colours that work for colour-blind readers, in every theme. |
+
+**Test:** run a morning's work from the keyboard alone, and pass the contrast test with a custom theme.
+
 ## v4.0 — The companion
 
 🙋 Phones, tablets and Chromebooks. A second app, which is why it's a major version. Only the desktop has the database:
@@ -333,10 +403,9 @@ these devices sync with it.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Read aloud | M | Hear a chapter read in a natural voice, on your own computer and offline, using RT Markdown Reader's voices and the dictionary's pronunciations. |
 | 🙋 Theme and font packs | M | Download more themes and fonts as packs, and share them with RT Markdown Reader. |
 | Your own PostgreSQL server | M | Connect to a server you run yourself. |
-| Marketing & royalties | M | Depends on [decision 18](docs/decisions.md). |
+| Add-ons | L | Extra features you can add to the app, as in RT Markdown Reader. |
 | Canon checking with AI | M | Read a chapter against the records and flag what doesn't match. |
 | Scripts & screenplays | M | A writing mode, from the old roadmap. |
 | Writing with others | L | Sharing a project with an editor or co-author. It needs a service in the middle. |
@@ -348,7 +417,7 @@ these devices sync with it.
 | Feature | Size | Details |
 |---|:-:|---|
 | Code signing | S | Windows and Mac, as for RT Markdown Reader. |
-| Tutorial & Help Center | M | Grows with each release; any author has to be able to start alone. |
+| Tutorial & Help Center | M | A first-run tutorial and a Help Center that grow with each release; any author has to be able to start alone. |
 | Accessibility | S | Screen readers, contrast and keyboard use, checked in the tests. |
 | Languages | L | The app in other languages, right-to-left text. |
 | Recon Towers App Store | S | StoryTracker goes back on the App Store page when the rebuild is done. Until then it stays on The Bench. |

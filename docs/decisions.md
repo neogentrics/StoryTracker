@@ -138,11 +138,19 @@ needs an Apple Developer membership and has to go through Apple's store.
 
 ### 18. Marketing and royalties (before v3.12)
 
+[The suite's plan](https://github.com/neogentrics/rt-markdown-reader/blob/main/docs/app-suite.md) gives these to a new app, RT Author Desk, along with published editions, ISBNs, prices and store links. Is that right?
+
 His answer on book tracking takes in the Book Catalog and Works in Progress. Notion also holds Marketing & Launches and
 Sales & Royalties under Business Ops, which he's kept apart from the stories.
 
-*Recommendation:* **Keep them out for now.** The stories and the business stay separate, as he set up. Revisit if other
-authors ask.
+| Thing | Home if he agrees | What this app does |
+|---|---|---|
+| Marketing, launches, royalties, accounts | RT Author Desk | Nothing. It's off this roadmap's Later list. |
+| Published editions, formats, dates, store links | RT Author Desk | v3.12's catalog shows them, read over App Link |
+| Writing status, word counts, what's left | This app | Keeps them, and Author Desk shows them |
+
+*Recommendation:* **Yes.** It's what he already set up: stories and business apart. Until Author Desk exists, v3.12's catalog
+lets him type the published facts in, and they move across when it arrives.
 
 ### 19. Recovery defaults (before v3.6)
 
@@ -175,6 +183,34 @@ Those habits are written in his Claude memory, and need changing at the switch.
 The repo has no licence. RT Markdown Reader is proprietary, with public source.
 
 *Recommendation:* **The same as RT Markdown Reader.** It's the suite's pattern.
+
+### 24. Where the new releases go (before v3.8)
+
+Comparing this roadmap with RT Markdown Reader's added v3.17 to v3.20. They're numbered after what was already planned, so
+nothing he's been told has changed number. That order isn't a recommendation.
+
+| Choice | In short |
+|---|---|
+| **The suite first** | v3.17 moves up to be the next release, and the rest shift by one. It's small, and Author Desk, RT Press and RT Audio Studio are being planned to it. |
+| **Leave them at the end** | Records and leaving Notion come first, as chosen in decision 22. The suite waits until v3.17. |
+| **Pictures sooner too** | The suite, then v3.18, then Records. Pictures on the page matter to a book, and he's asked about them already. |
+
+*Recommendation:* **The suite first,** then Records as planned. It's what the other apps are waiting for, and it doesn't
+hold Records up by much.
+
+### 25. Which app keeps which export (before RT Press starts)
+
+RT Press starts from this app's book layouts and EPUB work and goes further, for designed print interiors and cover wraps.
+Does this app keep them once Press exists?
+
+| Choice | In short |
+|---|---|
+| **This app keeps its exports** | Anyone can still get a print PDF and an EPUB with no second app. Press adds design on top. Two places to maintain. |
+| **Press takes print, this app keeps the rest** | Word, Markdown and EPUB stay here. Print PDFs move to Press. One home for print, but print then needs a second app. |
+| **Press takes all of it** | The cleanest split, but this app stops being complete by itself, which goes against the suite's promises. |
+
+*Recommendation:* **This app keeps its exports,** and Press shares the layout code rather than copying it. Every app in the
+suite is meant to stand alone.
 
 ## The order, and where to start
 
