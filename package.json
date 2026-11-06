@@ -1,7 +1,7 @@
 {
   "name": "rt-story-tracker",
   "productName": "RT Story Tracker",
-  "version": "3.6.0",
+  "version": "3.7.0",
   "description": "A place to write a book and keep everything around it, for Windows, macOS and Linux.",
   "author": "Recon Towers Dev Department <author@neogentrics.com>",
   "license": "SEE LICENSE IN LICENSE",
@@ -45,7 +45,7 @@
     "build:renderer": "node scripts/build-renderer.mjs",
     "start": "npm run build:renderer && electron .",
     "test": "node --test \"test/*.test.cjs\"",
-    "test:e2e": "npm run build:renderer && node test/e2e/app.e2e.cjs && node test/e2e/write.e2e.cjs && node test/e2e/features.e2e.cjs && node test/e2e/safety.e2e.cjs && node test/e2e/export.e2e.cjs && node test/e2e/import.e2e.cjs && node test/e2e/folder.e2e.cjs && node test/e2e/lock.e2e.cjs",
+    "test:e2e": "npm run build:renderer && node test/e2e/app.e2e.cjs && node test/e2e/write.e2e.cjs && node test/e2e/features.e2e.cjs && node test/e2e/safety.e2e.cjs && node test/e2e/export.e2e.cjs && node test/e2e/import.e2e.cjs && node test/e2e/folder.e2e.cjs && node test/e2e/lock.e2e.cjs && node test/e2e/link.e2e.cjs",
     "dist:win": "npm run build:renderer && electron-builder --win nsis --x64 --publish never",
     "dist:mac": "npm run build:renderer && electron-builder --mac dmg --arm64 --x64 --publish never",
     "dist:linux": "npm run build:renderer && electron-builder --linux AppImage deb --x64 --publish never",

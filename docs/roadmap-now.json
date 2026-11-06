@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "3.6.0: the password lock",
-    "note": "Released. Tested on Windows, Mac and Linux, with an independent AI review. No person outside the project has reviewed it.",
+    "title": "3.7.0: RT Markdown Reader, on this computer",
+    "note": "Released. Tested both ways against the real RT Markdown Reader.",
     "items": [
       {
-        "title": "Lock something small first",
-        "text": "Try it on a copy or a test project. Save the recovery key, lock it, then get back in each way you set up."
+        "title": "Link the two apps",
+        "text": "Turn on Linked apps in Preferences in both, then link them once. Send a document across each way."
       },
       {
-        "title": "Before your real books",
-        "text": "With every way in lost, nobody can open a project. Keep the recovery key away from the computer, and an unlocked copy until you trust it."
+        "title": "Still to come on its side",
+        "text": "RT Markdown Reader sends only to a linked app so far, and doesn’t read pictures yet."
       },
       {
         "title": "Still open from earlier",
-        "text": "Find my files on your own folder, a real Word manuscript, Pages on a Mac, and a real Scrivener project."
+        "text": "Your own test of the lock and of Find my files, a real Word manuscript, Pages on a Mac, and a real Scrivener project."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "A power cut during a lock is simulated, not tested for real, and the decisions below. None of them hold up 3.6."
+    "text": "A power cut during a lock is simulated, not tested for real, and the decisions below. None of them hold up 3.7."
   },
   "questions": [
     {

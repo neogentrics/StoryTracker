@@ -1797,3 +1797,11 @@ html[data-theme='contrast'] :is(button, input, select, textarea) {
 #security-progress {
   width: 100%;
 }
+
+/* Documents sent here */
+.inbox-note {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}

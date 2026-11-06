@@ -143,6 +143,7 @@ const DEFAULT_SETTINGS = {
   backupEvery: 'off',
   backupKeep: 10,
   lockAfter: 15,
+  appLink: false,
 };
 
 const LIMITS = { textSize: [14, 28], pageWidth: [32, 64], backupKeep: [1, 100] };
@@ -170,6 +171,7 @@ function cleanSettings(input) {
     backupEvery: known(source.backupEvery, BACKUP_EVERY, 'backupEvery'),
     backupKeep: Math.round(within('backupKeep')),
     lockAfter: Object.hasOwn(LOCK_AFTER, source.lockAfter) ? Number(source.lockAfter) : DEFAULT_SETTINGS.lockAfter,
+    appLink: source.appLink === true,
   };
 }
 

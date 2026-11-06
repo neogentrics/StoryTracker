@@ -29,7 +29,7 @@ function projectRow(project, { onOpen, onUnlock, onRemoveSample, onTrashProject 
   );
 }
 
-export function renderHome(root, { projects, onOpen, onUnlock, onCreate, onSample, onRemoveSample, onOpenFile, onFindFiles, onTrashProject, onShowTrash }) {
+export function renderHome(root, { projects, waiting = [], onOpen, onUnlock, onCreate, onSample, onRemoveSample, onOpenFile, onFindFiles, onTrashProject, onShowTrash }) {
   const first = projects.length === 0;
   const hasSample = projects.some((project) => project.sample);
   const title = el('input', {
@@ -62,6 +62,9 @@ export function renderHome(root, { projects, onOpen, onUnlock, onCreate, onSampl
         el('div', { class: 'brand' }, el('img', { src: 'icon.png', alt: '', width: '40', height: '40' }), 'RT Story Tracker'),
         el('h1', {}, first ? 'Where do you want to start?' : 'Your library'),
         first ? el('p', { class: 'lead' }, 'Everything saves by itself, on this computer. There’s nothing to set up.') : null,
+        waiting.length
+          ? el('p', { id: 'inbox-note', class: 'inbox-note', role: 'status' }, `${waiting[0].from} sent “${waiting[0].name}”${waiting.length > 1 ? ` and ${waiting.length - 1} more` : ''}. Open a project to add it.`)
+          : null,
         first
           ? null
           : el('ul', { class: 'project-list' }, projects.map((item) => projectRow(item, { onOpen, onUnlock, onRemoveSample, onTrashProject }))),

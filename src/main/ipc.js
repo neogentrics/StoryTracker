@@ -244,13 +244,25 @@ function registerSecurity({ security, workspace, window }) {
   });
 }
 
-function registerIpc({ status, workspace, updater, settings, backups, security, window, takeFile }) {
+function registerLinking({ linking, inbox, workspace }) {
+  handle('link:status', () => linking().status());
+  handle('link:set', (on) => linking().setOn(on));
+  handle('link:pair', (id) => linking().pair(id));
+  handle('link:unlink', (id) => linking().unlink(id));
+  handle('link:openInReader', busyWhile(workspace, (input) => linking().openInReader(input)));
+  handle('inbox:list', () => inbox().list());
+  handle('inbox:add', busyWhile(workspace, (input) => inbox().add(workspace(), input)));
+  handle('inbox:drop', (id) => inbox().drop(id));
+}
+
+function registerIpc({ status, workspace, updater, settings, backups, security, linking, inbox, window, takeFile }) {
   const busy = (work) => busyWhile(workspace, work);
   const unlocked = (work) => (...args) => {
     security().needExportPass();
     return work(...args);
   };
   registerSecurity({ security, workspace, window });
+  registerLinking({ linking, inbox, workspace });
   sweepTemporaryFiles();
   handle('app:status', status);
   handle('library:list', () => workspace().listProjects());

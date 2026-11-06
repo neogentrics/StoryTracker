@@ -19,6 +19,32 @@ Neither app has user accounts. The owner's choices so far:
 Those rules are **App Link**, in `docs/app-link.md` in the `rt-markdown-reader` repo (protocol version 1, on branch
 `feature/v3.6`). This page says how StoryTracker uses it, what it needs added, and how pairing and sync should work.
 
+## As built in 3.7
+
+StoryTracker's side of everything on this page down to [Keeping a file in step](#keeping-a-file-in-step-optional-sync), with
+these differences:
+
+- **`src/main/app-link.js` is RT Markdown Reader's own file** with this app's name in it. Both are read the same way, so a
+  fix in one belongs in the other.
+- **As what:** only a new chapter so far, or several if the document has chapter headings. Records, lore pages, ideas and
+  research arrive with those features in v3.8 onwards.
+- **The inbox is `Documents Sent Here`.** On the library screen a document waits with a note. A project that opens,
+  locked or not, offers it.
+- **Pictures come in, not out.** StoryTracker takes the optional `attachments` list in `open_document` and keeps pictures
+  with the book. Sending them the other way would mean decrypting them to plain files for an app that ignores the field,
+  so that waits until RT Markdown Reader reads it.
+- **`kind` is accepted and ignored** until there's more than one kind.
+- **Starting the other app.** Open in RT Markdown Reader looks where its installers put it, and if it can't be found it
+  says so rather than opening some other editor. An AppImage can't be found this way, but works once linked and running.
+- **The plain copy** for the no-link road lasts until the app closes, because the other app may still be reading it. It
+  goes at once if the project is locked, and is swept at the next start if the app stopped first.
+
+Tested in `test/link.test.cjs` and `test/e2e/link.e2e.cjs`, and by hand against RT Markdown Reader 3.10 from source: found,
+linked, a chapter sent over, a document sent back with its own *Send to Linked App*, and a file handed over with no link.
+
+**Still needed in RT Markdown Reader:** a *Send to StoryTracker* that works with no link. Today it sends only to a linked
+app, so with no link the way in is Open With. See the list at the end of this page.
+
 ## What App Link version 1 already gives us
 
 Read from `feature/v3.6` (commit `da9a6fa`) on 4 November 2026. RT Markdown Reader's side is built and tested on that
