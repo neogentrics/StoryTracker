@@ -35,16 +35,16 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.5](#v35--find-my-files) | Find my files | ✅ Released ([3.5.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.5.0)) |
 | [v3.6](#v36--password-lock) | Password lock | ✅ Released ([3.6.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.6.0)) |
 | [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | 🚧 Released as 3.7.0, being tested by the owner |
-| [v3.8](#v38--records) | Records | Planned |
-| [v3.9](#v39--versions-of-a-record) | Versions of a record | Planned |
-| [v3.10](#v310--timeline-and-places) | Timeline and places | Planned |
-| [v3.11](#v311--lore-ideas-research-dictionaries) | Lore, ideas, research, dictionaries | Planned |
-| [v3.12](#v312--where-every-book-stands) | Where every book stands | Planned |
-| [v3.13](#v313--claude-and-ai) | Claude and AI | Planned |
-| [v3.14](#v314--leaving-notion) | Leaving Notion | Planned |
-| [v3.15](#v315--two-computers) | Two computers | Planned |
-| [v3.16](#v316--files-kept-in-step) | Files kept in step | Planned |
-| [v3.17](#v317--the-recon-towers-suite) | The Recon Towers suite | Planned |
+| [v3.8](#v38--the-recon-towers-suite) | The Recon Towers suite | Planned |
+| [v3.9](#v39--records) | Records | Planned |
+| [v3.10](#v310--versions-of-a-record) | Versions of a record | Planned |
+| [v3.11](#v311--timeline-and-places) | Timeline and places | Planned |
+| [v3.12](#v312--lore-ideas-research-dictionaries) | Lore, ideas, research, dictionaries | Planned |
+| [v3.13](#v313--where-every-book-stands) | Where every book stands | Planned |
+| [v3.14](#v314--claude-and-ai) | Claude and AI | Planned |
+| [v3.15](#v315--leaving-notion) | Leaving Notion | Planned |
+| [v3.16](#v316--two-computers) | Two computers | Planned |
+| [v3.17](#v317--files-kept-in-step) | Files kept in step | Planned |
 | [v3.18](#v318--pictures-and-tables-on-the-page) | Pictures and tables on the page | Planned |
 | [v3.19](#v319--hear-it-and-say-it) | Hear it and say it | Planned |
 | [v3.20](#v320--find-your-way-around) | Find your way around | Planned |
@@ -194,7 +194,24 @@ for release.
 **Test:** send a document each way, with and without a link, and with a locked project. **Passed** on 2026-11-05, in the
 app's own tests and against RT Markdown Reader 3.10 from source.
 
-## v3.8 — Records
+## v3.8 — The Recon Towers suite
+
+🙋 The apps know each other when they're installed, not only when they're running. Built to
+[the suite's rules](https://github.com/neogentrics/rt-markdown-reader/blob/main/docs/app-suite.md), not a second set.
+
+| Feature | Size | Details |
+|---|:-:|---|
+| 🙋 Installed list | S | Each app leaves a small file saying it's installed and how to start it, and removes it when it's uninstalled. Replaces the guessing in Open in RT Markdown Reader. |
+| 🙋 Apps panel | M | The same panel in every app: which Recon Towers apps are on this computer, which are running, and which are linked. It offers to link one or open one. Finding an app never links it. |
+| 🙋 What it's doing | S | A linked app can ask for a short status, such as what's open. A locked project says nothing about itself, and no writing is ever in the answer. |
+| 🙋 Asking for facts | M | A linked app can ask for what this one owns: word counts, draft status, dictionary pronunciations. This app can ask RT Author Desk for a book's published facts. |
+| 🙋 Publish through RT Markdown Reader | S | Sending to WordPress, Ghost, Discord and wikis stays in RT Markdown Reader. This app hands it the chapter over App Link, and doesn't build its own. Never a locked project. |
+| Automations | M | Webhooks and n8n can start an export or a backup, or add a note to a project. Off until you turn it on, and locked projects stay out. |
+
+**Test:** install each app on a clean computer, in either order, and each finds the other. Uninstall one and it goes from
+the list. Status from a locked project says nothing.
+
+## v3.9 — Records
 
 🙋 Where the story bible begins: characters, and anything else an author wants to track.
 
@@ -211,7 +228,7 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 
 **Test:** load every dossier, then find any character faster than in Notion. A new author can set up a plain novel.
 
-## v3.9 — Versions of a record
+## v3.10 — Versions of a record
 
 🙋 What a record said as of each book, for authors who need it. Off in the simple templates.
 
@@ -225,7 +242,7 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 
 **Test:** freeze a version, try to edit it, and print a set without the author-only part.
 
-## v3.10 — Timeline and places
+## v3.11 — Timeline and places
 
 🙋 One timeline across every series, on your own calendar.
 
@@ -238,7 +255,7 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 
 **Test:** load the Master Timeline and Locations, and check them against Notion.
 
-## v3.11 — Lore, ideas, research, dictionaries
+## v3.12 — Lore, ideas, research, dictionaries
 
 🙋 Everything else a story needs.
 
@@ -255,13 +272,13 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 
 **Test:** load the Universe Bible, Races and Research Library, and find a fact by search alone.
 
-## v3.12 — Where every book stands
+## v3.13 — Where every book stands
 
 🙋 The Book Catalog and Works in Progress, kept current by the work itself.
 
 | Feature | Size | Details |
 |---|:-:|---|
-| 🙋 Book catalog | M | Writing status and series live here. Published editions, formats, dates and store links are RT Author Desk's, shown here once it exists. Until then they're typed in here. See [decision 18](docs/decisions.md). |
+| 🙋 Book catalog | M | Writing status and series live here. Published editions, formats, dates and store links are RT Author Desk's, shown here once it exists. Until then they're typed in here. |
 | 🙋 What's left | M | One view of every book: words, chapters done, what's next. It updates itself. |
 | 🙋 To-dos | S | Per book or project, and in the text. |
 | Reading order | S | Publication order and timeline order, side by side. |
@@ -269,7 +286,7 @@ app's own tests and against RT Markdown Reader 3.10 from source.
 
 **Test:** Works in Progress can be retired, because this view says the same thing on its own.
 
-## v3.13 — Claude and AI
+## v3.14 — Claude and AI
 
 🙋 Must be in the app, with settings for how far it goes. Follows RT Markdown Reader's connector and AI services. AI is an
 add-on: it's off until you turn it on, and the app is complete without it.
@@ -286,7 +303,7 @@ add-on: it's off until you turn it on, and the app is complete without it.
 **Test:** a Claude session finds a dossier, suggests an edit, and it appears as a change to accept, then at each other
 level. Proofread a selection with a local model, with the computer offline.
 
-## v3.14 — Leaving Notion
+## v3.15 — Leaving Notion
 
 🙋 The goal. Everything is ready, so now it moves.
 
@@ -299,7 +316,7 @@ level. Proofread a selection with a local model, with the computer offline.
 
 **Test:** a month of story work with Notion closed, and nothing missing.
 
-## v3.15 — Two computers
+## v3.16 — Two computers
 
 🙋 Same work on a desktop and a laptop, with no account.
 
@@ -312,7 +329,7 @@ level. Proofread a selection with a local model, with the computer offline.
 
 **Test:** change different things on two computers offline, reconnect, and check both. Then change the same chapter.
 
-## v3.16 — Files kept in step
+## v3.17 — Files kept in step
 
 🙋 Optional sync of a file with RT Markdown Reader. Needs App Link version 2.
 
@@ -320,27 +337,9 @@ level. Proofread a selection with a local model, with the computer offline.
 |---|:-:|---|
 | 🙋🛡️ Linked files | M | A chapter or record tied to one Markdown file, per item. Off in locked projects. |
 | 🙋 Changes to accept | M | A change in the file shows up as something to accept or reject. |
-| RT Markdown Reader on another computer | M | Using the same pairing as v3.15. |
+| RT Markdown Reader on another computer | M | Using the same pairing as v3.16. |
 
 **Test:** edit in each app, then in both at once. Comments in StoryTracker survive an edit from the file.
-
-## v3.17 — The Recon Towers suite
-
-🙋 The apps know each other when they're installed, not only when they're running. Built to
-[the suite's rules](https://github.com/neogentrics/rt-markdown-reader/blob/main/docs/app-suite.md), not a second set. Which
-release this should really be is [decision 24](docs/decisions.md).
-
-| Feature | Size | Details |
-|---|:-:|---|
-| 🙋 Installed list | S | Each app leaves a small file saying it's installed and how to start it, and removes it when it's uninstalled. Replaces the guessing in Open in RT Markdown Reader. |
-| 🙋 Apps panel | M | The same panel in every app: which Recon Towers apps are on this computer, which are running, and which are linked. It offers to link one or open one. Finding an app never links it. |
-| 🙋 What it's doing | S | A linked app can ask for a short status, such as what's open. A locked project says nothing about itself, and no writing is ever in the answer. |
-| 🙋 Asking for facts | M | A linked app can ask for what this one owns: word counts, draft status, dictionary pronunciations. This app can ask RT Author Desk for a book's published facts. |
-| 🙋 Publish through RT Markdown Reader | S | Sending to WordPress, Ghost, Discord and wikis stays in RT Markdown Reader. This app hands it the chapter over App Link, and doesn't build its own. Never a locked project. |
-| Automations | M | Webhooks and n8n can start an export or a backup, or add a note to a project. Off until you turn it on, and locked projects stay out. |
-
-**Test:** install each app on a clean computer, in either order, and each finds the other. Uninstall one and it goes from
-the list. Status from a locked project says nothing.
 
 ## v3.18 — Pictures and tables on the page
 
