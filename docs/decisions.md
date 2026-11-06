@@ -99,9 +99,9 @@ App Link should be the first.
 
 ### 15. The name
 
-✅ **Chosen 4 November 2026: RT Story Tracker.** The App Link id stays `storytracker`, and the file extension stays `.rtstory`. The repo keeps its name until he says otherwise.
+✅ **Chosen 4 November 2026: RT Story Tracker.** On 6 November he asked for the repo and the App Link id to follow, so both are `rt-story-tracker`. The file extension stays `.rtstory`, and the system's app id stays `com.recontowers.storytracker`, so updates keep working.
 
-The suite's pattern is *RT something*. The repo is `StoryTracker` and App Link's id is `storytracker`.
+The suite's pattern is *RT something*.
 
 | Choice | Note |
 |---|---|
@@ -136,13 +136,23 @@ needs an Apple Developer membership and has to go through Apple's store.
 
 *Recommendation:* **Leave it for later.** Android and Chromebooks first.
 
-### 18. Marketing and royalties (before v3.12)
+### 18. Marketing and royalties
+
+✅ **Chosen 6 November 2026: They move to RT Author Desk.**
+
+[The suite's plan](https://github.com/neogentrics/rt-markdown-reader/blob/main/docs/app-suite.md) gives these to a new app, RT Author Desk, along with published editions, ISBNs, prices and store links.
 
 His answer on book tracking takes in the Book Catalog and Works in Progress. Notion also holds Marketing & Launches and
 Sales & Royalties under Business Ops, which he's kept apart from the stories.
 
-*Recommendation:* **Keep them out for now.** The stories and the business stay separate, as he set up. Revisit if other
-authors ask.
+| Thing | Home | What this app does |
+|---|---|---|
+| Marketing, launches, royalties, accounts | RT Author Desk | Nothing. It's off this roadmap's Later list. |
+| Published editions, formats, dates, store links | RT Author Desk | v3.13's catalog shows them, read over App Link |
+| Writing status, word counts, what's left | This app | Keeps them, and Author Desk shows them |
+
+It's what he already set up: stories and business apart. Until Author Desk exists, v3.13's catalog lets him type the
+published facts in, and they move across when it arrives.
 
 ### 19. Recovery defaults (before v3.6)
 
@@ -155,7 +165,7 @@ authors ask.
 ✅ **Built in 3.6 as recommended.** The warning turned out not to be needed: the password and the recovery key can only be
 replaced, never removed, so a locked project always has at least two.
 
-### 20. How Notion ends (before v3.14)
+### 20. How Notion ends (before v3.15)
 
 | Choice | In short |
 |---|---|
@@ -166,7 +176,7 @@ replaced, never removed, so a locked project always has at least two.
 Claude sessions today read and update Notion constantly, and other work depends on that, so the change has to be planned.
 Those habits are written in his Claude memory, and need changing at the switch.
 
-*Recommendation:* **One area at a time,** starting when v3.13 is out.
+*Recommendation:* **One area at a time,** starting when v3.14 is out.
 
 ### 21. Licence (before v3.0)
 
@@ -175,6 +185,29 @@ Those habits are written in his Claude memory, and need changing at the switch.
 The repo has no licence. RT Markdown Reader is proprietary, with public source.
 
 *Recommendation:* **The same as RT Markdown Reader.** It's the suite's pattern.
+
+### 24. Where the new releases go
+
+✅ **Chosen 6 November 2026: The suite first.**
+
+Comparing this roadmap with RT Markdown Reader added four releases. The suite became v3.8, because Author Desk, RT Press and
+RT Audio Studio are being planned to it. Records and what follows moved up by one, to v3.9 to v3.17. Pictures and tables,
+read aloud and dictation, and finding your way around are v3.18 to v3.20.
+
+### 25. Which app keeps which export
+
+✅ **Chosen 6 November 2026: This app keeps its exports.**
+
+RT Press starts from this app's book layouts and EPUB work and goes further, for designed print interiors and cover wraps.
+This app keeps its print PDF and EPUB, and Press shares the layout code rather than copying it.
+
+| Choice | In short |
+|---|---|
+| **This app keeps its exports** | Anyone can still get a print PDF and an EPUB with no second app. Press adds design on top. Two places to maintain. |
+| **Press takes print, this app keeps the rest** | Word, Markdown and EPUB stay here. Print PDFs move to Press. One home for print, but print then needs a second app. |
+| **Press takes all of it** | The cleanest split, but this app stops being complete by itself, which goes against the suite's promises. |
+
+Every app in the suite is meant to stand alone, and nobody should need a second app to get a book out.
 
 ## The order, and where to start
 
@@ -187,7 +220,7 @@ The roadmap puts writing first, because that's his main reason for the app.
 | Choice | In short |
 |---|---|
 | **Writing first, as written** | v3.0 to v3.7 make it a real writing app; records and Notion come after. |
-| **Records sooner** | Move v3.8 to v3.12 ahead of v3.4 to v3.7. Reaches Notion's replacement sooner, while importing and the lock wait. |
+| **Records sooner** | Move v3.9 to v3.13 ahead of v3.4 to v3.7. Reaches Notion's replacement sooner, while importing and the lock wait. |
 | **RT Markdown Reader link sooner** | Move v3.7 up to right after v3.3. It's small, and RT Markdown Reader is ready for it first. |
 
 *Recommendation:* **Writing first, as written.** Moving the link up is also fine, as it doesn't disturb anything else.

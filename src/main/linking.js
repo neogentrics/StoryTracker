@@ -11,7 +11,8 @@ const { exportFile, safeName } = require('./export');
 const { writeFileSafely } = require('./storage/keys');
 
 const READER_ID = 'rt-markdown-reader';
-const LINKS_FILE = 'links.bin';
+const LINKS_FILE = 'app-links.bin';
+const OLD_LINKS_FILE = 'links.bin';
 const SENT_FOLDER = /^rtst-send-[0-9a-f]{16}$/;
 const LOCKED_WORDS = 'A locked project is never sent to another app. Take the password off first if you want to.';
 const NOT_FOUND_WORDS = 'RT Markdown Reader isn’t on this computer, or it’s somewhere this app can’t find. If it’s running, link the two in Preferences.';
@@ -37,6 +38,8 @@ class Linking {
   constructor({ workspace, settings, vault, inbox, root, home, dataDir, version, ask, places = readerPlaces, launch = launchReader, tempDir = os.tmpdir() }) {
     Object.assign(this, { workspace, settings, vault, inbox, root, home, dataDir, version, ask, places, launch, tempDir });
     this.file = path.join(root, LINKS_FILE);
+    // Links made under this app's old App Link id can't work, so they go, and the app offers to link again.
+    fs.rmSync(path.join(root, OLD_LINKS_FILE), { force: true });
     this.memory = null;
     this.server = null;
     this.sentFolder = null;

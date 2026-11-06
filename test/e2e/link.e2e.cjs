@@ -54,18 +54,18 @@ const answerYes = (app) => app.evaluate(({ dialog }) => { dialog.showMessageBox 
   await window.keyboard.type('It began on the road.');
 
   // Off until it's turned on: there's nothing to find.
-  assert.equal(fs.existsSync(path.join(shared, 'storytracker.json')), false);
+  assert.equal(fs.existsSync(path.join(shared, 'rt-story-tracker.json')), false);
   await menu(app, 'preferences');
   await window.waitForSelector('#preferences[open]');
   await window.check('#pref-link');
   await window.waitForSelector('[aria-label="Link RT Markdown Reader"]');
-  assert.ok(fs.existsSync(path.join(shared, 'storytracker.json')));
+  assert.ok(fs.existsSync(path.join(shared, 'rt-story-tracker.json')));
   await window.click('[aria-label="Link RT Markdown Reader"]');
   await window.waitForSelector('[aria-label="Remove the link to RT Markdown Reader"]');
   await window.click('#pref-close');
 
   // RT Markdown Reader sends a document, and it's offered, not filed.
-  await reader.send('storytracker', { name: 'Chapter 12.md', text: '# Chapter 12\n\nThe tide came in.\n' });
+  await reader.send('rt-story-tracker', { name: 'Chapter 12.md', text: '# Chapter 12\n\nThe tide came in.\n' });
   await window.waitForSelector('#inbox[open]');
   assert.match(await window.textContent('#inbox-title'), /RT Markdown Reader sent “Chapter 12\.md”/);
   assert.equal(await window.locator('#chapter-list .row').count(), 1);
@@ -75,7 +75,7 @@ const answerYes = (app) => app.evaluate(({ dialog }) => { dialog.showMessageBox 
   await window.waitForFunction(() => document.querySelector('.ProseMirror').textContent.includes('The tide came in'));
 
   // Not now leaves it waiting, and Throw away ends it.
-  await reader.send('storytracker', { name: 'Maybe.md', text: 'Perhaps later.' });
+  await reader.send('rt-story-tracker', { name: 'Maybe.md', text: 'Perhaps later.' });
   await window.waitForSelector('#inbox[open]');
   await window.click('#inbox-later');
   await window.waitForSelector('#inbox', { state: 'detached' });
@@ -106,9 +106,9 @@ const answerYes = (app) => app.evaluate(({ dialog }) => { dialog.showMessageBox 
   fs.writeFileSync(picture, PNG);
   await window.click('#open-library');
   await window.waitForSelector('.project-row');
-  const key = links.storytracker.key;
+  const key = links['rt-story-tracker'].key;
   const { call } = require('../../src/main/app-link');
-  const { endpoint } = JSON.parse(fs.readFileSync(path.join(shared, 'storytracker.json'), 'utf8'));
+  const { endpoint } = JSON.parse(fs.readFileSync(path.join(shared, 'rt-story-tracker.json'), 'utf8'));
   await call(endpoint, 'open_document', { app: 'rt-markdown-reader', key, name: 'Maps.md', text: 'See the map.', attachments: [{ name: 'map.png', path: picture }] });
   await window.waitForSelector('#inbox-note');
   assert.match(await window.textContent('#inbox-note'), /Maps\.md/);
@@ -139,7 +139,7 @@ const answerYes = (app) => app.evaluate(({ dialog }) => { dialog.showMessageBox 
 
   await menu(app, 'lock');
   await window.waitForSelector('#lock-screen');
-  await reader.send('storytracker', { name: 'For the locked one.md', text: 'Held in memory.' });
+  await reader.send('rt-story-tracker', { name: 'For the locked one.md', text: 'Held in memory.' });
   await new Promise((resolve) => { setTimeout(resolve, 500); });
   assert.equal(await window.locator('#inbox').count(), 0, 'nothing is offered behind the lock');
   await window.fill('#lock-password', PASSWORD);
