@@ -54,6 +54,7 @@ function setUp(t, { vault = fakeVault(), on = true, ask = async () => true, plac
   const peer = async ({ ask: peerAsk = async () => true } = {}) => {
     let links = {};
     const documents = [];
+    fs.mkdirSync(path.join(dir, 'reader'), { recursive: true });
     const app = new AppLink({
       folder,
       dataDir: path.join(dir, 'reader'),

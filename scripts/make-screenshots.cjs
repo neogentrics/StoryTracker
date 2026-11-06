@@ -307,6 +307,7 @@ const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   // A document from RT Markdown Reader, played here by App Link's own code.
   let links = {};
+  fs.mkdirSync(path.join(profile, 'reader'), { recursive: true });
   const reader = new AppLink({
     folder: process.env.NMR_LINK_DIR,
     dataDir: path.join(profile, 'reader'),

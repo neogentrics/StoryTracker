@@ -1,25 +1,25 @@
 {
   "now": {
-    "title": "v3.7: RT Markdown Reader, on this computer",
-    "note": "Built, and tested against the real RT Markdown Reader. Waiting for CI and your word to release.",
+    "title": "3.7.0: RT Markdown Reader, on this computer",
+    "note": "Released. Tested both ways against the real RT Markdown Reader.",
     "items": [
       {
-        "title": "Send to StoryTracker",
-        "text": "A document from RT Markdown Reader lands in a small window: where it goes, and as what. Nothing is filed by itself."
+        "title": "Link the two apps",
+        "text": "Turn on Linked apps in Preferences in both, then link them once. Send a document across each way."
       },
       {
-        "title": "Open in RT Markdown Reader",
-        "text": "A chapter or a book opens there as a copy."
+        "title": "Still to come on its side",
+        "text": "RT Markdown Reader sends only to a linked app so far, and doesn’t read pictures yet."
       },
       {
-        "title": "Link once",
-        "text": "The two apps find each other and you approve once. Off until you turn it on. A locked project is never sent."
+        "title": "Still open from earlier",
+        "text": "Your own test of the lock and of Find my files, a real Word manuscript, Pages on a Mac, and a real Scrivener project."
       }
     ]
   },
   "waiting": {
     "title": "A test and {decisions} decisions",
-    "text": "A power cut during a lock is simulated, not tested for real, and the decisions below. None of them hold up 3.6."
+    "text": "A power cut during a lock is simulated, not tested for real, and the decisions below. None of them hold up 3.7."
   },
   "questions": [
     {

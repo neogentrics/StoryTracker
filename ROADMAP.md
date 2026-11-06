@@ -34,7 +34,7 @@ losing anything, and pass its automated tests on Windows, Mac and Linux.
 | [v3.4](#v34--bring-it-in) | Bring it in | ✅ Released ([3.4.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.4.0)) |
 | [v3.5](#v35--find-my-files) | Find my files | ✅ Released ([3.5.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.5.0)) |
 | [v3.6](#v36--password-lock) | Password lock | ✅ Released ([3.6.0](https://github.com/neogentrics/StoryTracker/releases/tag/v3.6.0)) |
-| [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | 🚧 Built, in review |
+| [v3.7](#v37--rt-markdown-reader-on-this-computer) | RT Markdown Reader, on this computer | 🚧 Released as 3.7.0, being tested by the owner |
 | [v3.8](#v38--records) | Records | Planned |
 | [v3.9](#v39--versions-of-a-record) | Versions of a record | Planned |
 | [v3.10](#v310--timeline-and-places) | Timeline and places | Planned |

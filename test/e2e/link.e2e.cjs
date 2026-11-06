@@ -32,6 +32,7 @@ const answerYes = (app) => app.evaluate(({ dialog }) => { dialog.showMessageBox 
 (async () => {
   let links = {};
   const received = [];
+  fs.mkdirSync(path.join(work, 'reader'));
   const reader = new AppLink({
     folder: shared,
     dataDir: path.join(work, 'reader'),
